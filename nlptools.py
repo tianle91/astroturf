@@ -38,8 +38,8 @@ def get_ner_tokens(s):
         if not s.startswith('[') and not s.endswith(']')
     ]
 
-def is_hit(ner, entity_name_tokenized):
-    ner_wordlist = [d['word'].lower() for d in ner]
+def is_hit(ner_result, entity_name_tokenized):
+    ner_wordlist = [d['word'].lower() for d in ner_result]
     return all(token in ner_wordlist for token in entity_name_tokenized)
 
 get_ner = wrap_assert(pipeline("ner"))
