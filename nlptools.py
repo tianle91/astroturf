@@ -1,3 +1,6 @@
+# https://huggingface.co/transformers/usage.html#named-entity-recognition
+# https://github.com/huggingface/transformers/blob/master/src/transformers/pipelines.py#L1604
+
 from transformers.pipelines import SUPPORTED_TASKS
 from transformers import AutoTokenizer
 from transformers import pipeline
@@ -16,17 +19,18 @@ def get_ner_tokens(s):
     targeted_task = SUPPORTED_TASKS['ner']
 
     # https://github.com/huggingface/transformers/blob/master/src/transformers/pipelines.py#L1681
-    task_class, model_class = targeted_task["impl"], targeted_task[framework]
+    #task_class, model_class = targeted_task["impl"], targeted_task[framework]
     model = targeted_task["default"]["model"][framework]
 
     tokenizer = model
     # Instantiate tokenizer if needed
     if isinstance(tokenizer, (str, tuple)):
-        if isinstance(tokenizer, tuple):
-            # For tuple we have (tokenizer name, {kwargs})
-            tokenizer = AutoTokenizer.from_pretrained(tokenizer[0], **tokenizer[1])
-        else:
-            tokenizer = AutoTokenizer.from_pretrained(tokenizer)
+        # if isinstance(tokenizer, tuple):
+        #     # For tuple we have (tokenizer name, {kwargs})
+        #     #tokenizer = AutoTokenizer.from_pretrained(tokenizer[0], **tokenizer[1])
+        #     pass
+        # else:
+        tokenizer = AutoTokenizer.from_pretrained(tokenizer)
     
     # encode -> tokens
     return [
