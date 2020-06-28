@@ -11,3 +11,10 @@ This means learning how and when a user comments.
 Problems:
 1. Sentiment of comment is not necessarily sentiment towards entity.
 2. Hit-rate of entities with common usage is low. E.g. Uber (the company) is not uber (the adjective).
+
+# simulate
+
+To-do:
+1. Get all comments by user.
+2. Simulate when response occurs.
+3. Simulate content of respons.
