@@ -5,3 +5,9 @@ For each user, we score the sentiments of comments that mention that entity as w
 
 We then learn that user's overall commenting pattern and simulate a distinct user independent of that user.
 This means learning how and when a user comments.
+
+# sentiment
+
+Problems:
+1. Sentiment of comment is not necessarily sentiment towards entity.
+2. Hit-rate of entities with common usage is low. E.g. Uber (the company) is not uber (the adjective).
