@@ -70,8 +70,7 @@ if __name__ == '__main__':
 
     # args for user.comments.new()
     # https://praw.readthedocs.io/en/latest/code_overview/other/listinggenerator.html#praw.models.ListingGenerator
-    # limit – default 100, max 1000
-    
+    # limit – default 100, max 1000    
     i = 0
     for comment in user.comments.new(limit=limit):
         print ('[{}/{}] id: {}, body: {}'.format(
