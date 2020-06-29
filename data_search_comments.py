@@ -9,8 +9,6 @@ from datetime import datetime
 def clean_string(s):
     return ''.join([c if c.isalnum() else '_' for c in s])
 
-# get_ipython().system('gsutil -m rsync -r data/search/comment gs://astroturf-dev/search/comment')
-
 if __name__ == '__main__':
 
     import argparse
@@ -53,3 +51,5 @@ if __name__ == '__main__':
             query=entity_name,
             utciso=utciso, 
         ))
+
+    # get_ipython().system('gsutil -m rsync -r data/search/comment gs://astroturf-dev/search/comment')
