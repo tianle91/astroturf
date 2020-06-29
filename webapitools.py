@@ -5,4 +5,4 @@ def get_entity_mentions(entity_name, size=None):
 		qterm=entity_name,
 		size=size if size is not None else 25
 	)
-    return requests.get(q).json()['data']
+	return requests.get(q).json()['data']
