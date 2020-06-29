@@ -52,4 +52,4 @@ if __name__ == '__main__':
             utciso=utciso, 
         ))
 
-    # get_ipython().system('gsutil -m rsync -r data/search/comment gs://astroturf-dev/search/comment')
+    # !gsutil -m rsync -r data/search/comment gs://astroturf-dev/search/comment

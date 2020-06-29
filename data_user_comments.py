@@ -92,4 +92,4 @@ if __name__ == '__main__':
             with open(os.path.join(outpath, '{}.json'.format(comment.id)), 'w+') as f:
                 json.dump(package, f, indent=4)
 
-    # get_ipython().system('gsutil -m rsync -r data/user gs://astroturf-dev/user')
+    # !gsutil -m rsync -r data/user gs://astroturf-dev/user
