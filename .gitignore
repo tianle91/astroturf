@@ -133,4 +133,4 @@ praw.ini
 
 # data
 data/*
-
+finetune/*
