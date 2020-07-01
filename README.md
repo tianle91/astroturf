@@ -29,3 +29,24 @@ Some example patterns that I found on twitter are...
 - bots constantly replying to #MAGA or @AOC within 1 minute
 - bots following everyone that follows @AOC, @realDonaldTrump, etc.
 - bots following other bots
+
+# technical
+
+```
+data
+|- search
+|  |- comment
+|     |- q=...
+|        |- *.json: comments returned from query
+|- user
+|  |- *
+|  |  |- *.json: user comments
+```
+
+```
+finetune
+|- user
+|  |- data
+|  |  |- train.txt, valid.txt, eval.txt
+|  |- model
+```
