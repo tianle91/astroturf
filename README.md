@@ -37,10 +37,10 @@ data
 |- search
 |  |- comment
 |     |- q=...
-|        |- *.json: comments returned from query
+|        |- {comment_id}.json: comments returned from query
 |- user
-|  |- *
-|  |  |- *.json: user comments
+|  |- {username}
+|  |  |- {comment_id}.json: user comments
 ```
 
 ```
