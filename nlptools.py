@@ -15,25 +15,13 @@ def wrap_assert(f):
     return newf
 
 def get_ner_tokens(s):
-    framework='pt'
-    targeted_task = SUPPORTED_TASKS['ner']
-
     # https://github.com/huggingface/transformers/blob/master/src/transformers/pipelines.py#L1681
-    #task_class, model_class = targeted_task["impl"], targeted_task[framework]
-    model = targeted_task["default"]["model"][framework]
-
-    tokenizer = model
-    # Instantiate tokenizer if needed
-    if isinstance(tokenizer, (str, tuple)):
-        # if isinstance(tokenizer, tuple):
-        #     # For tuple we have (tokenizer name, {kwargs})
-        #     #tokenizer = AutoTokenizer.from_pretrained(tokenizer[0], **tokenizer[1])
-        #     pass
-        # else:
-        tokenizer = AutoTokenizer.from_pretrained(tokenizer)
-    
-    # encode -> tokens
+    framework='pt'
+    tokenizer = AutoTokenizer.from_pretrained(
+    	SUPPORTED_TASKS['ner']["default"]["model"][framework]
+    )
     return [
+    	# encode -> tokens
         s for s in tokenizer.convert_ids_to_tokens(tokenizer.encode(s)) 
         if not s.startswith('[') and not s.endswith(']')
     ]
@@ -44,3 +32,7 @@ def is_hit(ner_result, entity_name_tokenized):
 
 get_ner = wrap_assert(pipeline("ner"))
 get_sentiment = wrap_assert(pipeline("sentiment-analysis"))
+
+if __name__ == '__main__':
+    assert get_ner_tokens('uber') == ['u', '##ber'], 'failed get_ner_tokens'
+    assert is_hit(ner_result=get_ner('I love taking Uber around the city!'), entity_name_tokenized=['u', '##ber']), 'failed is_hit'
