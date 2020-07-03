@@ -36,7 +36,7 @@ Some example patterns that I found on twitter are...
 data
 |- search
 |  |- comment
-|     |- q=...
+|     |- q={query}
 |        |- {comment_id}.json: comments returned from query
 |- user
 |  |- {username}
