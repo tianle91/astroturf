@@ -127,3 +127,16 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# config
+praw.ini
+
+# data
+data/*
+finetune/*
+
+# tensorboard
+runs/*
+
+# lint
+.DS_Store
