@@ -40,7 +40,7 @@ data
 |        |- {comment_id}.json: comments returned from query
 |- user
 |  |- {username}
-|  |  |- {comment_id}.json: user comments and comment context
+|     |- {comment_id}.json: user comments and comment context
 
 gsutil -m rsync -r data/search gs://astroturf-dev/data/search
 gsutil -m rsync -r data/user gs://astroturf-dev/data/user
