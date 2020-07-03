@@ -41,6 +41,9 @@ data
 |- user
 |  |- {username}
 |  |  |- {comment_id}.json: user comments
+
+gsutil -m rsync -r data/search gs://astroturf-dev/data/search
+gsutil -m rsync -r data/user gs://astroturf-dev/data/user
 ```
 
 ```
@@ -49,4 +52,6 @@ finetune
 |  |- data
 |  |  |- train.txt, valid.txt, eval.txt
 |  |- model
+
+gsutil -m rsync -r finetune gs://astroturf-dev/finetune/
 ```
