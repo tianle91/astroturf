@@ -48,7 +48,7 @@ gsutil -m rsync -r data/user gs://astroturf-dev/data/user
 
 ```
 finetune
-|- user
+|- {username}
 |  |- data
 |  |  |- train.txt, valid.txt, eval.txt
 |  |- model
