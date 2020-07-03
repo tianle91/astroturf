@@ -91,5 +91,3 @@ if __name__ == '__main__':
                 f.write('{}, {}\n'.format(comment.id, datetime.utcnow().isoformat()))
             with open(os.path.join(outpath, '{}.json'.format(comment.id)), 'w+') as f:
                 json.dump(package, f, indent=4)
-
-    # !gsutil -m rsync -r data/user gs://astroturf-dev/user

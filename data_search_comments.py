@@ -51,5 +51,3 @@ if __name__ == '__main__':
             query=entity_name,
             utciso=utciso, 
         ))
-
-    # !gsutil -m rsync -r data/search/comment gs://astroturf-dev/search/comment
