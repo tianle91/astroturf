@@ -1,0 +1,1 @@
+gsutil -m rsync -r data/user gs://astroturf-dev/data/user

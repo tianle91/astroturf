@@ -32,26 +32,21 @@ Some example patterns that I found on twitter are...
 
 # technical
 
-```
-data
-|- search
-|  |- comment
-|     |- q={query}
-|        |- {comment_id}.json: comments returned from query
-|- user
-|  |- {username}
-|     |- {comment_id}.json: user comments and comment context
-
-gsutil -m rsync -r data/search gs://astroturf-dev/data/search
-gsutil -m rsync -r data/user gs://astroturf-dev/data/user
-```
+Directory structure
 
 ```
-finetune
-|- {username}
-|  |- data
-|  |  |- train.txt, valid.txt, eval.txt
-|  |- model
-
-gsutil -m rsync -r finetune gs://astroturf-dev/finetune/
+root or <gs://astroturf-dev/>
+|- data
+|  |- search
+|  |  |- comment
+|  |     |- q={query}
+|  |        |- {comment_id}.json: comments returned from query
+|  |- user
+|     |- {username}
+|        |- {comment_id}.json: user comments and comment context
+|- finetune
+    |- {username}
+       |- data
+       |  |- train.txt, valid.txt, eval.txt
+       |- model
 ```
