@@ -56,31 +56,34 @@ def write_to_text(fnames, outputfname, verbose=1):
 
 # training part
 
-def get_dataset(file_path, tokenizer: PreTrainedTokenizer):
+def get_dataset(file_path, tokenizer: PreTrainedTokenizer, block_size: int=None):
     return TextDataset(
-        tokenizer=tokenizer, 
-        file_path=file_path, 
-        #block_size=tokenizer.max_len, 
-        block_size=128,
-        overwrite_cache=True,
+        tokenizer = tokenizer, 
+        file_path = file_path, 
+        block_size = block_size if block_size is not None else tokenizer.max_len,
+        overwrite_cache = True,
     )
 
 if __name__ == '__main__':
 
     import argparse
     parser = argparse.ArgumentParser(description='finetune on user comments.')
-    parser.add_argument('--input', type=str, default='data/user/suncoasthost')
-    parser.add_argument('--output', type=str, default='finetune/suncoasthost')
+    parser.add_argument('--inputpath', type=str, default='data/user/suncoasthost')
+    # gtx1080ti: blocksize 512
+    parser.add_argument('--blocksize', type=int, default=None)
+    parser.add_argument('--outputpath', type=str, default='finetune/suncoasthost')
     args = parser.parse_args()
 
-    gpt2pretrainedstr = "gpt2"
-    tokenizer = GPT2Tokenizer.from_pretrained(gpt2pretrainedstr)
-    model = GPT2LMHeadModel.from_pretrained(gpt2pretrainedstr)
+    print ('inputpath: {}\nblocksize: {}\noutputpath: {}'.format(args.inputpath, args.blocksize, args.outputpath))
+
+    tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+    model = GPT2LMHeadModel.from_pretrained("gpt2")
     eos = tokenizer.eos_token
 
     # model data
 
     fnames = glob(os.path.join(args.inputpath, '*.json'))
+    assert len(fnames) > 0, 'check inputpath: {} is not empty!'.format(args.inputpath)
     valid_prop = .1
     shuffled_indices = list(np.random.choice(range(len(fnames)), len(fnames), replace=False))
     valid_size = max(1, int(valid_prop*len(fnames)))
@@ -90,7 +93,7 @@ if __name__ == '__main__':
     fnames_valid = fnames_shuffled[valid_size:2*valid_size]
     fnames_train = fnames_shuffled[2*valid_size:]
 
-    modeldatapath = os.path.join(args.output, 'data')
+    modeldatapath = os.path.join(args.outputpath, 'data')
     os.makedirs(modeldatapath, exist_ok=True)
 
     file_path_train = os.path.join(modeldatapath, 'train.txt')
@@ -103,13 +106,13 @@ if __name__ == '__main__':
 
     # model training
 
-    train_dataset = get_dataset(file_path_train, tokenizer=tokenizer)
-    valid_dataset = get_dataset(file_path_valid, tokenizer=tokenizer)
-    test_dataset = get_dataset(file_path_test, tokenizer=tokenizer)
+    train_dataset = get_dataset(file_path_train, tokenizer=tokenizer, block_size=args.blocksize)
+    valid_dataset = get_dataset(file_path_valid, tokenizer=tokenizer, block_size=args.blocksize)
+    test_dataset = get_dataset(file_path_test, tokenizer=tokenizer, block_size=args.blocksize)
 
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 
-    modeloutputpath = os.path.join(args.output, 'model')
+    modeloutputpath = os.path.join(args.outputpath, 'model')
 
     training_args = TrainingArguments(
         output_dir=modeloutputpath,
