@@ -36,17 +36,21 @@ Directory structure
 
 ```
 root or <gs://astroturf-dev/>
-|- data
-|  |- search
-|  |  |- comment
-|  |     |- q={query}
-|  |        |- {comment_id}.json: comments returned from query
-|  |- user
-|     |- {username}
-|        |- {comment_id}.json: user comments and comment context
-|- finetune
-    |- {username}
-       |- data
-       |  |- train.txt, valid.txt, eval.txt
-       |- model
+
+data: stuff from scraper
+    search: from call to pushshift api
+        comment
+            q={query}
+                {comment_id}.json: comments returned from query
+    user: from call to praw (require praw.ini)
+        {username}
+            {comment_id}.json: user comments and comment context
+finetune: stuff for huggingface transformers
+    {username}
+        data: inputs for model training
+            train.txt
+            valid.txt
+            test.txt
+        model: outputs of Trainer()
+            ???
 ```
