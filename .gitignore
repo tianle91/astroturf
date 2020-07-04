@@ -136,7 +136,7 @@ data/*
 finetune/*
 
 # tensorboard
-runs/*
+log/*
 
 # lint
 .DS_Store
