@@ -119,7 +119,11 @@ if __name__ == '__main__':
         do_train=True,
         do_eval=True,
         evaluate_during_training=True,
-        num_train_epochs=10,
+        max_steps=1000,
+        save_total_limit=1,
+        logging_dir='./log',
+        logging_first_step=True,
+        logging_steps=100,
     )
     trainer = Trainer(
         model=model,
