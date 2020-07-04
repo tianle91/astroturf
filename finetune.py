@@ -68,13 +68,13 @@ if __name__ == '__main__':
 
     import argparse
     parser = argparse.ArgumentParser(description='finetune on user comments.')
-    parser.add_argument('--inputpath', type=str, default='data/user/suncoasthost')
-    # gtx1080ti: blocksize 512
-    parser.add_argument('--blocksize', type=int, default=None)
-    parser.add_argument('--outputpath', type=str, default='finetune/suncoasthost')
+    parser.add_argument('--user', type=str, default='suncoasthost')
+    parser.add_argument('--blocksize', type=int, default=None) # gtx1080ti: blocksize 512
     args = parser.parse_args()
 
-    print ('inputpath: {}\nblocksize: {}\noutputpath: {}'.format(args.inputpath, args.blocksize, args.outputpath))
+    inputpath = 'data/user/{}'.format(args.user)
+    outputpath = 'finetune/{}'.format(args.user)
+    print ('user: {}\nblocksize: {}\n{}-->{}'.format(args.user, args.blocksize, inputpath, outputpath))
 
     tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
     model = GPT2LMHeadModel.from_pretrained("gpt2")
@@ -82,8 +82,8 @@ if __name__ == '__main__':
 
     # model data
 
-    fnames = glob(os.path.join(args.inputpath, '*.json'))
-    assert len(fnames) > 0, 'check inputpath: {} is not empty!'.format(args.inputpath)
+    fnames = glob(os.path.join(inputpath, '*.json'))
+    assert len(fnames) > 0, 'check inputpath: {} is not empty!'.format(inputpath)
     valid_prop = .1
     shuffled_indices = list(np.random.choice(range(len(fnames)), len(fnames), replace=False))
     valid_size = max(1, int(valid_prop*len(fnames)))
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     fnames_valid = fnames_shuffled[valid_size:2*valid_size]
     fnames_train = fnames_shuffled[2*valid_size:]
 
-    modeldatapath = os.path.join(args.outputpath, 'data')
+    modeldatapath = os.path.join(outputpath, 'data')
     os.makedirs(modeldatapath, exist_ok=True)
 
     file_path_train = os.path.join(modeldatapath, 'train.txt')
@@ -112,12 +112,14 @@ if __name__ == '__main__':
 
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 
-    modeloutputpath = os.path.join(args.outputpath, 'model')
+    modeloutputpath = os.path.join(outputpath, 'model')
 
     training_args = TrainingArguments(
         output_dir=modeloutputpath,
         do_train=True,
         do_eval=True,
+        evaluate_during_training=True,
+        num_train_epochs=10,
     )
     trainer = Trainer(
         model=model,
