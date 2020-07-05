@@ -30,6 +30,12 @@ Some example patterns that I found on twitter are...
 - bots following everyone that follows @AOC, @realDonaldTrump, etc.
 - bots following other bots
 
+# demo
+
+* find and tag entity mentions
+* finetune on user who had most positive entity mention
+* simulate user response
+
 # technical
 
 Directory structure
