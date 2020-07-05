@@ -69,7 +69,7 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='finetune on user comments.')
     parser.add_argument('--user', type=str, default='suncoasthost')
-    parser.add_argument('--blocksize', type=int, default=None) # gtx1080ti: blocksize 512
+    parser.add_argument('--blocksize', type=int, default=256)
     args = parser.parse_args()
 
     inputpath = 'data/user/{}'.format(args.user)
