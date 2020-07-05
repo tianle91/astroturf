@@ -4,3 +4,4 @@ transformers==2.11.0
 praw==7.1.0
 pandas==1.0.5
 tensorboard==2.2.2
+pylint==2.5.3
