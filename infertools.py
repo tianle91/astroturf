@@ -54,7 +54,7 @@ if __name__ == '__main__':
     # https://huggingface.co/transformers/_modules/transformers/pipelines.html#TextGenerationPipeline
     # https://huggingface.co/transformers/_modules/transformers/modeling_utils.html#PreTrainedModel.generate
     txtgen = get_text_generation_pipeline('finetune/{}/model/'.format(args.user))
-    responses = txtgen(prompt, max_length=1024)
+    responses = txtgen(prompt, max_length=len(prompt.split(' '))+128)
 
     i = 0
     for response in responses:
