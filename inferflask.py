@@ -1,3 +1,5 @@
+# https://www.digitalocean.com/community/tutorials/how-to-make-a-web-application-using-flask-in-python-3
+
 import praw
 from glob import glob
 from flask import Flask, render_template, request
