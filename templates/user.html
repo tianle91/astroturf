@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{% block title %} {{ userresponse['username'] }} {% endblock %}</h1>
+
+<form method="post">
+
+    <div class="form-group">
+        <label for="title">Url</label>
+        <input type="text" name="url" placeholder="reddit.com/r/.../..." class="form-control" value="{{ userresponse['url'] or request.form['url'] }}">
+        </input>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+    
+    <div class="form-group">
+        <label for="content">Prompt</label>
+        <textarea name="content" placeholder="..." rows="10" class="form-control">{{ userresponse['prompt'] }}</textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="content">Repsonse</label>
+        <textarea name="content" placeholder="..." rows="5" class="form-control">{{ userresponse['response'] }}</textarea>
+    </div>
+
+</form>
+<hr>
+{% endblock %}
