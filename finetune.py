@@ -19,20 +19,20 @@ from transformers import (
 
 # data part
 
-def get_qa_string(comment):
+def get_qa_string(package):
     '''format comment as question and answer'''
     context = 'In subreddit: {subname}\nTitle: {title}\n{body}'.format(
-        subname = comment['submission']['subreddit'],
-        title = comment['submission']['title'],
-        body = comment['submission']['selftext'],
+        subname = package['submission']['subreddit'],
+        title = package['submission']['title'],
+        body = package['submission']['selftext'],
     )
     question = 'What do you think?'
-    if comment['parent_comment'] is not None:
-        question = comment['parent_comment']['body']
+    if package['parent_comment'] is not None:
+        question = package['parent_comment']['body']
     return '{context}\n\nQ: {q}\nA: {a}'.format(
         context = context,
         q = question,
-        a = comment['comment']['body'],
+        a = package['comment']['body'] if package['comment'] is not None else '',
     )
 
 def write_to_text(fnames, outputfname, verbose=1):
@@ -47,10 +47,10 @@ def write_to_text(fnames, outputfname, verbose=1):
             print ('[{}/{}]'.format(i, total))
         i += 1
         with open(fname) as f:
-            comment = json.load(f)
+            package = json.load(f)
         with open(outputfname, 'a+') as f:
             f.write('{body}\n{eos}\n'.format(
-                body=get_qa_string(comment),
+                body=get_qa_string(package),
                 eos=eos
             ))
 
