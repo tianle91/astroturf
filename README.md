@@ -61,3 +61,5 @@ finetune: stuff for huggingface transformers
         model: outputs of Trainer()
             ???
 ```
+
+Installing pytorch on Raspberry Pi 4: https://gist.github.com/akaanirban/621e63237e63bb169126b537d7a1d979
