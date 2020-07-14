@@ -13,10 +13,11 @@ username_l = [
     s.replace('finetune/', '').replace('/model/pytorch_model.bin', '') 
     for s in glob('finetune/*/model/pytorch_model.bin')
 ]
-models = {
-    username:  get_text_generation_pipeline('finetune/{}/model/'.format(username))
-    for username in username_l
-}
+
+models = {}
+for username in username_l:
+    print ('loading user: {}...'.format(username))
+    models[username] = get_text_generation_pipeline('finetune/{}/model/'.format(username))
 
 @app.route('/')
 def index():
