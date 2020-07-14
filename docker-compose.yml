@@ -1,0 +1,11 @@
+version: '3'
+services:
+  gunicorn:
+    build:
+      context: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/astroturf
+    working_dir: /astroturf
+    entrypoint: bash run_gunicorn.sh
