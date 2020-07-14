@@ -9,18 +9,24 @@ from infertools import make_package_url, get_qa_string, get_text_generation_pipe
 app = Flask(__name__)
 reddit = praw.Reddit()
 
+username_l = [
+    s.replace('finetune/', '').replace('/model/pytorch_model.bin', '') 
+    for s in glob('finetune/*/model/pytorch_model.bin')
+]
+models = {
+    username:  get_text_generation_pipeline('finetune/{}/model/'.format(username))
+    for username in username_l
+}
+
 @app.route('/')
 def index():
-    users = [
-        {'username': s.replace('finetune/', '').replace('/model/pytorch_model.bin', '')}
-        for s in glob('finetune/*/model/pytorch_model.bin')
-    ]
+    users = [{'username': username} for username in username_l]
     return render_template('index.html', users=users)
 
 @app.route('/<username>', methods=('GET', 'POST'))
 def user(username):
     userresponse = {'username': username}
-    txtgen = get_text_generation_pipeline('finetune/{}/model/'.format(username))
+    txtgen = models[username]
     
     if request.method == 'POST':
         url = request.form['url']
