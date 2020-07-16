@@ -3,10 +3,13 @@
 {% block content %}
 <h1>{% block title %} {{ userresponse['username'] }} {% endblock %}</h1>
 
+Paste a Reddit submission or comment and simulate a Redditor's response!
+<hr>
+
 <form method="post">
 
     <div class="form-group">
-        <label for="title">Url</label>
+        <label for="title">Reddit Url</label>
         <input type="text" name="url" placeholder="https://www.reddit.com/r/.../" class="form-control" value="{{ userresponse['url'] or request.form['url'] }}">
         </input>
     </div>
@@ -16,12 +19,12 @@
     </div>
     
     <div class="form-group">
-        <label for="content">Prompt</label>
+        <label for="content">Model Input</label>
         <textarea name="content" placeholder="..." rows="10" class="form-control">{{ userresponse['prompt'] }}</textarea>
     </div>
 
     <div class="form-group">
-        <label for="content">Repsonse</label>
+        <label for="content">Model Output</label>
         <textarea name="content" placeholder="..." rows="5" class="form-control">{{ userresponse['response'] }}</textarea>
     </div>
 
