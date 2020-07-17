@@ -14,11 +14,6 @@ username_l = [
     for s in glob('finetune/*/model/pytorch_model.bin')
 ]
 
-models = {}
-for username in username_l:
-    print ('loading user: {}...'.format(username))
-    models[username] = get_text_generation_pipeline('finetune/{}/model/'.format(username))
-
 @app.route('/')
 def index():
     users = [{'username': username} for username in username_l]
@@ -27,7 +22,7 @@ def index():
 @app.route('/<username>', methods=('GET', 'POST'))
 def user(username):
     userresponse = {'username': username}
-    txtgen = models[username]
+    txtgen = get_text_generation_pipeline('finetune/{}/model/'.format(username))
     
     if request.method == 'POST':
         url = request.form['url']
