@@ -108,31 +108,33 @@ def dump_finetuned(user_name, blocksize):
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 
     modeloutputpath = os.path.join(outputpath, 'model')
-
-    training_args = TrainingArguments(
-        output_dir=modeloutputpath,
-        do_train=True,
-        do_eval=True,
-        evaluate_during_training=True,
-        learning_rate=1e-4,
-        max_steps=100,
-        save_total_limit=0,
-        logging_dir='./log',
-        logging_first_step=True,
-        logging_steps=10,
-    )
-    trainer = Trainer(
-        model=model,
-        args=training_args,
-        data_collator=data_collator,
-        train_dataset=train_dataset,
-        eval_dataset=test_dataset,
-        prediction_loss_only=True,
-    )
-    trainer.train()
-    trainer.save_model()
-    print (trainer.evaluate())
-    return True
+    if not os.path.isfile(os.path.join(modeloutputpath, 'pytorch_model.bin')):
+        training_args = TrainingArguments(
+            output_dir=modeloutputpath,
+            do_train=True,
+            do_eval=True,
+            evaluate_during_training=True,
+            learning_rate=1e-4,
+            max_steps=100,
+            save_total_limit=0,
+            logging_dir='./log',
+            logging_first_step=True,
+            logging_steps=10,
+        )
+        trainer = Trainer(
+            model=model,
+            args=training_args,
+            data_collator=data_collator,
+            train_dataset=train_dataset,
+            eval_dataset=test_dataset,
+            prediction_loss_only=True,
+        )
+        trainer.train()
+        trainer.save_model()
+        print (trainer.evaluate())
+        return True
+    else:
+        print ('Skipping since user_name: {} has trained model.'.format(user_name))
 
 if __name__ == '__main__':
 
