@@ -17,6 +17,10 @@ from transformers import (
     Trainer
 )
 
+tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+model = GPT2LMHeadModel.from_pretrained("gpt2")
+eos = tokenizer.eos_token
+
 # data part
 
 def get_qa_string(package):
@@ -64,21 +68,12 @@ def get_dataset(file_path, tokenizer: PreTrainedTokenizer, block_size: int=None)
         overwrite_cache = True,
     )
 
-if __name__ == '__main__':
-
-    import argparse
-    parser = argparse.ArgumentParser(description='finetune on user comments.')
-    parser.add_argument('--user', type=str, default='suncoasthost')
-    parser.add_argument('--blocksize', type=int, default=256)
-    args = parser.parse_args()
-
-    inputpath = 'data/user/{}'.format(args.user)
-    outputpath = 'finetune/{}'.format(args.user)
-    print ('user: {}\nblocksize: {}\n{}-->{}'.format(args.user, args.blocksize, inputpath, outputpath))
-
-    tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
-    model = GPT2LMHeadModel.from_pretrained("gpt2")
-    eos = tokenizer.eos_token
+def dump_finetuned(user_name, blocksize):
+    '''
+    '''
+    inputpath = 'data/user/{}'.format(user_name)
+    outputpath = 'finetune/{}'.format(user_name)
+    print ('user: {}\nblocksize: {}\n{}-->{}'.format(user_name, blocksize, inputpath, outputpath))
 
     # model data
 
@@ -137,3 +132,16 @@ if __name__ == '__main__':
     trainer.train()
     trainer.save_model()
     print (trainer.evaluate())
+    return True
+
+if __name__ == '__main__':
+
+    import argparse
+    parser = argparse.ArgumentParser(description='finetune on user comments.')
+    parser.add_argument('--users', type=str, nargs='*')
+    parser.add_argument('--blocksize', type=int, default=256)
+    args = parser.parse_args()
+
+    blocksize = args.blocksize
+    for user_name in args.users:
+        print ('\n\nuser_name: {} done?: {}\n\n'.format(user_name, dump_finetuned(user_name, blocksize)))
