@@ -14,6 +14,8 @@ username_l = [
     for s in glob('finetune/*/model/pytorch_model.bin')
 ]
 
+defaulturl = 'https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw'
+
 @app.route('/')
 def index():
     users = [{'username': username} for username in username_l]
@@ -21,11 +23,12 @@ def index():
 
 @app.route('/<username>', methods=('GET', 'POST'))
 def user(username):
-    userresponse = {'username': username}
+    userresponse = {'username': username, 'defaulturl': defaulturl}
     txtgen = get_text_generation_pipeline('finetune/{}/model/'.format(username))
     
     if request.method == 'POST':
         url = request.form['url']
+        url = url if 'reddit.com' in url else defaulturl
         package = make_package_url(url, reddit)
         prompt = get_qa_string(package)
         responses = txtgen(prompt, max_length=len(prompt.split(' '))+128)

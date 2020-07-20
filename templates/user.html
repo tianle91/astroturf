@@ -10,7 +10,7 @@ Paste a Reddit submission or comment and simulate a Redditor's response!
 
     <div class="form-group">
         <label for="title">Reddit Url</label>
-        <input type="text" name="url" placeholder="https://www.reddit.com/r/.../" class="form-control" value="{{ userresponse['url'] or request.form['url'] }}">
+        <input type="text" name="url" placeholder="{{ userresponse['defaulturl'] }}" class="form-control" value="{{ userresponse['url'] or request.form['url'] }}">
         </input>
     </div>
 
