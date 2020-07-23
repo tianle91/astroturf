@@ -1,10 +1,11 @@
 import os
 import json
 import pandas as pd
-
-from webapitools import get_entity_mentions
-from nlptools import get_ner_tokens, get_ner, get_sentiment, is_hit
 from datetime import datetime
+
+from astroturf.webapitools import get_entity_mentions
+from astroturf.nlptools import get_ner_tokens, get_ner, get_sentiment, is_hit
+
 
 def clean_string(s):
     return ''.join([c if c.isalnum() else '_' for c in s])

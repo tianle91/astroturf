@@ -4,8 +4,8 @@ from praw.models import Submission, Comment
 
 from transformers import GPT2Tokenizer, pipeline
 
-from data_user_comments import get_context, format_comment_as_json, format_submission_as_json
 from finetune import get_qa_string
+from astroturf.prawtools import get_context, format_comment_as_json, format_submission_as_json
 
 def make_package_comment(comment, reddit):
     _, submission = get_context(comment, reddit)
