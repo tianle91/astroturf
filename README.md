@@ -11,12 +11,12 @@ To run the UI, there's a few options depending on what you want to do.
 
 ## data structure
 ```
-data: stuff from scraper
-    search: from call to pushshift api
+data
+    search: output from pushshift
         comment
             q={query}
                 {comment_id}.json: comments returned from query
-    user: from call to praw (require praw.ini)
+    user: output from praw
         {username}
             {comment_id}.json: user comments and comment context
 finetune: stuff for huggingface transformers
@@ -25,6 +25,7 @@ finetune: stuff for huggingface transformers
             train.txt
             valid.txt
             test.txt
-        model: outputs of Trainer()
-            ???
+        model: outputs of model training
+            ...
+            pytorch_model.bin
 ```
