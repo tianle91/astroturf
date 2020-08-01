@@ -4,7 +4,7 @@ import praw
 from glob import glob
 from flask import Flask, render_template, request
 
-from infertools import make_package_url, get_qa_string, get_text_generation_pipeline
+from astroturf.infer import make_package_url, get_qa_string, get_text_generation_pipeline
 
 app = Flask(__name__)
 reddit = praw.Reddit()
