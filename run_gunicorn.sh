@@ -1,1 +1,1 @@
-gunicorn -w 2 -b 0.0.0.0:5000 inferflask:app
+gunicorn -w 2 -b 0.0.0.0:5000 ui:app
