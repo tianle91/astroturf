@@ -1,49 +1,16 @@
 # astroturf
+To get user comments and train a model on that user...
+1. `python data_user_comments.py --users user1 user2 user3`
+2. `python finetune.py --users user1 user2 user3`
+These users would end up in `finetune/{username}/...` and would be available for inference in the UI.
 
-Given an entity, we want to find all users that comment on that entity.
-For each user, we score the sentiments of comments that mention that entity as well as overall sentiment.
+To run the UI, there's a few options depending on what you want to do.
+1. docker `docker-compose run --service-ports gunicorn`.
+2. debugging `source run_flask.sh`
+3. production `source run_gunicorn.sh`
 
-We then learn that user's overall commenting pattern and simulate a distinct user independent of that user.
-This means learning how and when a user comments.
-
-# quotable quotes
-
-https://www.reddit.com/r/Entrepreneur/comments/b328hu/spotting_fake_users/eixl9p6?utm_source=share&utm_medium=web2x
-
-Some example patterns that I found on twitter are...
-- bots only posting about a single topic
-- bots only posting during specific time frames
-- bots constantly replying to #MAGA or @AOC within 1 minute
-- bots following everyone that follows @AOC, @realDonaldTrump, etc.
-- bots following other bots
-
-# components
-
-1. search for entity mentions and sentiment detection.
-
-    - Sentiment of comment is not necessarily sentiment towards entity.
-
-    - Hit-rate of entities with common usage is low. E.g. Uber (the company) is not uber (the adjective).
-
-2. simulate user response.
-
-    - When and what context would a user response occur?
-    
-    - Simulate content of response.
-
-# demo
-
-- find and tag entity mentions
-- finetune on user who had most positive entity mention
-- simulate user response
-
-# technical
-
-Directory structure
-
+## data structure
 ```
-root or <gs://astroturf-dev/>
-
 data: stuff from scraper
     search: from call to pushshift api
         comment
