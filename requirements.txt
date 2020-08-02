@@ -6,3 +6,5 @@ tensorboard==2.2.2
 pylint==2.5.3
 gunicorn==20.0.4
 Flask==1.1.2
+pytest==6.0.1
+pylint==2.5.3
