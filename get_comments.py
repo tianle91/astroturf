@@ -1,45 +1,36 @@
-import pandas as pd
-from datetime import datetime
-import os
 import json
+import os
 import pickle
+from datetime import datetime
+from glob import glob
+
+import pandas as pd
 import praw
 
-from astroturf.prawtools import get_context, format_comment_as_json, format_submission_as_json, make_package_training
+from astroturf.prawtools import (format_comment_as_json,
+                                 format_submission_as_json, get_context,
+                                 make_package_training)
 
-def dump_user_comments(user_name, reddit, limit=1000):
+
+def dump_user_comments(user_name, reddit, limit=1000, prefix='data/user/'):
     '''
     dump user comments to data/user/{user_name}/*.json
     and update data/user/{user_name}/manifest.csv with status
     '''
-    outpath = 'data/user/{}'.format(user_name)
+    outpath = os.path.join(prefix, user_name)
     os.makedirs(outpath, exist_ok=True)
-
-    manifestpath = os.path.join(outpath, 'manifest.csv')
-    if not os.path.isfile(manifestpath):
-        manifestdf = None
-        with open(manifestpath, 'w+') as f:
-            f.write('comment_id, created_utcnow_isoformat\n')
-    else:
-        manifestdf = pd.read_csv(manifestpath)
-
-    # args for user.comments.new()
-    # https://praw.readthedocs.io/en/latest/code_overview/other/listinggenerator.html#praw.models.ListingGenerator
-    # limit – default 100, max 1000    
-    user = reddit.redditor(user_name)
+    existingids = [s.replace(outpath, '').replace('.json', '') for s in glob(os.path.join(outpath, '*.json'))]
     i = 0
-    for comment in user.comments.new(limit=limit):
+    for comment in reddit.redditor(user_name).comments.new(limit=limit):
         print ('[{}/{}] id: {}, body: {}'.format(
             i, limit, comment.id, comment.body.replace('\n', ' ').replace('\t', ' ')[:50]
         ))
         i += 1
-        if manifestdf is not None and comment.id in list(manifestdf['comment_id']):
+        if comment.id in existingids:
             print ('skip since comment dump exists...')
             continue
         else:
             package = make_package_training(comment, reddit)
-            with open(manifestpath, 'a+') as f:
-                f.write('{}, {}\n'.format(comment.id, datetime.utcnow().isoformat()))
             with open(os.path.join(outpath, '{}.json'.format(comment.id)), 'w+') as f:
                 json.dump(package, f, indent=4)
     return True
