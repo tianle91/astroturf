@@ -19,21 +19,19 @@ def dump_user_comments(user_name, reddit, limit=1000, prefix='data/user/'):
     '''
     outpath = os.path.join(prefix, user_name)
     os.makedirs(outpath, exist_ok=True)
-    existingids = [s.replace(outpath, '').replace('.json', '') for s in glob(os.path.join(outpath, '*.json'))]
     i = 0
     for comment in reddit.redditor(user_name).comments.new(limit=limit):
         print ('[{}/{}] id: {}, body: {}'.format(
             i, limit, comment.id, comment.body.replace('\n', ' ').replace('\t', ' ')[:50]
         ))
         i += 1
-        if comment.id in existingids:
-            print ('skip since comment dump exists...')
-            continue
-        else:
+        commentoutpath = os.path.join(outpath, '{}.json'.format(comment.id))
+        if not os.path.isfile(commentoutpath):
             package = make_package_training(comment, reddit)
-            with open(os.path.join(outpath, '{}.json'.format(comment.id)), 'w+') as f:
+            with open(commentoutpath, 'w+') as f:
                 json.dump(package, f, indent=4)
     return True
+    
 
 
 if __name__ == '__main__':
