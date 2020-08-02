@@ -7,12 +7,19 @@ import praw
 
 from astroturf.prawtools import get_context, format_comment_as_json, format_submission_as_json
 
+def make_package(comment, reddit):
+    parent_comment, submission = get_context(comment, reddit)
+    return {
+        'comment': format_comment_as_json(comment),
+        'parent_comment': format_comment_as_json(parent_comment) if parent_comment is not None else None,
+        'submission': format_submission_as_json(submission)
+    }
+
 def dump_user_comments(user_name, reddit, limit=1000):
     '''
     dump user comments to data/user/{user_name}/*.json
     and update data/user/{user_name}/manifest.csv with status
     '''
-    user = reddit.redditor(user_name)
     outpath = 'data/user/{}'.format(user_name)
     os.makedirs(outpath, exist_ok=True)
 
@@ -27,6 +34,7 @@ def dump_user_comments(user_name, reddit, limit=1000):
     # args for user.comments.new()
     # https://praw.readthedocs.io/en/latest/code_overview/other/listinggenerator.html#praw.models.ListingGenerator
     # limit – default 100, max 1000    
+    user = reddit.redditor(user_name)
     i = 0
     for comment in user.comments.new(limit=limit):
         print ('[{}/{}] id: {}, body: {}'.format(
@@ -37,12 +45,7 @@ def dump_user_comments(user_name, reddit, limit=1000):
             print ('skip since comment dump exists...')
             continue
         else:
-            parent_comment, submission = get_context(comment, reddit)
-            package = {
-                'comment': format_comment_as_json(comment),
-                'parent_comment': format_comment_as_json(parent_comment) if parent_comment is not None else None,
-                'submission': format_submission_as_json(submission)
-            }
+            package = make_package(comment, reddit)
             with open(manifestpath, 'a+') as f:
                 f.write('{}, {}\n'.format(comment.id, datetime.utcnow().isoformat()))
             with open(os.path.join(outpath, '{}.json'.format(comment.id)), 'w+') as f:
