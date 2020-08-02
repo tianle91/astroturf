@@ -31,8 +31,6 @@ def dump_user_comments(user_name, reddit, limit=1000, prefix='data/user/'):
             with open(commentoutpath, 'w+') as f:
                 json.dump(package, f, indent=4)
     return True
-    
-
 
 if __name__ == '__main__':
 

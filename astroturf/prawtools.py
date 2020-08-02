@@ -1,9 +1,11 @@
-import pandas as pd
-from datetime import datetime
-import os
 import json
+import os
 import pickle
+from datetime import datetime
+
+import pandas as pd
 import praw
+
 
 def get_context(comment, reddit):
     submission = reddit.submission(id=comment.link_id.replace('t3_', ''))

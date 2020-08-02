@@ -1,5 +1,6 @@
 from astroturf.nlptools import get_ner, get_ner_tokens, is_hit
 
+
 def test_get_ner_tokens():
     assert get_ner_tokens('uber') == ['u', '##ber'], 'failed get_ner_tokens'
 

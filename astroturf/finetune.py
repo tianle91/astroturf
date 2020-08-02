@@ -3,19 +3,14 @@
 # https://github.com/huggingface/transformers/blob/master/examples/language-modeling/run_language_modeling.py
 # https://github.com/huggingface/transformers/blob/master/src/transformers/training_args.py
 
-import os
 import json
+import os
 from glob import glob
+
 import numpy as np
-from transformers import (
-    GPT2Tokenizer, 
-    GPT2LMHeadModel, 
-    TextDataset, 
-    PreTrainedTokenizer, 
-    DataCollatorForLanguageModeling,
-    TrainingArguments, 
-    Trainer
-)
+from transformers import (DataCollatorForLanguageModeling, GPT2LMHeadModel,
+                          GPT2Tokenizer, PreTrainedTokenizer, TextDataset,
+                          Trainer, TrainingArguments)
 
 tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
 model = GPT2LMHeadModel.from_pretrained("gpt2")

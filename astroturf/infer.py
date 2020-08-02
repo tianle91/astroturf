@@ -1,10 +1,13 @@
 from praw.exceptions import InvalidURL
-from praw.models import Submission, Comment
-
+from praw.models import Comment, Submission
 from transformers import GPT2Tokenizer, pipeline
 
 from astroturf.finetune import get_qa_string
-from astroturf.prawtools import get_context, format_comment_as_json, format_submission_as_json, make_package_infer_comment, make_package_infer_submission
+from astroturf.prawtools import (format_comment_as_json,
+                                 format_submission_as_json, get_context,
+                                 make_package_infer_comment,
+                                 make_package_infer_submission)
+
 
 def make_package_infer_url(url, reddit):
     try:

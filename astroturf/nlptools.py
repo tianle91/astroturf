@@ -1,9 +1,9 @@
 # https://huggingface.co/transformers/usage.html#named-entity-recognition
 # https://github.com/huggingface/transformers/blob/master/src/transformers/pipelines.py#L1604
 
+from transformers import AutoTokenizer, pipeline
 from transformers.pipelines import SUPPORTED_TASKS
-from transformers import AutoTokenizer
-from transformers import pipeline
+
 
 def wrap_assert(f):
     '''sometimes i dont want to deal with exceptions in f'''
