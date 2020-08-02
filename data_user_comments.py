@@ -16,7 +16,7 @@ def dump_user_comments(user_name, reddit, limit=1000):
     outpath = 'data/user/{}'.format(user_name)
     os.makedirs(outpath, exist_ok=True)
 
-    manifestpath = os.path.join('data/user/{}/manifest.csv'.format(user_name))
+    manifestpath = os.path.join(outpath, 'manifest.csv')
     if not os.path.isfile(manifestpath):
         manifestdf = None
         with open(manifestpath, 'w+') as f:
