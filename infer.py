@@ -1,5 +1,7 @@
 import praw
-from astroturf.infer import make_package_infer_url, get_qa_string, get_text_generation_pipeline
+
+from astroturf.infer import (get_qa_string, get_text_generation_pipeline,
+                             make_package_infer_url)
 
 if __name__ == '__main__':
 
