@@ -5,7 +5,6 @@ import json
 import pickle
 import praw
 
-
 def get_context(comment, reddit):
     submission = reddit.submission(id=comment.link_id.replace('t3_', ''))
     parent_comment = None
