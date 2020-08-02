@@ -5,15 +5,7 @@ import json
 import pickle
 import praw
 
-from astroturf.prawtools import get_context, format_comment_as_json, format_submission_as_json
-
-def make_package(comment, reddit):
-    parent_comment, submission = get_context(comment, reddit)
-    return {
-        'comment': format_comment_as_json(comment),
-        'parent_comment': format_comment_as_json(parent_comment) if parent_comment is not None else None,
-        'submission': format_submission_as_json(submission)
-    }
+from astroturf.prawtools import get_context, format_comment_as_json, format_submission_as_json, make_package_training
 
 def dump_user_comments(user_name, reddit, limit=1000):
     '''
@@ -45,7 +37,7 @@ def dump_user_comments(user_name, reddit, limit=1000):
             print ('skip since comment dump exists...')
             continue
         else:
-            package = make_package(comment, reddit)
+            package = make_package_training(comment, reddit)
             with open(manifestpath, 'a+') as f:
                 f.write('{}, {}\n'.format(comment.id, datetime.utcnow().isoformat()))
             with open(os.path.join(outpath, '{}.json'.format(comment.id)), 'w+') as f:

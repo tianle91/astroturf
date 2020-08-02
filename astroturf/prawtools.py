@@ -40,3 +40,26 @@ def format_submission_as_json(submission):
         'selftext': submission.selftext,
         'permalink': submission.permalink,
     }
+
+def make_package_training(comment, reddit):
+    parent_comment, submission = get_context(comment, reddit)
+    return {
+        'comment': format_comment_as_json(comment),
+        'parent_comment': format_comment_as_json(parent_comment) if parent_comment is not None else None,
+        'submission': format_submission_as_json(submission)
+    }
+
+def make_package_infer_comment(comment, reddit):
+    _, submission = get_context(comment, reddit)
+    return {
+        'comment': None,
+        'parent_comment': format_comment_as_json(comment),
+        'submission': format_submission_as_json(submission)
+    }
+
+def make_package_infer_submission(submission):
+    return {
+        'comment': None,
+        'parent_comment': None,
+        'submission': format_submission_as_json(submission)
+    }

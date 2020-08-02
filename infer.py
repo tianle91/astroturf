@@ -1,5 +1,5 @@
 import praw
-from astroturf.infer import make_package_url, get_qa_string, get_text_generation_pipeline
+from astroturf.infer import make_package_infer_url, get_qa_string, get_text_generation_pipeline
 
 if __name__ == '__main__':
 
@@ -11,7 +11,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     reddit = praw.Reddit()
-    package = make_package_url(args.url, reddit)
+    package = make_package_infer_url(args.url, reddit)
     prompt = get_qa_string(package)
     print ('prompt:\n\n{}\n'.format(prompt))
 

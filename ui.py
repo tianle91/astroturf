@@ -4,7 +4,7 @@ import praw
 from glob import glob
 from flask import Flask, render_template, request
 
-from astroturf.infer import make_package_url, get_qa_string, get_text_generation_pipeline
+from astroturf.infer import make_package_infer_url, get_qa_string, get_text_generation_pipeline
 
 app = Flask(__name__)
 reddit = praw.Reddit()
@@ -29,7 +29,7 @@ def user(username):
     if request.method == 'POST':
         url = request.form['url']
         url = url if 'reddit.com' in url else defaulturl
-        package = make_package_url(url, reddit)
+        package = make_package_infer_url(url, reddit)
         prompt = get_qa_string(package)
         responses = txtgen(prompt, max_length=len(prompt.split(' '))+128)
         response = responses[0]['generated_text'].replace(prompt, '').strip().split('\n')[0]
