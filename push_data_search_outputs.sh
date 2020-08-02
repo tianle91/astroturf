@@ -1,1 +1,0 @@
-gsutil -m rsync -r data/search gs://astroturf-dev/data/search
