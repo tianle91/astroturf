@@ -56,4 +56,6 @@ if __name__ == '__main__':
     limit = args.limit
     reddit = praw.Reddit()
     for user_name in args.users:
-        print ('\n\nuser_name: {} done?: {}\n\n'.format(user_name, dump_user_comments(user_name, reddit, limit=1000)))
+        print ('\n\nuser_name: {} running...\n\n'.format(user_name))
+        status = dump_user_comments(user_name, reddit, limit=1000)
+        print ('\n\nuser_name: {} done?: {}\n\n'.format(user_name, status))
