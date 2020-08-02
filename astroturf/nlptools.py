@@ -32,10 +32,3 @@ def is_hit(ner_result, entity_name_tokenized):
 
 get_ner = wrap_assert(pipeline("ner"))
 get_sentiment = wrap_assert(pipeline("sentiment-analysis"))
-
-if __name__ == '__main__':
-    assert get_ner_tokens('uber') == ['u', '##ber'], 'failed get_ner_tokens'
-    assert is_hit(
-        ner_result=get_ner('I love taking Uber around the city!'), 
-        entity_name_tokenized=['u', '##ber']
-    ), 'failed is_hit'
