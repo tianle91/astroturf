@@ -18,7 +18,5 @@ if __name__ == '__main__':
     for user_name in users:
         inputpath = 'data/user/{}'.format(user_name)
         outputpath = 'finetune/{}'.format(user_name)
-        print ('\n\nuser_name: {} ran?: {}\n\n'.format(
-            user_name, 
-            dump_finetuned(inputpath, outputpath, args.blocksize)
-        ))
+        ran = dump_finetuned(inputpath, outputpath, args.blocksize)
+        print ('\n\nuser_name: {} ran?: {}\n\n'.format(user_name, ran))
