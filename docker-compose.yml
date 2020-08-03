@@ -1,11 +1,16 @@
 version: '3'
 services:
-  gunicorn:
+  ui:
     build:
       context: .
     ports:
       - "5000:5000"
     volumes:
       - .:/astroturf
-    working_dir: /astroturf
-    entrypoint: bash run_gunicorn.sh
+    entrypoint: gunicorn -w 2 -b 0.0.0.0:5000 ui:app
+  getcomments:
+    build:
+      context: .
+    volumes:
+      - .:/astroturf
+    entrypoint: python get_comments.py
