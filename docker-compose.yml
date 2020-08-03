@@ -23,7 +23,7 @@ services:
   finetune:
     build:
       context: .
-      volumes:
-        - .:/astroturf
-      entrypoint: python finetune.py
+    volumes:
+      - .:/astroturf
+    entrypoint: python finetune.py
   
