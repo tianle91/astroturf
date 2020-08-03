@@ -1,5 +1,11 @@
 version: '3'
 services:
+  shell:
+    build:
+      context: .
+    volumes:
+      - .:/astroturf
+    entrypoint: bash
   ui:
     build:
       context: .
@@ -14,3 +20,10 @@ services:
     volumes:
       - .:/astroturf
     entrypoint: python get_comments.py
+  finetune:
+    build:
+      context: .
+      volumes:
+        - .:/astroturf
+      entrypoint: python finetune.py
+  
