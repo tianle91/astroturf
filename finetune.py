@@ -8,11 +8,17 @@ if __name__ == '__main__':
     parser.add_argument('--blocksize', type=int, default=256)
     args = parser.parse_args()
 
-    blocksize = args.blocksize
-    for user_name in args.users:
+    # list of users
+    if args.users is None:
+        with open('users.txt') as f:
+            users = f.read().split()
+    else:
+        users = list(args.users)
+
+    for user_name in users:
         inputpath = 'data/user/{}'.format(user_name)
         outputpath = 'finetune/{}'.format(user_name)
         print ('\n\nuser_name: {} ran?: {}\n\n'.format(
             user_name, 
-            dump_finetuned(inputpath, outputpath, blocksize)
+            dump_finetuned(inputpath, outputpath, args.blocksize)
         ))
