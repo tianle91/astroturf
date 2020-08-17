@@ -3,7 +3,7 @@ Gets a particular reddit user's comments, train a model on those comments, then 
 
 # Guide
 - `users.txt`: Enter interested users here.
-- `docker-compose run getcomments`: Get comments for all users in `users.txt`. Requires `praw.ini` in root folder. More info [here.](https://praw.readthedocs.io/en/latest/getting_started/configuration/prawini.html). Required for training models.
+- `docker-compose run getcomments`: Get comments for all users in `users.txt`. Requires `praw.ini` in root folder. More info [here.](https://praw.readthedocs.io/en/latest/getting_started/configuration/prawini.html) Required for training models.
 - `docker-compose run finetune`: Train model for each user in `users.txt`. Required for user to be available for querying on UI.
 - `docker-compose run --service-ports ui`: Start a web UI with available models in `finetune/{username}/...`.
 
