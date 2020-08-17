@@ -1,11 +1,16 @@
-# astroturf
+# Astroturf
 Gets a particular reddit user's comments, train a model on those comments, then expose model through UI so you can predict what he'd say.
 
-## Guide
+# Guide
+- `users.txt`: Enter interested users here.
+- `docker-compose run getcomments`: Get comments for all users in `users.txt`. Required for training models.
+- `docker-compose run finetune`: Train model for each user in `users.txt`. Required for user to be available for querying on UI.
+- `docker-compose run --service-ports ui`: Start a web UI.
+
+## Python stuff
 To get user comments and train a model on that user...
 1. `python data_user_comments.py --users user1 user2 user3`
 2. `python finetune.py --users user1 user2 user3`
-
 These users would end up in `finetune/{username}/...` and would be available for inference in the UI.
 
 ## UI
