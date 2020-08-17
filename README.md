@@ -1,4 +1,7 @@
 # astroturf
+Gets a particular reddit user's comments, train a model on those comments, then expose model through UI so you can predict what he'd say.
+
+## Guide
 To get user comments and train a model on that user...
 1. `python data_user_comments.py --users user1 user2 user3`
 2. `python finetune.py --users user1 user2 user3`
