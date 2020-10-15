@@ -18,14 +18,13 @@ def dump_user_comments(
     i = 0
     for comment in reddit.redditor(user_name).comments.new(limit=limit):
         commentoutpath = os.path.join(prefix_user, '{}.json'.format(comment.id))
-        print ('[{i}/{limit}] id: {id}, body: {body}'.format(
-            i=i, limit=limit, id=comment.id, body=comment.body.replace('\n', ' ').replace('\t', ' ')[:50]
-        ))
         if not commentoutpath in exist_blob_names:
+            print('[{i}/{limit}] id: {id}, body: {body}'.format(
+                i=i, limit=limit, id=comment.id, body=comment.body.replace('\n', ' ').replace('\t', ' ')[:50]
+            ))
             package = make_package_training(comment, reddit)
             gcp_blob = bucket.blob(commentoutpath)
             gcp_blob.upload_from_string(json.dumps(package, indent=4))
-            print ('id: {id} Uploaded!'.format(id=comment.id))
         i += 1
     return True
 
