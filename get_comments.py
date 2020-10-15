@@ -23,8 +23,8 @@ def dump_user_comments(
                 i=i, limit=limit, id=comment.id, body=comment.body.replace('\n', ' ').replace('\t', ' ')[:50]
             ))
             package = make_package_training(comment, reddit)
-            gcp_blob = bucket.blob(commentoutpath)
-            gcp_blob.upload_from_string(json.dumps(package, indent=4))
+            blob = bucket.blob(commentoutpath)
+            blob.upload_from_string(json.dumps(package, indent=4))
         i += 1
     return True
 
