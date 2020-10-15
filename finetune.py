@@ -1,4 +1,43 @@
+import os
+from glob import glob
+from google.cloud import storage
 from astroturf.finetune import dump_finetuned
+
+def refresh_finetuned(
+    user_name,
+    blocksize=16,
+    max_steps=10,
+    force_update=False,
+    data_bucket='astroturf-dev-data',
+    data_prefix='prawtools/make_package_training/user/',
+    model_bucket='astroturf-dev-models',
+    model_prefix='finetune/dump_finetuned/user/',
+):
+    client = storage.Client()
+    data_prefix_user = os.path.join(data_prefix, user_name)
+    os.makedirs(data_prefix_user, exist_ok=True)
+
+    model_prefix_user = os.path.join(model_prefix, user_name)
+    bucket = client.bucket(model_bucket)
+    output_flags = [os.path.join(model_prefix_user, 'model/{}'.format(s)) for s in [
+        'pytorch_model.bin', 'config.json', 'training_args.bin'
+    ]]
+    if not force_update and all(bucket.blob(s).exists() for s in output_flags):
+        print ('Skip refresh_finetuned due to existing output_flags:\n{}'.format('\n'.join(output_flags)))
+        return False
+
+    # download files for training
+    for blob in client.list_blobs(data_bucket, prefix=data_prefix_user):
+        if not os.path.isfile(blob.name):
+            print ('Downloading: {}'.format(blob.name))
+            blob.download_to_filename(blob.name)
+
+    dump_finetuned(data_prefix_user, model_prefix_user, blocksize, max_steps)
+    for fname in glob(os.path.join(model_prefix_user, 'model/*')):
+        print ('Uploading: {}'.format(fname))
+        blob = bucket.blob(fname)
+        blob.upload_from_filename(fname)
+    return True
 
 if __name__ == '__main__':
 
@@ -16,7 +55,5 @@ if __name__ == '__main__':
         users = list(args.users)
 
     for user_name in users:
-        inputpath = 'data/user/{}'.format(user_name)
-        outputpath = 'finetune/{}'.format(user_name)
-        ran = dump_finetuned(inputpath, outputpath, args.blocksize)
-        print ('\n\nuser_name: {} ran?: {}\n\n'.format(user_name, ran))
+        print('user_name: {} running...'.format(user_name))
+        ran = refresh_finetuned(user_name, blocksize=args.blocksize)
