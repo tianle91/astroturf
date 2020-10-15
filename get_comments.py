@@ -5,10 +5,6 @@ from google.cloud import storage
 from astroturf.prawtools import make_package_training
 
 
-def get_existing_user_comments_from_gcp(user_name, prefix, gcp_prefix):
-    outpath = os.path.join(prefix, user_name)
-    os.makedirs(outpath, exist_ok=True)
-
 def upload_blob_if_not_exist(bucket_name, source_file_name, destination_blob_name):
     """Uploads a file to the bucket.
     # bucket_name = "your-bucket-name"
