@@ -63,13 +63,15 @@ def get_dataset(file_path, tokenizer: PreTrainedTokenizer, block_size: int=None)
         overwrite_cache = True,
     )
 
-def dump_finetuned(inputpath, outputpath, blocksize):
+def dump_finetuned(inputpath, outputpath, blocksize, max_steps=50):
     '''Finetune GPT2LMHeadModel
     inputpath: expect .json here as outputs of astroturf.prawtools.make_package_training
     outputpath: to dump finetuned huggingface transformers
     blocksize:
     '''
-    print ('blocksize: {}\n{}-->{}'.format(blocksize, inputpath, outputpath))
+    print('blocksize: {}, max_steps: {}'.format(blocksize, max_steps))
+    print('inputpath: {}'.format(inputpath))
+    print('outputpath: {}'.format(outputpath))
 
     # model data
 
@@ -112,7 +114,7 @@ def dump_finetuned(inputpath, outputpath, blocksize):
             do_eval=True,
             evaluate_during_training=True,
             learning_rate=1e-4,
-            max_steps=10,
+            max_steps=max_steps,
             save_total_limit=0,
             logging_dir='./log',
             logging_first_step=True,
