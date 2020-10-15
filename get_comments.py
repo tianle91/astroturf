@@ -38,7 +38,7 @@ def dump_user_comments(
     i = 0
     for comment in reddit.redditor(user_name).comments.new(limit=limit):
         commentoutpath = os.path.join(local_outpath, '{}.json'.format(comment.id))
-        print ('[{i}/{limit}] id: {id}, body: {body}, commentoutpath: {}'.format(
+        print ('[{i}/{limit}] id: {id}, body: {body}'.format(
             i=i, limit=limit, id=comment.id, body=comment.body.replace('\n', ' ').replace('\t', ' ')[:50]
         ))
         i += 1
@@ -73,6 +73,5 @@ if __name__ == '__main__':
         users = list(args.users)
 
     for user_name in users:
-        print ('\n\nuser_name: {} running...\n\n'.format(user_name))
+        print ('user_name: {} running...'.format(user_name))
         status = dump_user_comments(user_name, reddit, limit=100, gcp_bucket='astroturf-dev-data')
-        print ('\n\nuser_name: {} done?: {}\n\n'.format(user_name, status))
