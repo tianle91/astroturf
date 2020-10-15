@@ -63,7 +63,7 @@ def get_dataset(file_path, tokenizer: PreTrainedTokenizer, block_size: int=None)
         overwrite_cache = True,
     )
 
-def dump_finetuned(inputpath, outputpath, blocksize, max_steps=50):
+def dump_finetuned(inputpath, outputpath, blocksize=16, max_steps=50):
     '''Finetune GPT2LMHeadModel
     inputpath: expect .json here as outputs of astroturf.prawtools.make_package_training
     outputpath: to dump finetuned huggingface transformers
