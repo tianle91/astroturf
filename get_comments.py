@@ -21,9 +21,9 @@ def upload_blob_if_not_exist(bucket_name, source_file_name, destination_blob_nam
         print("File {} exists! Skipped.".format(source_file_name))
 
 def dump_user_comments(
-        user_name, reddit, limit=1000,
-        local_prefix='data/user/',
-        gcp_bucket=None,
+    user_name, reddit, limit=1000,
+    local_prefix='data/user/',
+    gcp_bucket=None,
 ):
     '''dump user comments to {prefix}/{user_name}/*.json'''
     local_outpath = os.path.join(local_prefix, user_name)
