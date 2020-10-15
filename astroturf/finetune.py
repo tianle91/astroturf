@@ -64,7 +64,10 @@ def get_dataset(file_path, tokenizer: PreTrainedTokenizer, block_size: int=None)
     )
 
 def dump_finetuned(inputpath, outputpath, blocksize):
-    '''
+    '''Finetune GPT2LMHeadModel
+    inputpath: expect .json here as outputs of astroturf.prawtools.make_package_training
+    outputpath: to dump finetuned huggingface transformers
+    blocksize:
     '''
     print ('blocksize: {}\n{}-->{}'.format(blocksize, inputpath, outputpath))
 
