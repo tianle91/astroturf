@@ -10,7 +10,7 @@ def dump_user_comments(
     prefix='prawtools/make_package_training/user/',
     bucket='astroturf-dev-data',
 ):
-    '''dump user comments to gcp_bucket/{prefix}/{user_name}/{comment_id}.json and '''
+    '''dump user comments to {gcp_bucket}/{prefix}/{user_name}/{comment_id}.jsom'''
     client = storage.Client()
     bucket = client.bucket(bucket)
     prefix_user = os.path.join(prefix, user_name)
