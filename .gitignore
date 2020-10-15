@@ -134,6 +134,7 @@ praw.ini
 # data
 data/*
 finetune/*
+*.json
 
 # tensorboard
 log/*
