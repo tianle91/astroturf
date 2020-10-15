@@ -54,6 +54,7 @@ if __name__ == '__main__':
     parser.add_argument('--users', type=str, nargs='*')
     parser.add_argument('--blocksize', type=int, default=16)
     parser.add_argument('--maxsteps', type=int, default=10)
+    parser.add_argument('--forceupdate', type=bool, default=False)
     args = parser.parse_args()
 
     # list of users
@@ -65,4 +66,5 @@ if __name__ == '__main__':
 
     for user_name in users:
         print('user_name: {} running...'.format(user_name))
-        ran = refresh_finetuned(user_name, blocksize=args.blocksize, maxsteps=args.maxsteps)
+        ran = refresh_finetuned(user_name, blocksize=args.blocksize, maxsteps=args.maxsteps, force_update=args.forceupdate)
+        print('user_name: {} ran: {}'.format(user_name, ran))
