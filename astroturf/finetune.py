@@ -109,7 +109,7 @@ def dump_finetuned(inputpath, outputpath, blocksize):
             do_eval=True,
             evaluate_during_training=True,
             learning_rate=1e-4,
-            max_steps=100,
+            max_steps=10,
             save_total_limit=0,
             logging_dir='./log',
             logging_first_step=True,

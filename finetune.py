@@ -5,7 +5,7 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='finetune on user comments.')
     parser.add_argument('--users', type=str, nargs='*')
-    parser.add_argument('--blocksize', type=int, default=256)
+    parser.add_argument('--blocksize', type=int, default=16)
     args = parser.parse_args()
 
     # list of users
