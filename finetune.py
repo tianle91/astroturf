@@ -27,10 +27,15 @@ def refresh_finetuned(
         return False
 
     # download files for training
+    has_training_data = False
     for blob in client.list_blobs(data_bucket, prefix=data_prefix_user):
+        has_training_data = True
         if not os.path.isfile(blob.name):
             print ('Downloading: {}'.format(blob.name))
             blob.download_to_filename(blob.name)
+    if not has_training_data:
+        print ('has_training_data: {}'.format(has_training_data))
+        return False
 
     dump_finetuned(
         data_prefix_user, model_prefix_user,
