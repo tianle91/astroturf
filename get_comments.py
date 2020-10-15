@@ -4,54 +4,35 @@ import praw
 from google.cloud import storage
 from astroturf.prawtools import make_package_training
 
-def exist_blob(bucket_name, destination_blob_name):
-    """Check if file exists in bucket.
-    # bucket_name = "your-bucket-name"
-    # source_file_name = "local/path/to/file"
-    # destination_blob_name = "storage-object-name"
-    """
-    storage_client = storage.Client()
-    bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob(destination_blob_name)
-    return blob.exists()
-
-def upload_blob(bucket_name, source_file_name, destination_blob_name):
-    """Uploads a file to the bucket.
-    # bucket_name = "your-bucket-name"
-    # source_file_name = "local/path/to/file"
-    # destination_blob_name = "storage-object-name"
-    """
-    storage_client = storage.Client()
-    bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob(destination_blob_name)
-    blob.upload_from_filename(source_file_name)
-    print("File {} uploaded to {}.".format(source_file_name, destination_blob_name))
 
 def dump_user_comments(
     user_name, reddit, limit=1000,
     local_prefix='data/user/',
-    gcp_bucket=None
+    gcp_bucket='astroturf-dev-data',
 ):
     '''dump user comments to {prefix}/{user_name}/*.json and gcp_bucket'''
     local_outpath = os.path.join(local_prefix, user_name)
     os.makedirs(local_outpath, exist_ok=True)
+    gcp_storage_client = storage.Client()
+    gcp_bucket = gcp_storage_client.bucket(gcp_bucket)
+
     i = 0
     for comment in reddit.redditor(user_name).comments.new(limit=limit):
         commentoutpath = os.path.join(local_outpath, '{}.json'.format(comment.id))
         print ('[{i}/{limit}] id: {id}, body: {body}'.format(
             i=i, limit=limit, id=comment.id, body=comment.body.replace('\n', ' ').replace('\t', ' ')[:50]
         ))
-        i += 1
-        if not os.path.isfile(commentoutpath):
+        # ensure local_exists
+        local_exists = os.path.isfile(commentoutpath)
+        if not local_exists:
             package = make_package_training(comment, reddit)
             with open(commentoutpath, 'w+') as f:
                 json.dump(package, f, indent=4)
-        if gcp_bucket and not exist_blob(gcp_bucket, destination_blob_name=commentoutpath):
-            upload_blob(
-                gcp_bucket,
-                source_file_name=commentoutpath,
-                destination_blob_name=commentoutpath
-            )
+        # ensure cloud_exists
+        gcp_blob = gcp_bucket.blob(commentoutpath)
+        if not gcp_blob.exists():
+            gcp_blob.upload_from_filename(commentoutpath)
+        i += 1
     return True
 
 if __name__ == '__main__':
@@ -74,4 +55,4 @@ if __name__ == '__main__':
 
     for user_name in users:
         print ('user_name: {} running...'.format(user_name))
-        status = dump_user_comments(user_name, reddit, limit=100, gcp_bucket='astroturf-dev-data')
+        status = dump_user_comments(user_name, reddit, limit=100)
