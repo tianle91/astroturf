@@ -5,7 +5,7 @@ from google.cloud import storage
 from astroturf.prawtools import make_package_training
 
 
-def dump_user_comments(
+def refresh_user_comments(
     user_name, reddit, limit=1000,
     prefix='prawtools/make_package_training/user/',
     bucket='astroturf-dev-data',
@@ -48,4 +48,4 @@ if __name__ == '__main__':
 
     for user_name in users:
         print ('user_name: {} running...'.format(user_name))
-        status = dump_user_comments(user_name, reddit, limit=100)
+        status = refresh_user_comments(user_name, reddit, limit=100)
