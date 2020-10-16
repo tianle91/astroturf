@@ -114,8 +114,8 @@ def dump_finetuned(inputpath, outputpath, blocksize=16, max_steps=50):
         learning_rate=1e-4,
         max_steps=max_steps,
         save_total_limit=0,
-        logging_dir='./log',
-        logging_first_step=True,
+        # logging_dir='./log',
+        # logging_first_step=True,
         logging_steps=10,
     )
     trainer = Trainer(
