@@ -25,7 +25,7 @@ https://github.com/GoogleCloudPlatform/python-docs-samples/tree/master/functions
 
 ```
 gcloud functions deploy simulate_redditor_reponse \
-  --runtime python37 --retry --memory=1024MB --trigger-http --allow-unauthenticated --timeout 60s \
+  --runtime python37 --memory=2048MB --trigger-http --allow-unauthenticated --timeout 60s \
   --service-account storage-admin@astroturf-280818.iam.gserviceaccount.com
 
 curl --header "Content-Type: application/json" --request POST \
