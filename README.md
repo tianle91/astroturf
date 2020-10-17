@@ -27,6 +27,10 @@ https://github.com/GoogleCloudPlatform/python-docs-samples/tree/master/functions
 gcloud functions deploy simulate_redditor_reponse \
   --runtime python37 --memory=2048MB --trigger-http --allow-unauthenticated --timeout 60s \
   --service-account storage-admin@astroturf-280818.iam.gserviceaccount.com
+```
+
+```
+Error: memory limit exceeded. Function invocation was interrupted.
 
 curl --header "Content-Type: application/json" --request POST \
   --data '{"user_name":"spez","password":"https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw"}' \
