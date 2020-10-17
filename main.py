@@ -1,5 +1,6 @@
 import praw
 import os
+import json
 from glob import glob
 from google.cloud import storage
 from astroturf.infer import (get_qa_string, get_text_generation_pipeline,
@@ -8,26 +9,28 @@ from astroturf.infer import (get_qa_string, get_text_generation_pipeline,
 client = storage.Client()
 config_bucket = client.bucket('astroturf-dev-configs')
 model_prefix = 'finetune/dump_finetuned/user/'
+local_model_path = '/tmp/model/'
 
 def download_models(user_name):
-    os.makedirs(model_prefix, exist_ok=True)
+    os.makedirs(local_model_path, exist_ok=True)
     fnames = []
     for blob in client.list_blobs('astroturf-dev-models', prefix=os.path.join(model_prefix, user_name, 'model')):
         if not os.path.isfile(blob.name):
-            print('Downloading: {}'.format(blob.name))
-            blob.download_to_filename(blob.name)
+            localpathtemp = os.path.join(local_model_path, blob.name.split('/')[-1])
+            print('Downloading: {} to {}'.format(blob.name, localpathtemp))
+            blob.download_to_filename(localpathtemp)
         fnames.append(blob.name)
     if not len(fnames) > 0:
         raise EnvironmentError('{} has no model files.'.format(user_name))
 
-def clear_models(user_name):
-    for fname in glob(os.path.join(model_prefix, user_name, 'model/*')):
+def clear_models():
+    for fname in glob(os.path.join(local_model_path, '*')):
         os.remove(fname)
 
 def get_reddit():
-    praw_blob = config_bucket.blob('praw.ini')
-    praw_blob.download_to_filename(praw_blob.name)
-    return praw.Reddit()
+    praw_blob = config_bucket.blob('praw.json')
+    prawcfg = json.loads(praw_blob.download_as_string())
+    return praw.Reddit(**prawcfg)
 
 def simulate_redditor_reponse(request):
     """HTTP Cloud Function.
@@ -45,13 +48,13 @@ def simulate_redditor_reponse(request):
         download_models(user_name)
     except Exception as e:
         return str(e)
-    txtgen = get_text_generation_pipeline(os.path.join(model_prefix, user_name, 'model'))
     reddit = get_reddit()
+    txtgen = get_text_generation_pipeline(local_model_path)
     package = make_package_infer_url(request_json['url'], reddit)
     prompt = get_qa_string(package)
     responses = txtgen(prompt, max_length=len(prompt.split(' ')) + 128)
     response = responses[0]['generated_text'].replace(prompt, '').strip().split('\n')[0]
-    clear_models(user_name)
+    clear_models()
     request_json.update({
         'prompt': prompt,
         'response': response
