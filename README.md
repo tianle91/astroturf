@@ -30,5 +30,6 @@ gcloud functions deploy simulate_redditor_reponse \
 
 curl --header "Content-Type: application/json" --request POST \
   --data '{"user_name":"spez","password":"https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw"}' \
-  "https://us-northeast-1-astroturf-280818.cloudfunctions.net/simulate_redditor_reponse"
+  https://us-central1-astroturf-280818.cloudfunctions.net/simulate_redditor_reponse
 ```
+
