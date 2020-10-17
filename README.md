@@ -21,14 +21,14 @@ To run the UI, there's a few options depending on what you want to do.
 # Cloud Functions
 https://cloud.google.com/sdk/gcloud/reference/functions/deploy
 
+https://github.com/GoogleCloudPlatform/python-docs-samples/tree/master/functions/imagemagick
+
 ```
 gcloud functions deploy simulate_redditor_reponse \
-  --runtime python37 --memory=1024MB \
-  --trigger-http --allow-unauthenticated --timeout 60s \
+  --runtime python37 --retry --memory=1024MB --trigger-http --allow-unauthenticated --timeout 60s \
   --service-account storage-admin@astroturf-280818.iam.gserviceaccount.com
 
-curl --header "Content-Type: application/json" \
-  --request POST \
+curl --header "Content-Type: application/json" --request POST \
   --data '{"user_name":"spez","password":"https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw"}' \
   "https://us-northeast-1-astroturf-280818.cloudfunctions.net/simulate_redditor_reponse"
 ```
