@@ -51,7 +51,11 @@ def simulate_redditor_reponse(request):
     clear_models(user_name)
     return response
 
-#  gcloud functions deploy simulate_redditor_reponse --runtime python38 --trigger-http --allow-unauthenticated --service-account storage-admin@astroturf-280818.iam.gserviceaccount.com
+# gcloud functions deploy simulate_redditor_reponse --runtime python38 --trigger-http --allow-unauthenticated --service-account storage-admin@astroturf-280818.iam.gserviceaccount.com
+# curl --header "Content-Type: application/json" \
+#   --request POST \
+#   --data '{"user_name":"spez","password":"https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw"}' \
+#   "https://us-northeast-1-astroturf-280818.cloudfunctions.net/simulate_redditor_reponse"
 if __name__ == '__main__':
     class DummyRequest:
         def get_json(self, *args, **kwargs):
