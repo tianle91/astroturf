@@ -7,13 +7,10 @@ from astroturf.infer import (get_qa_string, get_text_generation_pipeline,
 
 client = storage.Client()
 config_bucket = client.bucket('astroturf-dev-configs')
-praw_blob = config_bucket.blob('praw.ini')
-praw_blob.download_to_filename(praw_blob.name)
-reddit = praw.Reddit()
 model_prefix = 'finetune/dump_finetuned/user/'
-os.makedirs(model_prefix, exist_ok=True)
 
 def download_models(user_name):
+    os.makedirs(model_prefix, exist_ok=True)
     fnames = []
     for blob in client.list_blobs('astroturf-dev-models', prefix=os.path.join(model_prefix, user_name, 'model')):
         if not os.path.isfile(blob.name):
@@ -26,6 +23,11 @@ def download_models(user_name):
 def clear_models(user_name):
     for fname in glob(os.path.join(model_prefix, user_name, 'model/*')):
         os.remove(fname)
+
+def get_reddit():
+    praw_blob = config_bucket.blob('praw.ini')
+    praw_blob.download_to_filename(praw_blob.name)
+    return praw.Reddit()
 
 def simulate_redditor_reponse(request):
     """HTTP Cloud Function.
@@ -44,6 +46,7 @@ def simulate_redditor_reponse(request):
     except Exception as e:
         return str(e)
     txtgen = get_text_generation_pipeline(os.path.join(model_prefix, user_name, 'model'))
+    reddit = get_reddit()
     package = make_package_infer_url(request_json['url'], reddit)
     prompt = get_qa_string(package)
     responses = txtgen(prompt, max_length=len(prompt.split(' ')) + 128)
