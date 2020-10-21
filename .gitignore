@@ -141,3 +141,5 @@ log/*
 
 # lint
 .DS_Store
+.idea/*
+.gcloudignore
