@@ -18,7 +18,16 @@ To run the UI, there's a few options depending on what you want to do.
 1. docker `docker-compose run --service-ports ui`.
 2. debugging `source run_flask.sh`
 
-# Cloud Functions
+
+# Infrastructure
+```
+app: ui -[inference]-> vm: inference service
+        -[refresh user]-> pub/sub: user_update_requests
+pub/sub: user_update_requests -> func: scraping service -> pub/sub: training_requests 
+pub/sub: training_requests -> vm: training service -> pub/sub: ui_update_requests
+```
+
+## Cloud Functions
 https://cloud.google.com/sdk/gcloud/reference/functions/deploy
 
 https://github.com/GoogleCloudPlatform/python-docs-samples/tree/master/functions/imagemagick
