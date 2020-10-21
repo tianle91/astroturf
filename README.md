@@ -21,23 +21,22 @@ To run the UI, there's a few options depending on what you want to do.
 
 # Infrastructure
 ```
-app: ui -[inference]-> vm: inference service
-        -[refresh user]-> pub/sub: user_update_requests
-pub/sub: user_update_requests -> func: scraping service -> pub/sub: training_requests 
-pub/sub: training_requests -> vm: training service -> pub/sub: ui_update_requests
+app: ui -[inference]-> func: retrieve predictions -[refresh inference]?-> pub/sub: user_response_inference_requests
+        -[refresh user]-> pub/sub: user_model_update_requests
+
+pub/sub: user_response_inference_requests -> gpu: inference service
+pub/sub: user_model_update_requests -> func: scraping service -[new data]?-> pub/sub: user_model_training_requests 
+pub/sub: user_model_training_requests -> gpu: training service -> pub/sub: ui_update_requests
 ```
 
 ## Cloud Functions
 https://cloud.google.com/sdk/gcloud/reference/functions/deploy
-
 https://github.com/GoogleCloudPlatform/python-docs-samples/tree/master/functions/imagemagick
-
 ```
 gcloud functions deploy simulate_redditor_reponse \
   --runtime python37 --memory=2048MB --trigger-http --allow-unauthenticated --timeout 60s \
   --service-account storage-admin@astroturf-280818.iam.gserviceaccount.com
 ```
-
 ```
 Error: memory limit exceeded. Function invocation was interrupted.
 
