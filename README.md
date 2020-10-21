@@ -21,12 +21,15 @@ To run the UI, there's a few options depending on what you want to do.
 
 # Infrastructure
 ```
-app: ui -[inference]-> func: retrieve predictions -[refresh inference]?-> pub/sub: user_response_inference_requests
-        -[refresh user]-> pub/sub: user_model_update_requests
+# fixed
+app: ui -[new inference]-> gpu: inference service -> gcs: new response
+        -[refresh user]-> pub: user_model_update_requests 
 
-pub/sub: user_response_inference_requests -> gpu: inference service
-pub/sub: user_model_update_requests -> func: scraping service -[new data]?-> pub/sub: user_model_training_requests 
-pub/sub: user_model_training_requests -> gpu: training service -> pub/sub: ui_update_requests
+# pre-emptible
+sub: user_model_update_requests -> func: scraping service -[new data]?-|-> pub: user_model_training_requests
+                                                                       |-> gcs: new data
+sub: user_model_training_requests -> gpu: training service -|-> pub: ui_update_requests
+                                                            |-> gcs: new model
 ```
 
 ## Cloud Functions
