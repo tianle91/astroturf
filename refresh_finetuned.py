@@ -22,6 +22,8 @@ def refresh_finetuned(
     output_flags = [os.path.join(model_prefix_user, 'model/{}'.format(s)) for s in [
         'pytorch_model.bin', 'config.json', 'training_args.bin'
     ]]
+
+    # skip if not force_update and model exists
     if not force_update and all(bucket.blob(s).exists() for s in output_flags):
         print ('Skip refresh_finetuned due to existing output_flags:\n{}'.format('\n'.join(output_flags)))
         return False
@@ -41,6 +43,8 @@ def refresh_finetuned(
         data_prefix_user, model_prefix_user,
         blocksize=blocksize, max_steps=maxsteps
     )
+
+    # upload results
     for fname in glob(os.path.join(model_prefix_user, 'model/*')):
         print ('Uploading: {}'.format(fname))
         blob = bucket.blob(fname)
