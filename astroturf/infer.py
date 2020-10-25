@@ -1,3 +1,4 @@
+from praw import Reddit
 from praw.exceptions import InvalidURL
 from praw.models import Comment, Submission
 from transformers import GPT2Tokenizer, pipeline
@@ -6,7 +7,7 @@ from astroturf.prawtools import (make_package_infer_comment,
                                  make_package_infer_submission)
 
 
-def make_package_infer_url(url, reddit):
+def make_package_infer_url(url: str, reddit: Reddit):
     try:
         refobj = reddit.comment(url=url)
     except InvalidURL:
