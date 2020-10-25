@@ -5,7 +5,7 @@ from google.cloud import storage
 
 from astroturf.infer import (get_qa_string, get_text_generation_pipeline,
                              make_package_infer_url)
-from main import refresh_local_models
+from main import refresh_local_models, simulate_redditor_response
 from praw_utils import get_reddit
 
 app = Flask(__name__)
@@ -29,19 +29,13 @@ def index():
 @app.route('/<username>', methods=('GET', 'POST'))
 def user(username):
     userresponse = {'username': username, 'defaulturl': defaulturl}
-    txtgen = get_text_generation_pipeline(local_model_path_user_d[username])
-    
     if request.method == 'POST':
         url = request.form['url']
         url = url if 'reddit.com' in url else defaulturl
-        package = make_package_infer_url(url, reddit)
-        prompt = get_qa_string(package)
-        responses = txtgen(prompt, max_length=len(prompt.split(' '))+128)
-        response = responses[0]['generated_text'].replace(prompt, '').strip().split('\n')[0]
-        userresponse = {
+        sim_output = simulate_redditor_response(username, url)
+        sim_output.update({
             'username': username,
             'url': url,
-            'prompt': prompt,
-            'response': response,
-        }
+        })
+        userresponse.update(sim_output)
     return render_template('user.html', userresponse=userresponse)
