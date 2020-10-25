@@ -11,10 +11,11 @@ from astroturf.infer import (get_qa_string, get_text_generation_pipeline,
 client = storage.Client()
 config_bucket = client.bucket('astroturf-dev-configs')
 path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_string())
+model_bucket = path_config['model_bucket']
 cloud_model_path = path_config['model_path']
 local_model_path = '/tmp/models/'
 
-def refresh_models(user_name, force_update=False):
+def refresh_local_models(user_name, force_update=False):
     """return local path for model files for user==user_name"""
     cloud_model_path_user = os.path.join(cloud_model_path, user_name, 'model')
     local_model_path_user = os.path.join(local_model_path, user_name)
@@ -25,7 +26,7 @@ def refresh_models(user_name, force_update=False):
         return local_model_path_user
     # refresh
     fnames = []
-    for blob in client.list_blobs('astroturf-dev-models', prefix=cloud_model_path_user):
+    for blob in client.list_blobs(model_bucket, prefix=cloud_model_path_user):
         if force_update or not os.path.isfile(blob.name):
             fname = blob.name.split('/')[-1]
             local_path_temp = os.path.join(local_model_path_user, fname)
@@ -55,7 +56,7 @@ def simulate_redditor_reponse(request):
     request_json = request.get_json(silent=True)
     user_name = request_json['user_name']
     try:
-        local_model_path_user = refresh_models(user_name)
+        local_model_path_user = refresh_local_models(user_name)
     except Exception as e:
         return str(e)
     reddit = get_reddit()
