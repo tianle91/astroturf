@@ -16,6 +16,7 @@ path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_strin
 model_bucket = path_config['model_bucket']
 cloud_model_path = path_config['model_path']
 local_model_path = '/tmp/models/'
+reddit = get_reddit(client, 'astroturf-dev-configs')
 
 def refresh_local_models(user_name, force_update=False):
     """return local path for model files for user==user_name"""
@@ -33,26 +34,27 @@ def refresh_local_models(user_name, force_update=False):
         raise ValueError('{} has no model files.'.format(user_name))
     return local_model_path_user
 
-def simulate_redditor_reponse(request: flask.Request):
+def simulate_redditor_response(user, url):
+    try:
+        local_model_path_user = refresh_local_models(user)
+    except Exception as e:
+        return str(e)
+    txtgen = get_text_generation_pipeline(local_model_path_user)
+    package = make_package_infer_url(url, reddit)
+    prompt = get_qa_string(package)
+    responses = txtgen(prompt, max_length=len(prompt.split(' ')) + 128)
+    return {
+        'prompt': prompt,
+        'response': responses[0]['generated_text'].replace(prompt, '').strip().split('\n')[0]
+    }
+
+def simulate_redditor_response_flask(request: flask.Request):
     """HTTP Cloud Function. Returns response text or any valid input to
     https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response
     """
     request_json = request.get_json(silent=True)
-    user_name = request_json['user_name']
-    try:
-        local_model_path_user = refresh_local_models(user_name)
-    except Exception as e:
-        return str(e)
-    reddit = get_reddit(client, 'astroturf-dev-configs')
-    txtgen = get_text_generation_pipeline(local_model_path_user)
-    package = make_package_infer_url(request_json['url'], reddit)
-    prompt = get_qa_string(package)
-    responses = txtgen(prompt, max_length=len(prompt.split(' ')) + 128)
-    response = responses[0]['generated_text'].replace(prompt, '').strip().split('\n')[0]
-    request_json.update({
-        'prompt': prompt,
-        'response': response
-    })
+    sim_output = simulate_redditor_response(request_json['user_name'], request_json['url'])
+    request_json.update(sim_output)
     return request_json
 
 
@@ -63,4 +65,4 @@ if __name__ == '__main__':
                 "user_name":"spez",
                 "url":"https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw"
             }
-    print (simulate_redditor_reponse(DummyRequest()))
+    print (simulate_redditor_response_flask(DummyRequest()))
