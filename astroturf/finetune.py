@@ -110,8 +110,8 @@ def dump_finetuned(inputpath, outputpath, blocksize=16, max_steps=50):
     training_args = TrainingArguments(
         output_dir=modeloutputpath,
         do_train=True,
-        do_eval=True,
-        evaluate_during_training=True,
+        # do_eval=True,
+        # evaluate_during_training=True,
         learning_rate=1e-4,
         max_steps=max_steps,
         save_total_limit=0,
@@ -130,4 +130,4 @@ def dump_finetuned(inputpath, outputpath, blocksize=16, max_steps=50):
     trainer.train()
     trainer.save_model()
     print (trainer.evaluate())
-    return True
+    return modeloutputpath
