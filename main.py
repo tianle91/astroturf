@@ -2,6 +2,7 @@ import praw
 import os
 import json
 from glob import glob
+import configparser
 from google.cloud import storage
 from astroturf.infer import (get_qa_string, get_text_generation_pipeline,
                              make_package_infer_url)
@@ -11,10 +12,15 @@ config_bucket = client.bucket('astroturf-dev-configs')
 model_prefix = 'finetune/dump_finetuned/user/'
 local_model_path = '/tmp/model/'
 
-def download_models(user_name):
+def refresh_models(user_name, force_update=False):
     os.makedirs(local_model_path, exist_ok=True)
+    prefix = os.path.join(model_prefix, user_name, 'model')
+    # skip refresh
+    if not force_update and os.path.isfile(os.path.join(prefix, 'pytorch_model.bin')):
+        return True
+    # refresh
     fnames = []
-    for blob in client.list_blobs('astroturf-dev-models', prefix=os.path.join(model_prefix, user_name, 'model')):
+    for blob in client.list_blobs('astroturf-dev-models', prefix=prefix):
         if not os.path.isfile(blob.name):
             localpathtemp = os.path.join(local_model_path, blob.name.split('/')[-1])
             print('Downloading: {} to {}'.format(blob.name, localpathtemp))
@@ -22,15 +28,17 @@ def download_models(user_name):
         fnames.append(blob.name)
     if not len(fnames) > 0:
         raise EnvironmentError('{} has no model files.'.format(user_name))
+    return True
 
 def clear_models():
     for fname in glob(os.path.join(local_model_path, '*')):
         os.remove(fname)
 
 def get_reddit():
-    praw_blob = config_bucket.blob('praw.json')
-    prawcfg = json.loads(praw_blob.download_as_string())
-    return praw.Reddit(**prawcfg)
+    praw_blob = config_bucket.blob('praw.ini')
+    config = configparser.ConfigParser()
+    config.read_string(praw_blob.download_as_text())
+    return praw.Reddit(**config['DEFAULT'])
 
 def simulate_redditor_reponse(request):
     """HTTP Cloud Function.
@@ -45,7 +53,7 @@ def simulate_redditor_reponse(request):
     request_json = request.get_json(silent=True)
     user_name = request_json['user_name']
     try:
-        download_models(user_name)
+        refresh_models(user_name)
     except Exception as e:
         return str(e)
     reddit = get_reddit()
