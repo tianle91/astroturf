@@ -1,32 +1,35 @@
 # https://www.digitalocean.com/community/tutorials/how-to-make-a-web-application-using-flask-in-python-3
 
-from glob import glob
-
-import praw
 from flask import Flask, render_template, request
+from google.cloud import storage
 
 from astroturf.infer import (get_qa_string, get_text_generation_pipeline,
                              make_package_infer_url)
+from main import refresh_local_models
+from praw_utils import get_reddit
 
 app = Flask(__name__)
-reddit = praw.Reddit()
+client = storage.Client()
+reddit = get_reddit(client, 'astroturf-dev-configs')
 
-username_l = [
-    s.replace('finetune/', '').replace('/model/pytorch_model.bin', '') 
-    for s in glob('finetune/*/model/pytorch_model.bin')
-]
+with open('users.txt') as f:
+    users = f.read().split()
+
+local_model_path_user_d = {
+    user_name: refresh_local_models(user_name)
+    for user_name in users
+}
 
 defaulturl = 'https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw'
 
 @app.route('/')
 def index():
-    users = [{'username': username} for username in username_l]
-    return render_template('index.html', users=users)
+    return render_template('index.html', users=[{'username': s} for s in users])
 
 @app.route('/<username>', methods=('GET', 'POST'))
 def user(username):
     userresponse = {'username': username, 'defaulturl': defaulturl}
-    txtgen = get_text_generation_pipeline('finetune/{}/model/'.format(username))
+    txtgen = get_text_generation_pipeline(local_model_path_user_d[username])
     
     if request.method == 'POST':
         url = request.form['url']
