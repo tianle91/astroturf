@@ -5,15 +5,15 @@ from google.cloud import storage
 
 
 def upload_all_local_files_with_prefix(
-    local_prefix: str,
-    cloud_bucket: str, cloud_prefix: str,
-    client: storage.Client
+        local_prefix: str,
+        cloud_bucket: str, cloud_prefix: str,
+        client: storage.Client
 ):
     bucket = client.bucket(cloud_bucket)
     fnames = []
     for local_path_temp in glob(os.path.join(local_prefix, '*')):
         fname = local_path_temp.split('/')[-1]
-        print ('Uploading: {fname} to bucket: {bkt} at prefix: {prfx}'.format(
+        print('Uploading: {fname} to bucket: {bkt} at prefix: {prfx}'.format(
             fname=fname,
             bkt=cloud_bucket,
             prfx=cloud_prefix
@@ -23,11 +23,12 @@ def upload_all_local_files_with_prefix(
         fnames.append(fname)
     return fnames
 
+
 def download_all_cloud_files_with_prefix(
-    local_prefix: str,
-    cloud_bucket: str, cloud_prefix: str,
-    client: storage.Client,
-    refresh_local: bool = True
+        local_prefix: str,
+        cloud_bucket: str, cloud_prefix: str,
+        client: storage.Client,
+        refresh_local: bool = True
 ):
     os.makedirs(local_prefix, exist_ok=True)
     fnames = []

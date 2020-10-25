@@ -3,8 +3,6 @@
 from flask import Flask, render_template, request
 from google.cloud import storage
 
-from astroturf.infer import (get_qa_string, get_text_generation_pipeline,
-                             make_package_infer_url)
 from main import refresh_local_models, simulate_redditor_response
 from praw_utils import get_reddit
 
@@ -22,9 +20,11 @@ local_model_path_user_d = {
 
 defaulturl = 'https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw'
 
+
 @app.route('/')
 def index():
     return render_template('index.html', users=[{'username': s} for s in users])
+
 
 @app.route('/<username>', methods=('GET', 'POST'))
 def user(username):

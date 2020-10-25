@@ -17,11 +17,12 @@ model_bucket = path_config['model_bucket']
 cloud_model_path = path_config['model_path']
 local_model_path = 'models'
 
+
 def refresh_finetuned(
-    user_name,
-    blocksize=16,
-    maxsteps=10,
-    force_update=False
+        user_name,
+        blocksize=16,
+        maxsteps=10,
+        force_update=False
 ):
     cloud_model_path_user = os.path.join(cloud_model_path, user_name)
     local_model_path_user = os.path.join(local_model_path, user_name)
@@ -35,7 +36,7 @@ def refresh_finetuned(
 
     # skip if not force_update and model exists
     if not force_update and all(bucket.blob(s).exists() for s in output_flags):
-        print ('Skip refresh_finetuned due to existing output_flags:\n{}'.format('\n'.join(output_flags)))
+        print('Skip refresh_finetuned due to existing output_flags:\n{}'.format('\n'.join(output_flags)))
         return cloud_model_path_user
     # download files for training
     downloaded_data_fnames = download_all_cloud_files_with_prefix(
@@ -59,9 +60,11 @@ def refresh_finetuned(
     )
     return cloud_model_path_user
 
+
 if __name__ == '__main__':
 
     import argparse
+
     parser = argparse.ArgumentParser(description='finetune on user comments.')
     parser.add_argument('--users', type=str, nargs='*')
     parser.add_argument('--blocksize', type=int, default=16)
@@ -78,5 +81,6 @@ if __name__ == '__main__':
 
     for user_name in users:
         print('user_name: {} running...'.format(user_name))
-        ran = refresh_finetuned(user_name, blocksize=args.blocksize, maxsteps=args.maxsteps, force_update=args.forceupdate)
+        ran = refresh_finetuned(user_name, blocksize=args.blocksize, maxsteps=args.maxsteps,
+                                force_update=args.forceupdate)
         print('user_name: {} ran: {}'.format(user_name, ran))

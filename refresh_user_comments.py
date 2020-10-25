@@ -12,6 +12,7 @@ path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_strin
 data_bucket = path_config['data_bucket']
 data_path = path_config['data_path']
 
+
 def refresh_user_comments(user_name: str, reddit: praw.Reddit, limit: int = 1000):
     '''dump user comments to {gcp_bucket}/{prefix}/{user_name}/{comment_id}.json'''
 
@@ -31,9 +32,11 @@ def refresh_user_comments(user_name: str, reddit: praw.Reddit, limit: int = 1000
         i += 1
     return True
 
+
 if __name__ == '__main__':
 
     import argparse
+
     parser = argparse.ArgumentParser(description='search comments by new for user.')
     parser.add_argument('--users', type=str, nargs='*')
     parser.add_argument('--limit', type=int, default=100)
@@ -41,7 +44,7 @@ if __name__ == '__main__':
 
     limit = args.limit
     reddit = praw.Reddit()
-    
+
     # list of users
     if args.users is None:
         with open('users.txt') as f:
@@ -50,5 +53,5 @@ if __name__ == '__main__':
         users = list(args.users)
 
     for user_name in users:
-        print ('user_name: {} running...'.format(user_name))
+        print('user_name: {} running...'.format(user_name))
         status = refresh_user_comments(user_name, reddit, limit=100)
