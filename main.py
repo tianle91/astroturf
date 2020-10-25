@@ -1,7 +1,6 @@
 import configparser
 import json
 import os
-from glob import glob
 
 import praw
 from google.cloud import storage
