@@ -15,6 +15,7 @@ from transformers import (DataCollatorForLanguageModeling, GPT2LMHeadModel,
 tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
 model = GPT2LMHeadModel.from_pretrained("gpt2")
 eos = tokenizer.eos_token
+model_output_fnames = ['pytorch_model.bin', 'config.json', 'training_args.bin']
 
 # data part
 
