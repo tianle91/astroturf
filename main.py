@@ -13,31 +13,29 @@ client = storage.Client()
 config_bucket = client.bucket('astroturf-dev-configs')
 path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_string())
 cloud_model_path = path_config['model_path']
-local_model_path = '/tmp/model/'
+local_model_path = '/tmp/models/'
 
 def refresh_models(user_name, force_update=False):
-    os.makedirs(local_model_path, exist_ok=True)
+    """return local path for model files for user==user_name"""
     cloud_model_path_user = os.path.join(cloud_model_path, user_name, 'model')
+    local_model_path_user = os.path.join(local_model_path, user_name)
+    os.makedirs(local_model_path_user, exist_ok=True)
     # skip refresh
-    if not force_update and os.path.isfile(os.path.join(cloud_model_path_user, 'pytorch_model.bin')):
+    if not force_update and os.path.isfile(os.path.join(local_model_path_user, 'pytorch_model.bin')):
         print('pytorch_model.bin exists! skipping refresh.')
-        return True
+        return local_model_path_user
     # refresh
     fnames = []
     for blob in client.list_blobs('astroturf-dev-models', prefix=cloud_model_path_user):
         if force_update or not os.path.isfile(blob.name):
             fname = blob.name.split('/')[-1]
-            local_path_temp = os.path.join(local_model_path, fname)
+            local_path_temp = os.path.join(local_model_path_user, fname)
             print('Downloading: {} to {}'.format(blob.name, local_path_temp))
             blob.download_to_filename(local_path_temp)
         fnames.append(blob.name)
     if not len(fnames) > 0:
         raise EnvironmentError('{} has no model files.'.format(user_name))
-    return True
-
-def clear_models():
-    for fname in glob(os.path.join(local_model_path, '*')):
-        os.remove(fname)
+    return local_model_path_user
 
 def get_reddit():
     praw_blob = config_bucket.blob('praw.ini')
@@ -58,16 +56,15 @@ def simulate_redditor_reponse(request):
     request_json = request.get_json(silent=True)
     user_name = request_json['user_name']
     try:
-        refresh_models(user_name)
+        local_model_path_user = refresh_models(user_name)
     except Exception as e:
         return str(e)
     reddit = get_reddit()
-    txtgen = get_text_generation_pipeline(local_model_path)
+    txtgen = get_text_generation_pipeline(local_model_path_user)
     package = make_package_infer_url(request_json['url'], reddit)
     prompt = get_qa_string(package)
     responses = txtgen(prompt, max_length=len(prompt.split(' ')) + 128)
     response = responses[0]['generated_text'].replace(prompt, '').strip().split('\n')[0]
-    clear_models()
     request_json.update({
         'prompt': prompt,
         'response': response
