@@ -12,8 +12,9 @@ from transformers import (DataCollatorForLanguageModeling, GPT2LMHeadModel,
                           GPT2Tokenizer, PreTrainedTokenizer, TextDataset,
                           Trainer, TrainingArguments)
 
+model_checkpoint_name = "distilgpt2" # "gpt2"
 tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
-model = GPT2LMHeadModel.from_pretrained("gpt2")
+model = GPT2LMHeadModel.from_pretrained(model_checkpoint_name)
 eos = tokenizer.eos_token
 model_output_fnames = ['pytorch_model.bin', 'config.json', 'training_args.bin']
 
@@ -129,5 +130,5 @@ def dump_finetuned(inputpath, outputpath, blocksize=16, max_steps=50):
     )
     trainer.train()
     trainer.save_model()
-    print (trainer.evaluate())
+    # print (trainer.evaluate())
     return modeloutputpath
