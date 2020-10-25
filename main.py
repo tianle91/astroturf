@@ -43,7 +43,7 @@ def simulate_redditor_reponse(request: flask.Request):
         local_model_path_user = refresh_local_models(user_name)
     except Exception as e:
         return str(e)
-    reddit = get_reddit(client, path_config['config_bucket'])
+    reddit = get_reddit(client, 'astroturf-dev-configs')
     txtgen = get_text_generation_pipeline(local_model_path_user)
     package = make_package_infer_url(request_json['url'], reddit)
     prompt = get_qa_string(package)
