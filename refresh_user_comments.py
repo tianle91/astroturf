@@ -1,7 +1,9 @@
 import json
 import os
+
 import praw
 from google.cloud import storage
+
 from astroturf.prawtools import make_package_training
 
 

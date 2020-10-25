@@ -1,7 +1,10 @@
 import os
 from glob import glob
+
 from google.cloud import storage
+
 from astroturf.finetune import dump_finetuned
+
 
 def refresh_finetuned(
     user_name,
