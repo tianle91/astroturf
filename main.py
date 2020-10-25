@@ -1,9 +1,10 @@
-import praw
-import os
-import json
-from glob import glob
 import configparser
+import os
+from glob import glob
+
+import praw
 from google.cloud import storage
+
 from astroturf.infer import (get_qa_string, get_text_generation_pipeline,
                              make_package_infer_url)
 
