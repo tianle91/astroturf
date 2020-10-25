@@ -1,4 +1,5 @@
 import configparser
+import json
 import os
 from glob import glob
 
@@ -10,22 +11,25 @@ from astroturf.infer import (get_qa_string, get_text_generation_pipeline,
 
 client = storage.Client()
 config_bucket = client.bucket('astroturf-dev-configs')
-model_prefix = 'finetune/dump_finetuned/user/'
+path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_string())
+cloud_model_path = path_config['model_path']
 local_model_path = '/tmp/model/'
 
 def refresh_models(user_name, force_update=False):
     os.makedirs(local_model_path, exist_ok=True)
-    prefix = os.path.join(model_prefix, user_name, 'model')
+    cloud_model_path_user = os.path.join(cloud_model_path, user_name, 'model')
     # skip refresh
-    if not force_update and os.path.isfile(os.path.join(prefix, 'pytorch_model.bin')):
+    if not force_update and os.path.isfile(os.path.join(cloud_model_path_user, 'pytorch_model.bin')):
+        print('pytorch_model.bin exists! skipping refresh.')
         return True
     # refresh
     fnames = []
-    for blob in client.list_blobs('astroturf-dev-models', prefix=prefix):
-        if not os.path.isfile(blob.name):
-            localpathtemp = os.path.join(local_model_path, blob.name.split('/')[-1])
-            print('Downloading: {} to {}'.format(blob.name, localpathtemp))
-            blob.download_to_filename(localpathtemp)
+    for blob in client.list_blobs('astroturf-dev-models', prefix=cloud_model_path_user):
+        if force_update or not os.path.isfile(blob.name):
+            fname = blob.name.split('/')[-1]
+            local_path_temp = os.path.join(local_model_path, fname)
+            print('Downloading: {} to {}'.format(blob.name, local_path_temp))
+            blob.download_to_filename(local_path_temp)
         fnames.append(blob.name)
     if not len(fnames) > 0:
         raise EnvironmentError('{} has no model files.'.format(user_name))
