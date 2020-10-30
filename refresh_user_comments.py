@@ -36,6 +36,7 @@ def refresh_user_comments(user_name: str, reddit: praw.Reddit, limit: int = 1000
 if __name__ == '__main__':
 
     import argparse
+    from praw_utils import get_reddit
 
     parser = argparse.ArgumentParser(description='search comments by new for user.')
     parser.add_argument('--users', type=str, nargs='*')
@@ -43,7 +44,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     limit = args.limit
-    reddit = praw.Reddit()
+    reddit = get_reddit(client, 'astroturf-dev-configs')
 
     # list of users
     if args.users is None:
