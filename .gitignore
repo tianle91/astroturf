@@ -84,3 +84,6 @@ log/*
 
 # service account json
 astroturf -ea9230192cd3.json
+
+# pycharm
+.idea/*
