@@ -4,9 +4,8 @@ import os
 import flask
 from google.cloud import storage
 
-from astroturf.finetune import model_output_fnames
-from astroturf.infer import (get_qa_string, get_text_generation_pipeline,
-                             make_package_infer_url)
+from astroturf.finetune import model_output_fnames, get_qa_string
+from astroturf.infer import get_text_generation_pipeline, make_package_infer_url
 from gcp_utils import download_all_cloud_files_with_prefix
 from praw_utils import get_reddit
 
