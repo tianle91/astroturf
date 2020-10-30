@@ -55,4 +55,4 @@ if __name__ == '__main__':
 
     for user_name in users:
         print('user_name: {} running...'.format(user_name))
-        status = refresh_user_comments(user_name, reddit, limit=100)
+        status = refresh_user_comments(user_name, reddit, limit=args.limit)
