@@ -19,10 +19,10 @@ services:
       context: .
     volumes:
       - .:/astroturf
-    entrypoint: python refresh_user_finetuned.py
+    entrypoint: python refresh_finetuned.py
   refreshdata:
     build:
       context: .
     volumes:
       - .:/astroturf
-    entrypoint: python refresh_user_comments.py
+    entrypoint: python refresh_comments.py
