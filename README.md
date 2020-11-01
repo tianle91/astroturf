@@ -9,7 +9,8 @@ Gets a particular reddit user's comments, train a model on those comments, then 
 # Infrastructure
 ```
 app: ui -[infer]-> run local inference and serve it
-        -[refresh user]-> pub: user_model_update_requests
+app: ui -[update]-> pub: update_request, sub: update_status
+app: ui -[refresh]-> ???
 
-sub: user_model_update_requests -> {refresh_user_comments, refresh_finetuned}.py 
+sub: update_request -> {refresh_user_comments, refresh_finetuned}.py -> pub: update_status 
 ```
