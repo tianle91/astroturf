@@ -17,6 +17,8 @@ config_bucket = client.bucket('astroturf-dev-configs')
 path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_string())
 model_bucket = path_config['model_bucket']
 cloud_model_path = path_config['model_path']
+data_bucket = path_config['data_bucket']
+cloud_data_path = path_config['data_path']
 
 users = {
     blob.name.replace(cloud_model_path, '').split('/')[0]
@@ -27,9 +29,17 @@ print('Models exist for users:\n{}'.format(users))
 defaulturl = 'https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw'
 
 
-def last_updated_date(username):
+def model_last_updated(username):
     for blob in client.list_blobs(model_bucket, prefix=os.path.join(cloud_model_path, username)):
-        return blob.updated
+        return blob.updated.strftime('%c')
+
+
+def data_last_updated(username):
+    maxdate = None
+    for blob in client.list_blobs(data_bucket, prefix=os.path.join(cloud_data_path, username)):
+        if maxdate is None or blob.updated > maxdate:
+            maxdate = blob.updated
+    return maxdate.strftime('%c')
 
 
 @app.route('/')
@@ -39,7 +49,7 @@ def index():
 
 @app.route('/<username>', methods=('GET', 'POST'))
 def user(username):
-    userresponse = {'username': username, 'defaulturl': defaulturl, 'lastupdated': last_updated_date(username)}
+    userresponse = {'username': username, 'defaulturl': defaulturl, 'lastupdated': model_last_updated(username)}
     # (premature?) optimization for simulate_redditor_response
     refresh_local_models(username)
     if request.method == 'POST':
@@ -52,3 +62,15 @@ def user(username):
         })
         userresponse.update(sim_output)
     return render_template('user.html', userinference=userresponse)
+
+
+@app.route('/<username>/refresh', methods=('GET', 'POST'))
+def refresh(username):
+    userrefresh = {
+        'username': username,
+        'modellastupdated': model_last_updated(username),
+        'datalastupdated': data_last_updated(username)
+    }
+    if request.method == 'POST':
+        pass
+    return render_template('refresh.html', userrefresh=userrefresh)

@@ -5,6 +5,9 @@
 Paste a Reddit submission or comment and simulate a Redditor's response!
 <br>
 Model last updated on {{ userinference['lastupdated'] }}.
+<a href="{{ url_for('refresh', username=userinference['username']) }}">
+    Refresh.
+</a>
 <hr>
 
 <form method="post">
