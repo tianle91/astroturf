@@ -4,6 +4,15 @@
     <h1>{% block title %} Select a Redditor to query... {% endblock %}</h1>
     Paste a Reddit submission or comment and simulate a Redditor's response!
     <hr>
+
+    <h2>Users</h2>
+    <form method="post">
+        <div class="input-group mb-3">
+            <input type="text" name="url" placeholder="username" class="form-control" value="{{ request.form['username'] }}">
+            <button type="submit" class="btn btn-primary">Refresh User</button>
+        </div>
+    </form>
+    <hr>
     {% for user in users %}
         <a href="{{ url_for('user', username=user['username']) }}">
             <h2>{{ user['username'] }}</h2>
