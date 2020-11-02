@@ -16,4 +16,3 @@ Gets a particular reddit user's comments, train a model on those comments, then 
 
 ## Compute 
 - sub: model_refresh_servicer. Scrapes user comments, finetunes model and uploads to model bucket. 
-```
