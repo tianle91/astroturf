@@ -2,6 +2,8 @@
 
 {% block content %}
     <h1>{% block title %} Select a Redditor to query... {% endblock %}</h1>
+    Paste a Reddit submission or comment and simulate a Redditor's response!
+    <hr>
     {% for user in users %}
         <a href="{{ url_for('user', username=user['username']) }}">
             <h2>{{ user['username'] }}</h2>

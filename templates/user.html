@@ -1,9 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{% block title %} {{ userinference['username'] }} {% endblock %}</h1>
-Paste a Reddit submission or comment and simulate a Redditor's response!
-<br>
+<h1>{{ userinference['username'] }}</h1>
 Model last updated on {{ userinference['lastupdated'] }}.
 <a href="{{ url_for('refresh', username=userinference['username']) }}">
     Refresh.

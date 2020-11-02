@@ -2,6 +2,7 @@
 
 import json
 import os
+from typing import Optional
 
 from flask import Flask, render_template, request
 from google.cloud import storage
@@ -20,21 +21,22 @@ cloud_model_path = path_config['model_path']
 data_bucket = path_config['data_bucket']
 cloud_data_path = path_config['data_path']
 
-users = {
+users = sorted(list({
     blob.name.replace(cloud_model_path, '').split('/')[0]
     for blob in client.list_blobs(model_bucket, prefix=cloud_model_path)
-}
+}))
 print('Models exist for users:\n{}'.format(users))
 
 defaulturl = 'https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw'
 
 
-def model_last_updated(username):
+def model_last_updated(username: str) -> Optional[str]:
     for blob in client.list_blobs(model_bucket, prefix=os.path.join(cloud_model_path, username)):
         return blob.updated.strftime('%c')
+    return None
 
 
-def data_last_updated(username):
+def data_last_updated(username: str) -> Optional[str]:
     maxdate = None
     for blob in client.list_blobs(data_bucket, prefix=os.path.join(cloud_data_path, username)):
         if maxdate is None or blob.updated > maxdate:
