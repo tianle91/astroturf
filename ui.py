@@ -1,6 +1,7 @@
 # https://www.digitalocean.com/community/tutorials/how-to-make-a-web-application-using-flask-in-python-3
 
 import json
+import os
 
 from flask import Flask, render_template, request
 from google.cloud import storage
@@ -17,10 +18,18 @@ path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_strin
 model_bucket = path_config['model_bucket']
 cloud_model_path = path_config['model_path']
 
-users = [blob.name.replace(cloud_model_path, '') for blob in client.list_blobs(model_bucket, prefix=cloud_model_path)]
-local_model_path_user_d = {user_name: refresh_local_models(user_name) for user_name in users}
+users = {
+    blob.name.replace(cloud_model_path, '').split('/')[0]
+    for blob in client.list_blobs(model_bucket, prefix=cloud_model_path)
+}
+print('Models exist for users:\n{}'.format(users))
 
 defaulturl = 'https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw'
+
+
+def last_updated_date(username):
+    for blob in client.list_blobs(model_bucket, prefix=os.path.join(cloud_model_path, username)):
+        return blob.updated
 
 
 @app.route('/')
@@ -30,7 +39,9 @@ def index():
 
 @app.route('/<username>', methods=('GET', 'POST'))
 def user(username):
-    userresponse = {'username': username, 'defaulturl': defaulturl}
+    userresponse = {'username': username, 'defaulturl': defaulturl, 'lastupdated': last_updated_date(username)}
+    # (premature?) optimization for simulate_redditor_response
+    refresh_local_models(username)
     if request.method == 'POST':
         url = request.form['url']
         url = url if 'reddit.com' in url else defaulturl
@@ -40,4 +51,4 @@ def user(username):
             'url': url,
         })
         userresponse.update(sim_output)
-    return render_template('user.html', userresponse=userresponse)
+    return render_template('user.html', userinference=userresponse)

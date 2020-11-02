@@ -1,16 +1,17 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{% block title %} {{ userresponse['username'] }} {% endblock %}</h1>
-
+<h1>{% block title %} {{ userinference['username'] }} {% endblock %}</h1>
 Paste a Reddit submission or comment and simulate a Redditor's response!
+<br>
+Model last updated on {{ userinference['lastupdated'] }}.
 <hr>
 
 <form method="post">
 
     <div class="form-group">
         <label for="title">Reddit Url</label>
-        <input type="text" name="url" placeholder="{{ userresponse['defaulturl'] }}" class="form-control" value="{{ userresponse['url'] or request.form['url'] }}">
+        <input type="text" name="url" placeholder="{{ userinference['defaulturl'] }}" class="form-control" value="{{ userinference['url'] or request.form['url'] }}">
         </input>
     </div>
 
@@ -20,12 +21,12 @@ Paste a Reddit submission or comment and simulate a Redditor's response!
     
     <div class="form-group">
         <label for="content">Model Input</label>
-        <textarea name="content" placeholder="..." rows="10" class="form-control">{{ userresponse['prompt'] }}</textarea>
+        <textarea name="content" placeholder="..." rows="10" class="form-control">{{ userinference['prompt'] }}</textarea>
     </div>
 
     <div class="form-group">
         <label for="content">Model Output</label>
-        <textarea name="content" placeholder="..." rows="5" class="form-control">{{ userresponse['response'] }}</textarea>
+        <textarea name="content" placeholder="..." rows="5" class="form-control">{{ userinference['response'] }}</textarea>
     </div>
 
 </form>
