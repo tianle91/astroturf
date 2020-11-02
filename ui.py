@@ -55,6 +55,7 @@ def user(username):
     # (premature?) optimization for simulate_redditor_response
     refresh_local_models(username)
     if request.method == 'POST':
+        print (request.form)
         url = request.form['url']
         url = url if 'reddit.com' in url else defaulturl
         sim_output = simulate_redditor_response(username, url)
@@ -74,5 +75,8 @@ def refresh(username):
         'datalastupdated': data_last_updated(username)
     }
     if request.method == 'POST':
-        pass
+        if 'update_data' in request.form:
+            print ('TODO: publish request to update data')
+        if 'update_model' in request.form:
+            print('TODO: publish request to update model')
     return render_template('refresh.html', userrefresh=userrefresh)
