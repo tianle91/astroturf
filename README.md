@@ -7,10 +7,13 @@ Gets a particular reddit user's comments, train a model on those comments, then 
 - `docker-compose run --service-ports ui`: Start a web UI with available models.
 
 # Infrastructure
-```
-app: ui -[infer]-> run local inference and serve it
-app: ui -[update]-> pub: update_request, sub: update_status
-app: ui -[refresh]-> ???
+`pub: model_refresh_requests -> sub: model_refresh_servicer`
 
-sub: update_request -> {refresh_user_comments, refresh_finetuned}.py -> pub: update_status 
+## UI
+- ui allows all users from model bucket to be inferenced always.
+- ui downloads user model and runs inference on demand.
+- pub: model_refresh_requests. Publishes requests for new model or refresh user model.
+
+## Compute 
+- sub: model_refresh_servicer. Scrapes user comments, finetunes model and uploads to model bucket. 
 ```
