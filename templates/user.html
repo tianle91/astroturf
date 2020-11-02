@@ -3,9 +3,7 @@
 {% block content %}
 <h1>{% block title %} {{ userinference['username'] }} {% endblock %}</h1>
 Model last updated on {{ userinference['lastupdated'] }}.
-<a href="{{ url_for('refresh', username=userinference['username']) }}">
-    Refresh.
-</a>
+<a href="{{ url_for('refresh', username=userinference['username']) }}">Refresh.</a>
 <hr>
 
 <form method="post">
