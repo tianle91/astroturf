@@ -6,6 +6,7 @@ from typing import Optional
 
 from flask import Flask, render_template, request
 from google.cloud import storage
+from google.cloud import pubsub_v1
 
 from main import refresh_local_models, simulate_redditor_response
 from praw_utils import get_reddit
@@ -20,6 +21,10 @@ model_bucket = path_config['model_bucket']
 cloud_model_path = path_config['model_path']
 data_bucket = path_config['data_bucket']
 cloud_data_path = path_config['data_path']
+project_id = path_config['project_id']
+
+publisher = pubsub_v1.PublisherClient()
+topic_path = publisher.topic_path(project_id, 'model_refresh_requests')
 
 users = sorted(list({
     blob.name.replace(cloud_model_path, '').split('/')[0]
@@ -79,4 +84,13 @@ def refresh(username):
             print ('TODO: publish request to update data')
         if 'update_model' in request.form:
             print('TODO: publish request to update model')
+
+        future = publisher.publish(
+            topic_path,
+            b'model update request',
+            update_data = str('update_data' in request.form),
+            update_model = str('update_model' in request.form),
+        )
+        message_id = future.result()
+        userrefresh.update({'pub_message_id': message_id})
     return render_template('refresh.html', userrefresh=userrefresh)

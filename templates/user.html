@@ -2,19 +2,19 @@
 
 {% block content %}
 <h1>{% block title %} {{ userinference['username'] }} {% endblock %}</h1>
+Paste a Reddit submission or comment and simulate a Redditor's response!
+<br>
 Model last updated on {{ userinference['lastupdated'] }}.
 <a href="{{ url_for('refresh', username=userinference['username']) }}">Refresh.</a>
 <hr>
 
 <form method="post">
-
     <div class="form-group">
         <label>Reddit Url</label>
         <input type="text" name="url" placeholder="{{ userinference['defaulturl'] }}" class="form-control" value="{{ userinference['url'] or request.form['url'] }}">
         <br>
         <button type="submit" class="btn btn-primary">Submit</button>
     </div>
-
     <div class="form-group">
         <label>Model Input</label>
         <textarea name="prompt" placeholder="..." rows="10" class="form-control">{{ userinference['prompt'] }}</textarea>
@@ -22,7 +22,6 @@ Model last updated on {{ userinference['lastupdated'] }}.
         <label>Model Output</label>
         <textarea name="response" placeholder="..." rows="5" class="form-control">{{ userinference['response'] }}</textarea>
     </div>
-
 </form>
 <hr>
 {% endblock %}
