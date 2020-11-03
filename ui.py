@@ -14,7 +14,6 @@ from praw_utils import get_reddit
 app = Flask(__name__)
 client = storage.Client()
 reddit = get_reddit(client, 'astroturf-dev-configs')
-client = storage.Client()
 config_bucket = client.bucket('astroturf-dev-configs')
 path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_string())
 model_bucket = path_config['model_bucket']
