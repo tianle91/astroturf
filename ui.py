@@ -5,8 +5,8 @@ import os
 from typing import Optional
 
 from flask import Flask, render_template, request
-from google.cloud import storage
 from google.cloud import pubsub_v1
+from google.cloud import storage
 
 from main import refresh_local_models, simulate_redditor_response
 from praw_utils import get_reddit
@@ -60,7 +60,7 @@ def user(username):
     # (premature?) optimization for simulate_redditor_response
     refresh_local_models(username)
     if request.method == 'POST':
-        print (request.form)
+        print(request.form)
         url = request.form['url']
         url = url if 'reddit.com' in url else defaulturl
         sim_output = simulate_redditor_response(username, url)
@@ -80,16 +80,11 @@ def refresh(username):
         'datalastupdated': data_last_updated(username)
     }
     if request.method == 'POST':
-        if 'update_data' in request.form:
-            print ('TODO: publish request to update data')
-        if 'update_model' in request.form:
-            print('TODO: publish request to update model')
-
         future = publisher.publish(
             topic_path,
             b'model update request',
-            update_data = str('update_data' in request.form),
-            update_model = str('update_model' in request.form),
+            update_data=str('update_data' in request.form),
+            update_model=str('update_model' in request.form),
         )
         message_id = future.result()
         userrefresh.update({'pub_message_id': message_id})
