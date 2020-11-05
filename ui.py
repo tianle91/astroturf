@@ -29,14 +29,18 @@ data_bucket = path_config['data_bucket']
 cloud_data_path = path_config['data_path']
 project_id = path_config['project_id']
 
+# publishing refresh requests
 publisher = pubsub_v1.PublisherClient()
 topic_path = publisher.topic_path(project_id, 'model_refresh_requests')
 
-users = sorted(list({
-    blob.name.replace(cloud_model_path, '').split('/')[0]
-    for blob in client.list_blobs(model_bucket, prefix=cloud_model_path)
-}))
-print('Models exist for users:\n{}'.format(users))
+
+def is_trained(username: str) -> bool:
+    users = sorted(list({
+        blob.name.replace(cloud_model_path, '').split('/')[0]
+        for blob in client.list_blobs(model_bucket, prefix=cloud_model_path)
+    }))
+    return username in users
+
 
 defaulturl = 'https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw'
 
@@ -73,7 +77,7 @@ def index():
 @app.route('/infer/<username>', methods=('GET', 'POST'))
 def infer(username):
     userresponse = {'username': username, 'defaulturl': defaulturl, 'lastupdated': model_last_updated(username)}
-    if username not in users:
+    if not is_trained(username):
         flash('No model found for User: {}. Request model training?'.format(username))
         return redirect(url_for('refresh', username=username))
     refresh_local_models(username)
