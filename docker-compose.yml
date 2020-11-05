@@ -14,16 +14,15 @@ services:
     volumes:
       - .:/astroturf
     entrypoint: gunicorn -w 2 -b 0.0.0.0:5000 ui:app
-  getcomments:
+  refreshfinetune:
     build:
       context: .
     volumes:
       - .:/astroturf
-    entrypoint: python get_comments.py
-  finetune:
+    entrypoint: python refresh_finetuned.py
+  refreshdata:
     build:
       context: .
     volumes:
       - .:/astroturf
-    entrypoint: python finetune.py
-  
+    entrypoint: python refresh_comments.py

@@ -1,33 +1,27 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{% block title %} {{ userresponse['username'] }} {% endblock %}</h1>
-
+<h1>{% block title %} {{ userinference['username'] }} {% endblock %}</h1>
 Paste a Reddit submission or comment and simulate a Redditor's response!
+<br>
+Model last updated on {{ userinference['lastupdated'] }}.
+<a href="{{ url_for('refresh', username=userinference['username']) }}">Refresh.</a>
 <hr>
 
 <form method="post">
-
     <div class="form-group">
-        <label for="title">Reddit Url</label>
-        <input type="text" name="url" placeholder="{{ userresponse['defaulturl'] }}" class="form-control" value="{{ userresponse['url'] or request.form['url'] }}">
-        </input>
-    </div>
-
-    <div class="form-group">
+        <label>Reddit Url</label>
+        <input type="text" name="url" placeholder="{{ userinference['defaulturl'] }}" class="form-control" value="{{ userinference['url'] or request.form['url'] }}">
+        <br>
         <button type="submit" class="btn btn-primary">Submit</button>
     </div>
-    
     <div class="form-group">
-        <label for="content">Model Input</label>
-        <textarea name="content" placeholder="..." rows="10" class="form-control">{{ userresponse['prompt'] }}</textarea>
+        <label>Model Input</label>
+        <textarea name="prompt" placeholder="..." rows="10" class="form-control">{{ userinference['prompt'] }}</textarea>
+        <br>
+        <label>Model Output</label>
+        <textarea name="response" placeholder="..." rows="5" class="form-control">{{ userinference['response'] }}</textarea>
     </div>
-
-    <div class="form-group">
-        <label for="content">Model Output</label>
-        <textarea name="content" placeholder="..." rows="5" class="form-control">{{ userresponse['response'] }}</textarea>
-    </div>
-
 </form>
 <hr>
 {% endblock %}

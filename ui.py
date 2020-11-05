@@ -1,44 +1,91 @@
 # https://www.digitalocean.com/community/tutorials/how-to-make-a-web-application-using-flask-in-python-3
 
-from glob import glob
+import json
+import os
+from typing import Optional
 
-import praw
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, flash, redirect, url_for
+from google.cloud import pubsub_v1
+from google.cloud import storage
 
-from astroturf.infer import (get_qa_string, get_text_generation_pipeline,
-                             make_package_infer_url)
+from main import refresh_local_models, simulate_redditor_response
+from praw_utils import get_reddit
 
 app = Flask(__name__)
-reddit = praw.Reddit()
+client = storage.Client()
 
-username_l = [
-    s.replace('finetune/', '').replace('/model/pytorch_model.bin', '') 
-    for s in glob('finetune/*/model/pytorch_model.bin')
-]
+# some clients and variables
+reddit = get_reddit(client, 'astroturf-dev-configs')
+config_bucket = client.bucket('astroturf-dev-configs')
+app.secret_key = config_bucket.blob('app_secret_key').download_as_string()
+
+# some paths
+path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_string())
+model_bucket = path_config['model_bucket']
+cloud_model_path = path_config['model_path']
+data_bucket = path_config['data_bucket']
+cloud_data_path = path_config['data_path']
+project_id = path_config['project_id']
+
+publisher = pubsub_v1.PublisherClient()
+topic_path = publisher.topic_path(project_id, 'model_refresh_requests')
+
+users = sorted(list({
+    blob.name.replace(cloud_model_path, '').split('/')[0]
+    for blob in client.list_blobs(model_bucket, prefix=cloud_model_path)
+}))
+print('Models exist for users:\n{}'.format(users))
 
 defaulturl = 'https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw'
 
+
+def model_last_updated(username: str) -> Optional[str]:
+    for blob in client.list_blobs(model_bucket, prefix=os.path.join(cloud_model_path, username)):
+        return blob.updated.strftime('%c')
+    return None
+
+
+def data_last_updated(username: str) -> Optional[str]:
+    maxdate = None
+    for blob in client.list_blobs(data_bucket, prefix=os.path.join(cloud_data_path, username)):
+        if maxdate is None or blob.updated > maxdate:
+            maxdate = blob.updated
+    return maxdate.strftime('%c')
+
+
 @app.route('/')
 def index():
-    users = [{'username': username} for username in username_l]
-    return render_template('index.html', users=users)
+    return render_template('index.html', users=[{'username': s} for s in users])
+
 
 @app.route('/<username>', methods=('GET', 'POST'))
 def user(username):
-    userresponse = {'username': username, 'defaulturl': defaulturl}
-    txtgen = get_text_generation_pipeline('finetune/{}/model/'.format(username))
-    
+    userresponse = {'username': username, 'defaulturl': defaulturl, 'lastupdated': model_last_updated(username)}
+    # (premature?) optimization for simulate_redditor_response
+    refresh_local_models(username)
     if request.method == 'POST':
+        print(request.form)
         url = request.form['url']
         url = url if 'reddit.com' in url else defaulturl
-        package = make_package_infer_url(url, reddit)
-        prompt = get_qa_string(package)
-        responses = txtgen(prompt, max_length=len(prompt.split(' '))+128)
-        response = responses[0]['generated_text'].replace(prompt, '').strip().split('\n')[0]
-        userresponse = {
+        sim_output = simulate_redditor_response(username, url)
+        sim_output.update({
             'username': username,
             'url': url,
-            'prompt': prompt,
-            'response': response,
-        }
-    return render_template('user.html', userresponse=userresponse)
+        })
+        userresponse.update(sim_output)
+    return render_template('user.html', userinference=userresponse)
+
+
+@app.route('/<username>/refresh', methods=('GET', 'POST'))
+def refresh(username):
+    userrefresh = {
+        'username': username,
+        'modellastupdated': model_last_updated(username),
+        'datalastupdated': data_last_updated(username)
+    }
+    if request.method == 'POST':
+        future = publisher.publish(topic_path, str.encode(username))
+        message_id = future.result()
+        flash('Submitted request to refresh User: {}. Published Message ID: {}'.format(username, message_id))
+        return redirect(url_for('index'))
+    return render_template('refresh.html', userrefresh=userrefresh)

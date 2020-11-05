@@ -1,13 +1,8 @@
-import json
-import os
-import pickle
-from datetime import datetime
-
-import pandas as pd
-import praw
+from praw import Reddit
+from praw.models import Comment, Submission
 
 
-def get_context(comment, reddit):
+def get_context(comment: Comment, reddit: Reddit):
     submission = reddit.submission(id=comment.link_id.replace('t3_', ''))
     parent_comment = None
     if not comment.parent_id == comment.link_id:
@@ -15,7 +10,8 @@ def get_context(comment, reddit):
         parent_comment = reddit.comment(id=comment.parent_id.replace('t1_', ''))
     return parent_comment, submission
 
-def get_all_context(comment, reddit):
+
+def get_all_context(comment: Comment, reddit: Reddit):
     parent_comment, submission = get_context(comment, reddit)
     if parent_comment is None:
         # base case: is a top level comment
@@ -25,16 +21,18 @@ def get_all_context(comment, reddit):
         parent_comments, submission = get_all_context(parent_comment, reddit)
         return (parent_comments + [parent_comment], submission)
 
-def format_comment_as_json(comment):
+
+def format_comment_as_json(comment: Comment):
     return {
-        'id': comment.id, 
-        'author': comment.author.name if comment.author is not None else None, 
-        'body': comment.body, 
+        'id': comment.id,
+        'author': comment.author.name if comment.author is not None else None,
+        'body': comment.body,
         'created_utc': comment.created_utc,
         'permalink': comment.permalink,
     }
 
-def format_submission_as_json(submission):
+
+def format_submission_as_json(submission: Submission):
     return {
         'id': submission.id,
         'subreddit': submission.subreddit.display_name,
@@ -43,7 +41,8 @@ def format_submission_as_json(submission):
         'permalink': submission.permalink,
     }
 
-def make_package_training(comment, reddit):
+
+def make_package_training(comment: Comment, reddit: Reddit):
     parent_comment, submission = get_context(comment, reddit)
     return {
         'comment': format_comment_as_json(comment),
@@ -51,7 +50,8 @@ def make_package_training(comment, reddit):
         'submission': format_submission_as_json(submission)
     }
 
-def make_package_infer_comment(comment, reddit):
+
+def make_package_infer_comment(comment: Comment, reddit: Reddit):
     _, submission = get_context(comment, reddit)
     return {
         'comment': None,
@@ -59,7 +59,8 @@ def make_package_infer_comment(comment, reddit):
         'submission': format_submission_as_json(submission)
     }
 
-def make_package_infer_submission(submission):
+
+def make_package_infer_submission(submission: Submission):
     return {
         'comment': None,
         'parent_comment': None,

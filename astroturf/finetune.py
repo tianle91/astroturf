@@ -12,38 +12,42 @@ from transformers import (DataCollatorForLanguageModeling, GPT2LMHeadModel,
                           GPT2Tokenizer, PreTrainedTokenizer, TextDataset,
                           Trainer, TrainingArguments)
 
+model_checkpoint_name = "distilgpt2"  # "gpt2"
 tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
-model = GPT2LMHeadModel.from_pretrained("gpt2")
+model = GPT2LMHeadModel.from_pretrained(model_checkpoint_name)
 eos = tokenizer.eos_token
+model_output_fnames = ['pytorch_model.bin', 'config.json', 'training_args.bin']
+
 
 # data part
 
 def get_qa_string(package):
     '''format comment as question and answer'''
     context = 'In subreddit: {subname}\nTitle: {title}\n{body}'.format(
-        subname = package['submission']['subreddit'],
-        title = package['submission']['title'],
-        body = package['submission']['selftext'],
+        subname=package['submission']['subreddit'],
+        title=package['submission']['title'],
+        body=package['submission']['selftext'],
     )
     question = 'What do you think?'
     if package['parent_comment'] is not None:
         question = package['parent_comment']['body']
     return '{context}\n\nQ: {q}\nA: {a}'.format(
-        context = context,
-        q = question,
-        a = package['comment']['body'] if package['comment'] is not None else '',
+        context=context,
+        q=question,
+        a=package['comment']['body'] if package['comment'] is not None else '',
     )
+
 
 def write_to_text(fnames, outputfname, verbose=1):
     # clear destination
     with open(outputfname, 'w+') as f:
         f.write('')
-    
+
     total = len(fnames)
     i = 0
     for fname in fnames:
         if i % 100 == 0 and verbose > 0:
-            print ('[{}/{}]'.format(i, total))
+            print('[{}/{}]'.format(i, total))
         i += 1
         with open(fname) as f:
             package = json.load(f)
@@ -53,20 +57,27 @@ def write_to_text(fnames, outputfname, verbose=1):
                 eos=eos
             ))
 
+
 # training part
 
-def get_dataset(file_path, tokenizer: PreTrainedTokenizer, block_size: int=None):
+def get_dataset(file_path, tokenizer: PreTrainedTokenizer, block_size: int = None):
     return TextDataset(
-        tokenizer = tokenizer, 
-        file_path = file_path, 
-        block_size = block_size if block_size is not None else tokenizer.max_len,
-        overwrite_cache = True,
+        tokenizer=tokenizer,
+        file_path=file_path,
+        block_size=block_size if block_size is not None else tokenizer.max_len,
+        overwrite_cache=True,
     )
 
-def dump_finetuned(inputpath, outputpath, blocksize):
+
+def dump_finetuned(inputpath, outputpath, blocksize=16, max_steps=50):
+    '''Finetune GPT2LMHeadModel
+    inputpath: expect .json here as outputs of astroturf.prawtools.make_package_training
+    outputpath: to dump finetuned huggingface transformers
+    blocksize:
     '''
-    '''
-    print ('blocksize: {}\n{}-->{}'.format(blocksize, inputpath, outputpath))
+    print('blocksize: {}, max_steps: {}'.format(blocksize, max_steps))
+    print('inputpath: {}'.format(inputpath))
+    print('outputpath: {}'.format(outputpath))
 
     # model data
 
@@ -74,12 +85,12 @@ def dump_finetuned(inputpath, outputpath, blocksize):
     assert len(fnames) > 0, 'check inputpath: {} is not empty!'.format(inputpath)
     valid_prop = .1
     shuffled_indices = list(np.random.choice(range(len(fnames)), len(fnames), replace=False))
-    valid_size = max(1, int(valid_prop*len(fnames)))
+    valid_size = max(1, int(valid_prop * len(fnames)))
 
     fnames_shuffled = [fnames[i] for i in shuffled_indices]
     fnames_test = fnames_shuffled[:valid_size]
-    fnames_valid = fnames_shuffled[valid_size:2*valid_size]
-    fnames_train = fnames_shuffled[2*valid_size:]
+    fnames_valid = fnames_shuffled[valid_size:2 * valid_size]
+    fnames_train = fnames_shuffled[2 * valid_size:]
 
     modeldatapath = os.path.join(outputpath, 'data')
     os.makedirs(modeldatapath, exist_ok=True)
@@ -101,32 +112,27 @@ def dump_finetuned(inputpath, outputpath, blocksize):
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 
     modeloutputpath = os.path.join(outputpath, 'model')
-    targetpath = os.path.join(modeloutputpath, 'pytorch_model.bin')
-    if not os.path.isfile(targetpath):
-        training_args = TrainingArguments(
-            output_dir=modeloutputpath,
-            do_train=True,
-            do_eval=True,
-            evaluate_during_training=True,
-            learning_rate=1e-4,
-            max_steps=100,
-            save_total_limit=0,
-            logging_dir='./log',
-            logging_first_step=True,
-            logging_steps=10,
-        )
-        trainer = Trainer(
-            model=model,
-            args=training_args,
-            data_collator=data_collator,
-            train_dataset=train_dataset,
-            eval_dataset=test_dataset,
-            prediction_loss_only=True,
-        )
-        trainer.train()
-        trainer.save_model()
-        print (trainer.evaluate())
-        return True
-    else:
-        print ('Skipping since targetpath: {} exists.'.format(targetpath))
-        return False
+    training_args = TrainingArguments(
+        output_dir=modeloutputpath,
+        do_train=True,
+        # do_eval=True,
+        # evaluate_during_training=True,
+        learning_rate=1e-4,
+        max_steps=max_steps,
+        save_total_limit=0,
+        # logging_dir='./log',
+        # logging_first_step=True,
+        logging_steps=10,
+    )
+    trainer = Trainer(
+        model=model,
+        args=training_args,
+        data_collator=data_collator,
+        train_dataset=train_dataset,
+        eval_dataset=test_dataset,
+        prediction_loss_only=True,
+    )
+    trainer.train()
+    trainer.save_model()
+    # print (trainer.evaluate())
+    return modeloutputpath

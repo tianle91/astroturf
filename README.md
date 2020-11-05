@@ -1,19 +1,18 @@
 # Astroturf
 Gets a particular reddit user's comments, train a model on those comments, then expose model through UI so you can predict what he'd say.
 
-# Guide
 - `users.txt`: Enter interested users here.
-- `docker-compose run getcomments`: Get comments for all users in `users.txt`. Requires `praw.ini` in root folder. More info [here.](https://praw.readthedocs.io/en/latest/getting_started/configuration/prawini.html) Required for training models.
-- `docker-compose run finetune`: Train model for each user in `users.txt`. Required for user to be available for querying on UI. You may need a GPU here (refer to `python finetune.py`).
-- `docker-compose run --service-ports ui`: Start a web UI with available models in `finetune/{username}/...`.
+- `docker-compose run refreshfinetune`: Get comments for all users in `users.txt`.
+- `docker-compose run refreshdata`: Train model for each user in `users.txt`.
+- `docker-compose run --service-ports ui`: Start a web UI with available models.
 
-## Python stuff
-To get user comments and train a model on that user...
-1. `python data_user_comments.py --users user1 user2 user3`
-2. `python finetune.py --users user1 user2 user3`
-These users would end up in `finetune/{username}/...` and would be available for inference in the UI. Try smaller `--blocksize` argument if you run out of memory.
+# Infrastructure
+`pub: model_refresh_requests -> sub: model_refresh_servicer`
 
 ## UI
-To run the UI, there's a few options depending on what you want to do.
-1. docker `docker-compose run --service-ports ui`.
-2. debugging `source run_flask.sh`
+- ui allows all users from model bucket to be inferenced always.
+- ui downloads user model and runs inference on demand.
+- pub: model_refresh_requests. Publishes requests for new model or refresh user model.
+
+## Compute 
+- sub: model_refresh_servicer. Scrapes user comments, finetunes model and uploads to model bucket. 
