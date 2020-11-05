@@ -19,8 +19,6 @@ app.secret_key = config_bucket.blob('app_secret_key').download_as_string()
 
 # some paths
 path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_string())
-model_bucket = path_config['model_bucket']
-cloud_model_path = path_config['model_path']
 project_id = path_config['project_id']
 
 # publishing refresh requests
