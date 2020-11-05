@@ -7,6 +7,8 @@ from typing import Optional
 from flask import Flask, render_template, request, flash, redirect, url_for
 from google.cloud import pubsub_v1
 from google.cloud import storage
+from praw import Reddit
+from prawcore.exceptions import NotFound
 
 from main import refresh_local_models, simulate_redditor_response
 from praw_utils import get_reddit
@@ -45,23 +47,35 @@ def model_last_updated(username: str) -> Optional[str]:
     return None
 
 
-def data_last_updated(username: str) -> Optional[str]:
-    maxdate = None
-    for blob in client.list_blobs(data_bucket, prefix=os.path.join(cloud_data_path, username)):
-        if maxdate is None or blob.updated > maxdate:
-            maxdate = blob.updated
-    return maxdate.strftime('%c')
+def is_invalid(username: str, r: Reddit) -> bool:
+    if len(username) == 0:
+        # not catched by NotFound (as of 2020-11-04
+        return True
+    try:
+        r.redditor(name=username).id
+    except NotFound:
+        return True
+    return False
 
 
-@app.route('/')
+@app.route('/', methods=('GET', 'POST'))
 def index():
-    return render_template('index.html', users=[{'username': s} for s in users])
+    if request.method == 'POST':
+        username = request.form['requestedusername']
+        if is_invalid(username, reddit):
+            flash('User: {} is invalid or not found!'.format(username))
+            return redirect(url_for('index'))
+        else:
+            return redirect(url_for('infer', username=username))
+    return render_template('index.html')
 
 
-@app.route('/<username>', methods=('GET', 'POST'))
-def user(username):
+@app.route('/infer/<username>', methods=('GET', 'POST'))
+def infer(username):
     userresponse = {'username': username, 'defaulturl': defaulturl, 'lastupdated': model_last_updated(username)}
-    # (premature?) optimization for simulate_redditor_response
+    if username not in users:
+        flash('No model found for User: {}. Request model training?'.format(username))
+        return redirect(url_for('refresh', username=username))
     refresh_local_models(username)
     if request.method == 'POST':
         print(request.form)
@@ -73,16 +87,15 @@ def user(username):
             'url': url,
         })
         userresponse.update(sim_output)
-    return render_template('user.html', userinference=userresponse)
+    return render_template('infer.html', userinference=userresponse)
 
 
-@app.route('/<username>/refresh', methods=('GET', 'POST'))
+@app.route('/refresh/<username>', methods=('GET', 'POST'))
 def refresh(username):
-    userrefresh = {
-        'username': username,
-        'modellastupdated': model_last_updated(username),
-        'datalastupdated': data_last_updated(username)
-    }
+    if is_invalid(username, reddit):
+        flash('User: {} is invalid or not found!'.format(username))
+        return redirect(url_for('index'))
+    userrefresh = {'username': username}
     if request.method == 'POST':
         future = publisher.publish(topic_path, str.encode(username))
         message_id = future.result()

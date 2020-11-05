@@ -2,13 +2,13 @@
 
 {% block content %}
 <h1>{% block title %} {{ userrefresh['username'] }} {% endblock %}</h1>
-Request for a refresh of data or model for user.
-<br>
-Model last updated on {{ userrefresh['modellastupdated'] }}.
-<a href="{{ url_for('user', username=userrefresh['username']) }}">Simulate.</a>
+Request for a refresh model for user.
 <hr>
+
 <!--TODO: show some progress or something?-->
+
+<br>
 <form method="post">
-    <button type="submit" class="btn btn-primary">Update</button>
+    <button type="submit" class="btn btn-primary">Request Update</button>
 </form>
 {% endblock %}
