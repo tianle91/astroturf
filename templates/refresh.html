@@ -9,16 +9,6 @@ Model last updated on {{ userrefresh['modellastupdated'] }}.
 <hr>
 <!--TODO: show some progress or something?-->
 <form method="post">
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" name="update_data" id="refreshData">
-        <label class="form-check-label" for="refreshData"> Data (last updated on {{ userrefresh['datalastupdated'] }})</label>
-        <br>
-        <input class="form-check-input" type="checkbox" name="update_model" id="refreshModel">
-        <label class="form-check-label" for="refreshModel"> Model (last updated on {{ userrefresh['modellastupdated'] }})</label>
-        <br>
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
+    <button type="submit" class="btn btn-primary">Update</button>
 </form>
-<hr>
-Published Message ID: {{ userrefresh['pub_message_id'] }}
 {% endblock %}

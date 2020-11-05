@@ -4,7 +4,7 @@ import json
 import os
 from typing import Optional
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, flash, redirect, url_for
 from google.cloud import pubsub_v1
 from google.cloud import storage
 
@@ -13,8 +13,13 @@ from praw_utils import get_reddit
 
 app = Flask(__name__)
 client = storage.Client()
+
+# some clients and variables
 reddit = get_reddit(client, 'astroturf-dev-configs')
 config_bucket = client.bucket('astroturf-dev-configs')
+app.secret_key = config_bucket.blob('app_secret_key').download_as_string()
+
+# some paths
 path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_string())
 model_bucket = path_config['model_bucket']
 cloud_model_path = path_config['model_path']
@@ -79,12 +84,8 @@ def refresh(username):
         'datalastupdated': data_last_updated(username)
     }
     if request.method == 'POST':
-        future = publisher.publish(
-            topic_path,
-            b'model update request',
-            update_data=str('update_data' in request.form),
-            update_model=str('update_model' in request.form),
-        )
+        future = publisher.publish(topic_path, str.encode(username))
         message_id = future.result()
-        userrefresh.update({'pub_message_id': message_id})
+        flash('Submitted request to refresh User: {}. Published Message ID: {}'.format(username, message_id))
+        return redirect(url_for('index'))
     return render_template('refresh.html', userrefresh=userrefresh)
