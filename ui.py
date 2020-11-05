@@ -25,6 +25,9 @@ topic_path = publisher.topic_path(project_id, 'model_refresh_requests')
 
 defaulturl = 'https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw'
 
+def is_invalid_url(url):
+    return 'reddit.com' not in url
+
 
 @app.route('/', methods=('GET', 'POST'))
 def index():
@@ -46,15 +49,13 @@ def infer(username):
         return redirect(url_for('refresh', username=username))
     refresh_local_models(username)
     if request.method == 'POST':
-        print(request.form)
         url = request.form['url']
-        url = url if 'reddit.com' in url else defaulturl
-        sim_output = simulate_redditor_response(username, url)
-        sim_output.update({
-            'username': username,
-            'url': url,
-        })
-        userresponse.update(sim_output)
+        if is_invalid_url(url):
+            if url != '':
+                flash('Invalid url: {}'.format(url))
+                return redirect(url_for('infer', username=username))
+            url = defaulturl
+        userresponse.update({'url': url, **simulate_redditor_response(username, url)})
     return render_template('infer.html', userinference=userresponse)
 
 
