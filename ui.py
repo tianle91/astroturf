@@ -10,18 +10,16 @@ from main import refresh_local_models, simulate_redditor_response, is_invalid, i
 from praw_utils import get_reddit
 
 app = Flask(__name__)
-client = storage.Client()
 
 # some clients and variables
+client = storage.Client()
 reddit = get_reddit(client, 'astroturf-dev-configs')
 config_bucket = client.bucket('astroturf-dev-configs')
 app.secret_key = config_bucket.blob('app_secret_key').download_as_string()
 
-# some paths
+# publishing refresh requests
 path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_string())
 project_id = path_config['project_id']
-
-# publishing refresh requests
 publisher = pubsub_v1.PublisherClient()
 topic_path = publisher.topic_path(project_id, 'model_refresh_requests')
 
