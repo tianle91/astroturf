@@ -44,7 +44,7 @@ if __name__ == '__main__':
             # there's something to do!
             # ack the message first
             subscriber.acknowledge(request={"subscription": subscription_path, "ack_ids": ack_ids})
-            print('ack_ids: {}'.format(ack_ids))
+            # print('ack_ids: {}'.format(ack_ids))
             # run the updates
             print ('\nrefresh_user_comments...\n')
             status = refresh_user_comments(user_name, reddit, limit=args.limit)
