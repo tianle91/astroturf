@@ -1,11 +1,5 @@
 version: '3'
 services:
-  shell:
-    build:
-      context: .
-    volumes:
-      - .:/astroturf
-    entrypoint: bash
   ui:
     build:
       context: .
