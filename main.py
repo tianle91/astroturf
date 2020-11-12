@@ -56,10 +56,13 @@ def status(username: str) -> str:
 
 def get_trained_usernames() -> List[str]:
     resl = []
-    for blob in client.list_blobs(status_bucket):
-        user_name, status_fname = blob.name.split('/')[0], blob.name.split('/')[1]
-        if status_fname == StatusFlags.model_training_success:
-            resl.append(user_name)
+    for blob in client.list_blobs(status_bucket, prefix=''):
+        name_split = blob.name.split('/')
+        user_name = name_split[0]
+        if len(name_split) > 1:
+            fname = name_split[1]
+            if fname == StatusFlags.model_training_success:
+                resl.append(user_name)
     return resl
 
 
