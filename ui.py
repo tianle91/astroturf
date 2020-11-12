@@ -8,7 +8,7 @@ from google.cloud import storage
 
 from main import refresh_local_models, simulate_redditor_response
 from praw_utils import get_reddit
-from status import is_invalid, last_trained, status, get_trained_usernames
+from status import is_invalid, last_success, status, get_trained_usernames
 
 app = Flask(__name__)
 
@@ -45,7 +45,7 @@ def index():
 
 @app.route('/infer/<username>', methods=('GET', 'POST'))
 def infer(username):
-    usr_last_trained = last_trained(username)
+    usr_last_trained = last_success(username)
     userresponse = {'username': username, 'defaulturl': defaulturl}
     if usr_last_trained is None:
         flash('No model found for User: {}. Request model training?'.format(username))
@@ -72,6 +72,9 @@ def refresh(username):
         'status': status(username),
     }
     if request.method == 'POST':
+        last_trained_usr = last_success(username)
+
+        if last_trained_usr is not None and
         future = publisher.publish(topic_path, str.encode(username))
         message_id = future.result()
         flash('Submitted request to refresh User: {}. Published Message ID: {}'.format(username, message_id))

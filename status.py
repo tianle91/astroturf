@@ -62,16 +62,22 @@ def get_trained_usernames() -> List[str]:
     return resl
 
 
-def last_trained(username: str) -> Optional[datetime]:
+def last_success(username: str) -> Optional[datetime]:
     return get_reloaded_if_exists(status_bucket.blob(
         os.path.join(username, StatusFlags.model_training_success)
     )).updated
 
 
-def last_refreshed(username: str) -> Optional[datetime]:
-    return get_reloaded_if_exists(status_bucket.blob(
-        os.path.join(username, StatusFlags.data_refresh_success)
+def last_progress(username: str) -> Optional[datetime]:
+    data_refresh_progress_updated = get_reloaded_if_exists(status_bucket.blob(
+        os.path.join(username, StatusFlags.data_refresh_progress)
     )).updated
+    model_training_progress_updated = get_reloaded_if_exists(status_bucket.blob(
+        os.path.join(username, StatusFlags.model_training_progress)
+    )).updated
+    progresses = [data_refresh_progress_updated, model_training_progress_updated]
+    progresses = [dt for dt in progresses if dt is not None]
+    return None if len(progresses) == 0 else min(progresses)
 
 
 def is_invalid(username: str, r: Reddit) -> bool:
