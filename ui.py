@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, flash, redirect, url_for
 from google.cloud import pubsub_v1
 from google.cloud import storage
 
-from main import refresh_local_models, simulate_redditor_response, is_invalid, last_trained, last_refreshed, status
+from main import refresh_local_models, simulate_redditor_response, is_invalid, last_trained, last_refreshed, status, get_trained_usernames
 from praw_utils import get_reddit
 
 app = Flask(__name__)
@@ -39,7 +39,7 @@ def index():
             return redirect(url_for('index'))
         else:
             return redirect(url_for('infer', username=username))
-    return render_template('index.html')
+    return render_template('index.html', users=get_trained_usernames())
 
 
 @app.route('/infer/<username>', methods=('GET', 'POST'))
