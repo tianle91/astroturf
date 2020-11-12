@@ -1,6 +1,7 @@
 # https://www.digitalocean.com/community/tutorials/how-to-make-a-web-application-using-flask-in-python-3
 
 import json
+from datetime import datetime, timedelta, timezone
 
 from flask import Flask, render_template, request, flash, redirect, url_for
 from google.cloud import pubsub_v1
@@ -8,7 +9,7 @@ from google.cloud import storage
 
 from main import refresh_local_models, simulate_redditor_response
 from praw_utils import get_reddit
-from status import is_invalid, last_success, status, get_trained_usernames
+from status import is_invalid, last_success, status, get_trained_usernames, last_progress
 
 app = Flask(__name__)
 
@@ -72,10 +73,15 @@ def refresh(username):
         'status': status(username),
     }
     if request.method == 'POST':
-        last_trained_usr = last_success(username)
-
-        if last_trained_usr is not None and
-        future = publisher.publish(topic_path, str.encode(username))
-        message_id = future.result()
-        flash('Submitted request to refresh User: {}. Published Message ID: {}'.format(username, message_id))
+        last_update = [last_success(username), last_progress(username)]
+        last_update = [dt for dt in last_update if dt is not None]
+        earliest_update_possible = datetime.now(timezone.utc) - timedelta(minutes=5)
+        if len(last_update) > 0 and min(last_update) >= earliest_update_possible:
+            flash('Invalid request for User: {} Try again in: {} seconds.'.format(
+                username, (min(last_update) - earliest_update_possible).seconds
+            ))
+        else:
+            future = publisher.publish(topic_path, str.encode(username))
+            message_id = future.result()
+            flash('Submitted request to refresh User: {}. Published Message ID: {}'.format(username, message_id))
     return render_template('refresh.html', userrefresh=userrefresh)
