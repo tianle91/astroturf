@@ -6,8 +6,8 @@ from flask import Flask, render_template, request, flash, redirect, url_for
 from google.cloud import pubsub_v1
 from google.cloud import storage
 
-from main import refresh_local_models, simulate_redditor_response, is_invalid, last_trained, last_refreshed, status, \
-    get_trained_usernames
+from main import refresh_local_models, simulate_redditor_response
+from status import is_invalid, last_trained, last_refreshed, status, get_trained_usernames
 from praw_utils import get_reddit
 
 app = Flask(__name__)
