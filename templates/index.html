@@ -13,9 +13,9 @@
 
 <h2>Trained Users</h2>
 <hr>
-{% for user in users %}
-    <a href="{{ url_for('infer', username=user['username']) }}">
-        <h2>{{ user['username'] }}</h2>
+{% for username in users %}
+    <a href="{{ url_for('infer', username=username) }}">
+        <h2>{{ username }}</h2>
     </a>
     <hr>
 {% endfor %}
