@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 from typing import Optional
 
@@ -29,6 +29,12 @@ def get_reloaded_if_exists(blob: Blob) -> Blob:
     return blob
 
 
+def get_compact_time_since(dt: Optional[datetime]) -> float:
+    utcnow = datetime.now(timezone.utc)
+    seconds_since = None if dt is None else (utcnow - dt).seconds
+    return '{} seconds ago'.format(seconds_since if seconds_since is not None else '?')
+
+
 def status(username: str) -> str:
     data_refresh_success = get_reloaded_if_exists(status_bucket.blob(
         os.path.join(username, StatusFlags.data_refresh_success)
@@ -43,10 +49,18 @@ def status(username: str) -> str:
         os.path.join(username, StatusFlags.model_training_success)
     ))
     return '\n'.join([
-        'data_refresh_progress: updated: {}'.format(data_refresh_progress.updated),
-        'data_refresh_success: updated: {}'.format(data_refresh_success.updated),
-        'model_training_progress: updated: {}'.format(model_training_progress.updated),
-        'model_training_success: updated: {}'.format(model_training_success.updated),
+        'data_refresh_progress:   {}'.format(
+            get_compact_time_since(data_refresh_progress.updated)
+        ),
+        'data_refresh_success:    {}'.format(
+            get_compact_time_since(data_refresh_success.updated)
+        ),
+        'model_training_progress: {}'.format(
+            get_compact_time_since(model_training_progress.updated)
+        ),
+        'model_training_success:  {}'.format(
+            get_compact_time_since(model_training_success.updated)
+        ),
     ])
 
 
