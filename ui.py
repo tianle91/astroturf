@@ -45,13 +45,7 @@ def index():
 @app.route('/infer/<username>', methods=('GET', 'POST'))
 def infer(username):
     usr_last_trained = last_trained(username)
-    usr_last_refreshed = last_refreshed(username)
-    userresponse = {
-        'username': username,
-        'defaulturl': defaulturl,
-        'usrlasttrained': usr_last_trained,
-        'usrlastrefreshed': usr_last_refreshed
-    }
+    userresponse = {'username': username, 'defaulturl': defaulturl}
     if usr_last_trained is None:
         flash('No model found for User: {}. Request model training?'.format(username))
         return redirect(url_for('refresh', username=username))
