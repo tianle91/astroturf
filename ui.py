@@ -7,8 +7,8 @@ from google.cloud import pubsub_v1
 from google.cloud import storage
 
 from main import refresh_local_models, simulate_redditor_response
-from status import is_invalid, last_trained, last_refreshed, status, get_trained_usernames
 from praw_utils import get_reddit
+from status import is_invalid, last_trained, status, get_trained_usernames
 
 app = Flask(__name__)
 
@@ -64,8 +64,6 @@ def infer(username):
 
 @app.route('/refresh/<username>', methods=('GET', 'POST'))
 def refresh(username):
-    usr_last_trained = last_trained(username)
-    usr_last_refreshed = last_refreshed(username)
     if is_invalid(username, reddit):
         flash('User: {} is invalid or not found!'.format(username))
         return redirect(url_for('index'))
