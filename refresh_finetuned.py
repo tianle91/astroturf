@@ -6,15 +6,17 @@ from google.cloud import storage
 from astroturf.finetune import dump_finetuned, model_output_fnames
 from gcp_utils import (download_all_cloud_files_with_prefix,
                        upload_all_local_files_with_prefix)
+from statusflags import StatusFlags
 
 client = storage.Client()
 config_bucket = client.bucket('astroturf-dev-configs')
 path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_string())
-data_bucket = path_config['data_bucket']
-cloud_data_path = path_config['data_path']
+data_bucket = client.bucket(path_config['data_bucket'])
+model_bucket = client.bucket(path_config['model_bucket'])
+status_bucket = client.bucket(path_config['status_bucket'])
+
+# some local variables
 local_data_path = 'data'
-model_bucket = path_config['model_bucket']
-cloud_model_path = path_config['model_path']
 local_model_path = 'models'
 
 
@@ -23,42 +25,52 @@ def refresh_finetuned(
         blocksize=16,
         maxsteps=10,
         force_update=False
-):
-    cloud_model_path_user = os.path.join(cloud_model_path, user_name)
+) -> str:
+    # set up local directories
     local_model_path_user = os.path.join(local_model_path, user_name)
-    os.makedirs(local_model_path_user, exist_ok=True)
-    cloud_data_path_user = os.path.join(cloud_data_path, user_name)
     local_data_path_user = os.path.join(local_data_path, user_name)
+    os.makedirs(local_model_path_user, exist_ok=True)
     os.makedirs(local_data_path_user, exist_ok=True)
 
-    bucket = client.bucket(model_bucket)
-    output_flags = [os.path.join(cloud_model_path_user, s) for s in model_output_fnames]
+    # progress status tracker
+    status_progress = status_bucket.blob(os.path.join(user_name, StatusFlags.model_training_progress))
+    status_progress.upload_from_string('starting')
+
+    # set up some output flags for completion check
+    output_flags = [os.path.join(user_name, s) for s in model_output_fnames]
 
     # skip if not force_update and model exists
-    if not force_update and all(bucket.blob(s).exists() for s in output_flags):
+    if not force_update and all(model_bucket.blob(s).exists() for s in output_flags):
         print('Skip refresh_finetuned due to existing output_flags:\n{}'.format('\n'.join(output_flags)))
-        return cloud_model_path_user
+        return user_name
     # download files for training
     downloaded_data_fnames = download_all_cloud_files_with_prefix(
         local_data_path_user,
-        data_bucket, cloud_data_path_user,
+        data_bucket.name, user_name,
         client, refresh_local=False
     )
     if not len(downloaded_data_fnames) > 0:
         raise ValueError('no data for user_name: {}'.format(user_name))
+
     # run the finetuning
     # this guy dumps model files in os.path.join(local_model_path_user, 'model')
     dump_finetuned(
         local_data_path_user, local_model_path_user,
         blocksize=blocksize, max_steps=maxsteps
     )
+
     # upload results
     _ = upload_all_local_files_with_prefix(
         os.path.join(local_model_path_user, 'model'),
-        model_bucket, os.path.join(cloud_model_path_user, 'model'),
+        model_bucket.name, os.path.join(user_name, 'model'),
         client
     )
-    return cloud_model_path_user
+
+    # status cleanup
+    status_progress.delete()
+    status_success = status_bucket.blob(os.path.join(user_name, StatusFlags.model_training_success))
+    status_success.upload_from_string('done')
+    return user_name
 
 
 if __name__ == '__main__':
