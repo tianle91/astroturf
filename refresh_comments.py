@@ -15,8 +15,6 @@ status_bucket = client.bucket(path_config['status_bucket'])
 
 
 def refresh_user_comments(user_name: str, reddit: praw.Reddit, limit: int = 1000):
-    '''dump user comments to {gcp_bucket}/{prefix}/{user_name}/{comment_id}.json'''
-
     # progress status tracker
     status_progress = status_bucket.blob(os.path.join(user_name, StatusFlags.data_refresh_progress))
     status_progress.upload_from_string('starting')
