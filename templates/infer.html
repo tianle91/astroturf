@@ -2,7 +2,6 @@
 
 {% block content %}
 <h1>{% block title %} {{ userinference['username'] }} {% endblock %}</h1>
-Model last updated on {{ userinference['usrlasttrained'] }}.
 <a href="{{ url_for('refresh', username=userinference['username']) }}">Refresh?</a>
 <hr>
 
@@ -18,11 +17,10 @@ Paste a Reddit submission or comment and simulate a Redditor's response!
 </form>
 
 <br>
-<div class="form-group">
-    <label>Model Input</label>
-    <textarea name="prompt" placeholder="..." rows="10" class="form-control">{{ userinference['prompt'] }}</textarea>
-    <br>
-    <label>Model Output</label>
-    <textarea name="response" placeholder="..." rows="5" class="form-control">{{ userinference['response'] }}</textarea>
-</div>
+Model Prompt:
+<br>
+<pre>{{ userinference['prompt'] }}</pre>
+Model Output:
+<br>
+<pre>{{ userinference['response'] }}</pre>
 {% endblock %}

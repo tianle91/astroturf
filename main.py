@@ -5,6 +5,7 @@ from typing import Optional
 
 import flask
 from google.cloud import storage
+from google.cloud.storage import Blob
 from praw import Reddit
 from prawcore.exceptions import NotFound
 
@@ -12,6 +13,7 @@ from astroturf.finetune import model_output_fnames, get_qa_string
 from astroturf.infer import get_text_generation_pipeline, make_package_infer_url
 from gcp_utils import download_all_cloud_files_with_prefix
 from praw_utils import get_reddit
+from statusflags import StatusFlags
 
 client = storage.Client()
 config_bucket = client.bucket('astroturf-dev-configs')
@@ -24,12 +26,43 @@ local_model_path = '/tmp/models/'
 reddit = get_reddit(client, 'astroturf-dev-configs')
 
 
+def get_reloaded_if_exists(blob: Blob) -> Blob:
+    if blob.exists():
+        blob.reload()
+    return blob
+
+
+def status(username: str) -> str:
+    data_refresh_success = get_reloaded_if_exists(status_bucket.blob(
+        os.path.join(username, StatusFlags.data_refresh_success)
+    ))
+    data_refresh_progress = get_reloaded_if_exists(status_bucket.blob(
+        os.path.join(username, StatusFlags.data_refresh_progress)
+    ))
+    model_training_progress = get_reloaded_if_exists(status_bucket.blob(
+        os.path.join(username, StatusFlags.model_training_progress)
+    ))
+    model_training_success = get_reloaded_if_exists(status_bucket.blob(
+        os.path.join(username, StatusFlags.model_training_success)
+    ))
+    return '\n'.join([
+        'data_refresh_success: updated: {}'.format(data_refresh_success.updated),
+        'data_refresh_progress: updated: {}'.format(data_refresh_progress.updated),
+        'model_training_progress: updated: {}'.format(model_training_progress.updated),
+        'model_training_success: updated: {}'.format(model_training_success.updated),
+    ])
+
+
 def last_trained(username: str) -> Optional[datetime]:
-    return status_bucket.blob(os.path.join(username, '_UPDATE_TRAIN_SUCCESS')).updated
+    return get_reloaded_if_exists(status_bucket.blob(
+        os.path.join(username, StatusFlags.model_training_success)
+    )).updated
 
 
 def last_refreshed(username: str) -> Optional[datetime]:
-    return status_bucket.blob(os.path.join(username, '_UPDATE_REFRESH_SUCCESS')).updated
+    return get_reloaded_if_exists(status_bucket.blob(
+        os.path.join(username, StatusFlags.data_refresh_success)
+    )).updated
 
 
 def is_invalid(username: str, r: Reddit) -> bool:

@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, flash, redirect, url_for
 from google.cloud import pubsub_v1
 from google.cloud import storage
 
-from main import refresh_local_models, simulate_redditor_response, is_invalid, last_trained, last_refreshed
+from main import refresh_local_models, simulate_redditor_response, is_invalid, last_trained, last_refreshed, status
 from praw_utils import get_reddit
 
 app = Flask(__name__)
@@ -24,6 +24,7 @@ publisher = pubsub_v1.PublisherClient()
 topic_path = publisher.topic_path(project_id, 'model_refresh_requests')
 
 defaulturl = 'https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw'
+
 
 def is_invalid_url(url):
     return 'reddit.com' not in url
@@ -75,8 +76,7 @@ def refresh(username):
         return redirect(url_for('index'))
     userrefresh = {
         'username': username,
-        'usrlasttrained': usr_last_trained,
-        'usrlastrefreshed': usr_last_refreshed
+        'status': status(username),
     }
     if request.method == 'POST':
         future = publisher.publish(topic_path, str.encode(username))
