@@ -76,7 +76,7 @@ def refresh(username):
         last_update = [last_success(username), last_progress(username)]
         last_update = [dt for dt in last_update if dt is not None]
         earliest_update_possible = datetime.now(timezone.utc) - timedelta(minutes=5)
-        if len(last_update) > 0 and min(last_update) >= earliest_update_possible:
+        if len(last_update) > 0 and max(last_update) >= earliest_update_possible:
             flash('Invalid request for User: {} Try again in: {} seconds.'.format(
                 username, (min(last_update) - earliest_update_possible).seconds
             ))

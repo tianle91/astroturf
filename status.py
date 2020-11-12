@@ -91,7 +91,7 @@ def last_progress(username: str) -> Optional[datetime]:
     )).updated
     progresses = [data_refresh_progress_updated, model_training_progress_updated]
     progresses = [dt for dt in progresses if dt is not None]
-    return None if len(progresses) == 0 else min(progresses)
+    return None if len(progresses) == 0 else max(progresses)
 
 
 def is_invalid(username: str, r: Reddit) -> bool:
