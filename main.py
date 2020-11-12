@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 from typing import Optional
 
 import flask
@@ -15,18 +16,20 @@ from praw_utils import get_reddit
 client = storage.Client()
 config_bucket = client.bucket('astroturf-dev-configs')
 path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_string())
-model_bucket = path_config['model_bucket']
-cloud_model_path = path_config['model_path']
+model_bucket = client.bucket(path_config['model_bucket'])
+status_bucket = client.bucket(path_config['status_bucket'])
+
+# some local variables
 local_model_path = '/tmp/models/'
 reddit = get_reddit(client, 'astroturf-dev-configs')
 
 
-def is_trained(username: str) -> bool:
-    users = sorted(list({
-        blob.name.replace(cloud_model_path, '').split('/')[0]
-        for blob in client.list_blobs(model_bucket, prefix=cloud_model_path)
-    }))
-    return username in users
+def last_trained(username: str) -> Optional[datetime]:
+    return status_bucket.blob(os.path.join(username, '_UPDATE_TRAIN_SUCCESS')).updated
+
+
+def last_refreshed(username: str) -> Optional[datetime]:
+    return status_bucket.blob(os.path.join(username, '_UPDATE_REFRESH_SUCCESS')).updated
 
 
 def is_invalid(username: str, r: Reddit) -> bool:
@@ -40,16 +43,9 @@ def is_invalid(username: str, r: Reddit) -> bool:
     return False
 
 
-def model_last_updated(username: str) -> Optional[str]:
-    if not is_trained(username):
-        return None
-    for blob in client.list_blobs(model_bucket, prefix=os.path.join(cloud_model_path, username)):
-        return blob.updated.strftime('%c')
-
-
 def refresh_local_models(username, force_update=False):
     """return local path for model files for user==user_name"""
-    cloud_model_path_user = os.path.join(cloud_model_path, username, 'model')
+    cloud_model_path_user = os.path.join(username, 'model')
     local_model_path_user = os.path.join(local_model_path, username, 'model')
     # skip refresh
     targets_exist = [os.path.isfile(os.path.join(local_model_path_user, fname)) for fname in model_output_fnames]

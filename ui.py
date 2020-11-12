@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, flash, redirect, url_for
 from google.cloud import pubsub_v1
 from google.cloud import storage
 
-from main import refresh_local_models, simulate_redditor_response, is_invalid, is_trained, model_last_updated
+from main import refresh_local_models, simulate_redditor_response, is_invalid, last_trained, last_refreshed
 from praw_utils import get_reddit
 
 app = Flask(__name__)
@@ -43,8 +43,15 @@ def index():
 
 @app.route('/infer/<username>', methods=('GET', 'POST'))
 def infer(username):
-    userresponse = {'username': username, 'defaulturl': defaulturl, 'lastupdated': model_last_updated(username)}
-    if not is_trained(username):
+    usr_last_trained = last_trained(username)
+    usr_last_refreshed = last_refreshed(username)
+    userresponse = {
+        'username': username,
+        'defaulturl': defaulturl,
+        'usrlasttrained': usr_last_trained,
+        'usrlastrefreshed': usr_last_refreshed
+    }
+    if usr_last_trained is None:
         flash('No model found for User: {}. Request model training?'.format(username))
         return redirect(url_for('refresh', username=username))
     refresh_local_models(username)
@@ -61,10 +68,16 @@ def infer(username):
 
 @app.route('/refresh/<username>', methods=('GET', 'POST'))
 def refresh(username):
+    usr_last_trained = last_trained(username)
+    usr_last_refreshed = last_refreshed(username)
     if is_invalid(username, reddit):
         flash('User: {} is invalid or not found!'.format(username))
         return redirect(url_for('index'))
-    userrefresh = {'username': username}
+    userrefresh = {
+        'username': username,
+        'usrlasttrained': usr_last_trained,
+        'usrlastrefreshed': usr_last_refreshed
+    }
     if request.method == 'POST':
         future = publisher.publish(topic_path, str.encode(username))
         message_id = future.result()
