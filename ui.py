@@ -40,7 +40,7 @@ def index():
             return redirect(url_for('index'))
         else:
             return redirect(url_for('infer', username=username))
-    return render_template('index.html', users=get_trained_usernames())
+    return render_template('index.html', users=sorted(get_trained_usernames()))
 
 
 @app.route('/infer/<username>', methods=('GET', 'POST'))

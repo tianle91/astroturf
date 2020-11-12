@@ -2,22 +2,25 @@
 
 {% block content %}
 <h1>{% block title %} Which Redditor to simulate? {% endblock %}</h1>
+Simulate how Redditors would respond to a Submission or Comment!
+
+<hr>
+<h2>Specify Redditor</h2>
+Search for trained user here or submit request to train a model on a Redditor.
 <form method="post">
     <div class="form-group">
         <input type="text" name="requestedusername" placeholder="Redditor" class="form-control"
                value="{{ request.form['requestedusername'] }}">
         <br>
-        <button type="submit" class="btn btn-primary">Submit</button>
     </div>
 </form>
 
-<h2>Trained Users</h2>
 <hr>
+<h2>Trained Users</h2>
+Select a Redditor with a trained model.
+<br>
 {% for username in users %}
-    <a href="{{ url_for('infer', username=username) }}">
-        <h2>{{ username }}</h2>
-    </a>
-    <hr>
+    <a href="{{ url_for('infer', username=username) }}"><h3>{{ username }}</h3></a>
 {% endfor %}
 
 {% endblock %}
