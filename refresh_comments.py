@@ -16,13 +16,12 @@ status_bucket = client.bucket(path_config['status_bucket'])
 
 def refresh_user_comments(user_name: str, reddit: praw.Reddit, limit: int = 1000):
     '''dump user comments to {gcp_bucket}/{prefix}/{user_name}/{comment_id}.json'''
-    cloud_data_path_user = user_name
     status_progress = status_bucket.blob(os.path.join(user_name, StatusFlags.data_refresh_progress))
     status_progress.upload_from_string('starting')
-    exist_blob_paths = [blob.name for blob in client.list_blobs(data_bucket, prefix=cloud_data_path_user)]
+    exist_blob_paths = [blob.name for blob in client.list_blobs(data_bucket, prefix=user_name)]
     i = 0
     for comment in reddit.redditor(user_name).comments.new(limit=limit):
-        blob_path = os.path.join(cloud_data_path_user, '{}.json'.format(comment.id))
+        blob_path = os.path.join(user_name, '{}.json'.format(comment.id))
         if not blob_path in exist_blob_paths:
             status_str = '[{i}/{limit}] id: {id}, body: {body}'.format(
                 i=i, limit=limit, id=comment.id, body=comment.body.replace('\n', ' ').replace('\t', ' ')[:50]
