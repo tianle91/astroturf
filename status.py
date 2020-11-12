@@ -43,8 +43,8 @@ def status(username: str) -> str:
         os.path.join(username, StatusFlags.model_training_success)
     ))
     return '\n'.join([
-        'data_refresh_success: updated: {}'.format(data_refresh_success.updated),
         'data_refresh_progress: updated: {}'.format(data_refresh_progress.updated),
+        'data_refresh_success: updated: {}'.format(data_refresh_success.updated),
         'model_training_progress: updated: {}'.format(model_training_progress.updated),
         'model_training_success: updated: {}'.format(model_training_success.updated),
     ])
