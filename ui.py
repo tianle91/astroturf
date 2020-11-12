@@ -77,5 +77,4 @@ def refresh(username):
         future = publisher.publish(topic_path, str.encode(username))
         message_id = future.result()
         flash('Submitted request to refresh User: {}. Published Message ID: {}'.format(username, message_id))
-        return redirect(url_for('index'))
     return render_template('refresh.html', userrefresh=userrefresh)
