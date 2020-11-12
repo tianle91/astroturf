@@ -13,16 +13,14 @@ services:
       - "5000:5000"
     volumes:
       - .:/astroturf
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=astroturf-ui.json
     entrypoint: gunicorn -w 2 -b 0.0.0.0:5000 ui:app
-  refreshfinetune:
+  refreshlistener:
     build:
       context: .
     volumes:
       - .:/astroturf
-    entrypoint: python refresh_finetuned.py
-  refreshdata:
-    build:
-      context: .
-    volumes:
-      - .:/astroturf
-    entrypoint: python refresh_comments.py
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=astroturf-update.json
+    entrypoint: python refresh_listener.py
