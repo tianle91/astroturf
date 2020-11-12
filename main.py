@@ -1,6 +1,7 @@
 import json
 import os
 from datetime import datetime
+from typing import List
 from typing import Optional
 
 import flask
@@ -51,6 +52,15 @@ def status(username: str) -> str:
         'model_training_progress: updated: {}'.format(model_training_progress.updated),
         'model_training_success: updated: {}'.format(model_training_success.updated),
     ])
+
+
+def get_trained_usernames() -> List[str]:
+    resl = []
+    for blob in client.list_blobs(status_bucket):
+        user_name, status_fname = blob.name.split('/')[0], blob.name.split('/')[1]
+        if status_fname == StatusFlags.model_training_success:
+            resl.append(user_name)
+    return resl
 
 
 def last_trained(username: str) -> Optional[datetime]:
