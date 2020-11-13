@@ -18,7 +18,7 @@ def refresh_user_comments(user_name: str, reddit: praw.Reddit, limit: int = 1000
     # progress status tracker
     status_progress = status_bucket.blob(os.path.join(user_name, StatusFlags.data_refresh_progress))
     status_progress.upload_from_string('starting')
-
+    print (reddit.auth.limits)
     # completion checker
     exist_blob_paths = [blob.name for blob in client.list_blobs(data_bucket, prefix=user_name)]
     i = 0
@@ -33,8 +33,8 @@ def refresh_user_comments(user_name: str, reddit: praw.Reddit, limit: int = 1000
             blob = data_bucket.blob(blob_path)
             blob.upload_from_string(json.dumps(package, indent=4))
         i += 1
-
     # status cleanup
+    print(reddit.auth.limits)
     status_progress.delete()
     status_success = status_bucket.blob(os.path.join(user_name, StatusFlags.data_refresh_success))
     status_success.upload_from_string('done')
