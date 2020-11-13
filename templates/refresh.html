@@ -5,6 +5,7 @@
 {% block content %}
 <h1>{% block title %} {{ userrefresh['username'] }} {% endblock %}</h1>
 Request for a refresh model for user.
+<a href="{{ url_for('infer', username=userrefresh['username']) }}">Infer?</a>
 <hr>
 
 <!--TODO: show some progress or something?-->
