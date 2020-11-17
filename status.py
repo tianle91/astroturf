@@ -36,6 +36,9 @@ def get_compact_time_since(dt: Optional[datetime]) -> float:
 
 
 def status(username: str) -> str:
+    refresh_request = get_reloaded_if_exists(status_bucket.blob(
+        os.path.join(username, StatusFlags.refresh_request)
+    ))
     data_refresh_success = get_reloaded_if_exists(status_bucket.blob(
         os.path.join(username, StatusFlags.data_refresh_success)
     ))
@@ -49,6 +52,9 @@ def status(username: str) -> str:
         os.path.join(username, StatusFlags.model_training_success)
     ))
     return '\n'.join([
+        'refresh_request:         {}'.format(
+            get_compact_time_since(refresh_request.updated)
+        ),
         'data_refresh_progress:   {}'.format(
             get_compact_time_since(data_refresh_progress.updated)
         ),
@@ -74,6 +80,12 @@ def get_trained_usernames() -> List[str]:
             if fname == StatusFlags.model_training_success:
                 resl.append(user_name)
     return resl
+
+
+def last_request(username: str) -> Optional[datetime]:
+    return get_reloaded_if_exists(status_bucket.blob(
+        os.path.join(username, StatusFlags.refresh_request)
+    )).updated
 
 
 def last_success(username: str) -> Optional[datetime]:

@@ -1,6 +1,7 @@
 # https://www.digitalocean.com/community/tutorials/how-to-make-a-web-application-using-flask-in-python-3
 
 import json
+import os
 from datetime import datetime, timedelta, timezone
 
 from flask import Flask, render_template, request, flash, redirect, url_for
@@ -9,7 +10,8 @@ from google.cloud import storage
 
 from main import refresh_local_models, simulate_redditor_response
 from praw_utils import get_reddit
-from status import is_invalid, last_success, status, get_trained_usernames, last_progress
+from status import is_invalid, last_success, status, get_trained_usernames, last_progress, last_request
+from statusflags import StatusFlags
 
 app = Flask(__name__)
 
@@ -24,6 +26,7 @@ path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_strin
 project_id = path_config['project_id']
 publisher = pubsub_v1.PublisherClient()
 topic_path = publisher.topic_path(project_id, 'model_refresh_requests')
+status_bucket = client.bucket(path_config['status_bucket'])
 
 defaulturl = 'https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw'
 
@@ -73,7 +76,7 @@ def refresh(username):
         'status': status(username),
     }
     if request.method == 'POST':
-        last_update = [last_success(username), last_progress(username)]
+        last_update = [last_request(username), last_success(username), last_progress(username)]
         last_update = [dt for dt in last_update if dt is not None]
         earliest_update_possible = datetime.now(timezone.utc) - timedelta(minutes=5)
         if len(last_update) > 0 and max(last_update) >= earliest_update_possible:
@@ -83,5 +86,9 @@ def refresh(username):
         else:
             future = publisher.publish(topic_path, str.encode(username))
             message_id = future.result()
+            refresh_request = status_bucket.blob(
+                os.path.join(username, StatusFlags.refresh_request)
+            )
+            refresh_request.upload_from_string(message_id)
             flash('Submitted request to refresh User: {}. Published Message ID: {}'.format(username, message_id))
     return render_template('refresh.html', userrefresh=userrefresh)
