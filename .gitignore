@@ -88,3 +88,6 @@ astroturf-ui.json
 
 # pycharm
 .idea/*
+
+# vscode
+.devcontainer/*
