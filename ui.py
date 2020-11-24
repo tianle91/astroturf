@@ -22,7 +22,8 @@ config_bucket = client.bucket('astroturf-dev-configs')
 app.secret_key = config_bucket.blob('app_secret_key').download_as_string()
 
 # publishing refresh requests
-path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_string())
+path_config = json.loads(config_bucket.blob(
+    'pathConfig.json').download_as_string())
 project_id = path_config['project_id']
 publisher = pubsub_v1.PublisherClient()
 topic_path = publisher.topic_path(project_id, 'model_refresh_requests')
@@ -62,7 +63,8 @@ def infer(username):
                 flash('Invalid url: {}'.format(url))
                 return redirect(url_for('infer', username=username))
             url = defaulturl
-        userresponse.update({'url': url, **simulate_redditor_response(username, url)})
+        userresponse.update(
+            {'url': url, **simulate_redditor_response(username, url)})
     return render_template('infer.html', userinference=userresponse)
 
 
@@ -76,9 +78,11 @@ def refresh(username):
         'status': status(username),
     }
     if request.method == 'POST':
-        last_update = [last_request(username), last_success(username), last_progress(username)]
+        last_update = [last_request(username), last_success(
+            username), last_progress(username)]
         last_update = [dt for dt in last_update if dt is not None]
-        earliest_update_possible = datetime.now(timezone.utc) - timedelta(minutes=5)
+        earliest_update_possible = datetime.now(
+            timezone.utc) - timedelta(minutes=5)
         if len(last_update) > 0 and max(last_update) >= earliest_update_possible:
             flash('Invalid request for User: {} Try again in: {} seconds.'.format(
                 username, (min(last_update) - earliest_update_possible).seconds
@@ -90,5 +94,6 @@ def refresh(username):
                 os.path.join(username, StatusFlags.refresh_request)
             )
             refresh_request.upload_from_string(message_id)
-            flash('Submitted request to refresh User: {}. Published Message ID: {}'.format(username, message_id))
+            flash('Submitted request to refresh User: {}. Published Message ID: {}'.format(
+                username, message_id))
     return render_template('refresh.html', userrefresh=userrefresh)
