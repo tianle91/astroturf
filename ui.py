@@ -4,13 +4,13 @@ import json
 import os
 from datetime import datetime, timedelta, timezone
 
-from flask import Flask, render_template, request, flash, redirect, url_for
-from google.cloud import pubsub_v1
-from google.cloud import storage
+from flask import Flask, flash, redirect, render_template, request, url_for
+from google.cloud import pubsub_v1, storage
 
 from main import refresh_local_models, simulate_redditor_response
 from praw_utils import get_reddit
-from status import is_invalid, last_success, status, get_trained_usernames, last_progress, last_request
+from status import (get_trained_usernames, is_invalid, last_progress,
+                    last_request, last_success, status)
 from statusflags import StatusFlags
 
 app = Flask(__name__)
