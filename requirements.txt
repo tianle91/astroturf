@@ -9,3 +9,4 @@ configparser==5.0.1
 google-cloud-pubsub==2.1.0
 fastapi==0.61.2
 uvicorn==0.12.3
+requests==2.25.0
