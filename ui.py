@@ -8,7 +8,6 @@ import requests
 from flask import Flask, flash, redirect, render_template, request, url_for
 from google.cloud import pubsub_v1, storage
 
-from main import refresh_local_models, simulate_redditor_response
 from praw_utils import get_reddit
 from status import (get_trained_usernames, is_invalid, last_progress,
                     last_request, last_success, status)
