@@ -14,7 +14,8 @@ from praw_utils import get_reddit
 
 client = storage.Client()
 config_bucket = client.bucket('astroturf-dev-configs')
-path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_string())
+path_config = json.loads(config_bucket.blob(
+    'pathConfig.json').download_as_string())
 model_bucket = client.bucket(path_config['model_bucket'])
 status_bucket = client.bucket(path_config['status_bucket'])
 
@@ -28,7 +29,8 @@ def refresh_local_models(username, force_update=False):
     cloud_model_path_user = os.path.join(username, 'model')
     local_model_path_user = os.path.join(local_model_path, username, 'model')
     # skip refresh
-    targets_exist = [os.path.isfile(os.path.join(local_model_path_user, fname)) for fname in model_output_fnames]
+    targets_exist = [os.path.isfile(os.path.join(
+        local_model_path_user, fname)) for fname in model_output_fnames]
     if not force_update and all(targets_exist):
         return local_model_path_user
     # refresh
