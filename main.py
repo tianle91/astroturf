@@ -1,11 +1,14 @@
 import json
 import os
+from typing import Dict
 
 import flask
 from google.cloud import storage
+from transformers import pipeline
 
-from astroturf.finetune import model_output_fnames, get_qa_string
-from astroturf.infer import get_text_generation_pipeline, make_package_infer_url
+from astroturf.finetune import get_qa_string, model_output_fnames
+from astroturf.infer import (get_text_generation_pipeline,
+                             make_package_infer_url)
 from gcp_utils import download_all_cloud_files_with_prefix
 from praw_utils import get_reddit
 
@@ -37,19 +40,25 @@ def refresh_local_models(username, force_update=False):
     return local_model_path_user
 
 
+def simulate_pipeline_response(pipeline: pipeline, url: str) -> Dict[str, str]:
+    package = make_package_infer_url(url, reddit)
+    prompt = get_qa_string(package)
+    responses = pipeline(prompt, max_length=len(prompt.split(' ')) + 128)
+    return {
+        'prompt': prompt,
+        'response': responses[0]['generated_text'].replace(prompt, '').strip().split('\n')[0]
+    }
+
+
 def simulate_redditor_response(username, url):
     try:
         local_model_path_user = refresh_local_models(username)
     except Exception as e:
         return str(e)
-    txtgen = get_text_generation_pipeline(local_model_path_user)
-    package = make_package_infer_url(url, reddit)
-    prompt = get_qa_string(package)
-    responses = txtgen(prompt, max_length=len(prompt.split(' ')) + 128)
-    return {
-        'prompt': prompt,
-        'response': responses[0]['generated_text'].replace(prompt, '').strip().split('\n')[0]
-    }
+    return simulate_pipeline_response(
+        get_text_generation_pipeline(local_model_path_user),
+        url=url
+    )
 
 
 def simulate_redditor_response_flask(request: flask.Request):
