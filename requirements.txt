@@ -7,3 +7,5 @@ Flask==1.1.2
 google-cloud-storage==1.31.2
 configparser==5.0.1
 google-cloud-pubsub==2.1.0
+fastapi==0.61.2
+uvicorn==0.12.3
