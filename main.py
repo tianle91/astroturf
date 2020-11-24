@@ -61,23 +61,7 @@ def simulate_redditor_response(username, url):
     )
 
 
-def simulate_redditor_response_flask(request: flask.Request):
-    """HTTP Cloud Function. Returns response text or any valid input to
-    https://flask.palletsprojects.com/en/1.1.x/api/#flask.make_response
-    """
-    request_json = request.get_json(silent=True)
-    sim_output = simulate_redditor_response(request_json['username'], request_json['url'])
-    request_json.update(sim_output)
-    return request_json
-
-
 if __name__ == '__main__':
-    class DummyRequest:
-        def get_json(self, *args, **kwargs):
-            return {
-                "username": "spez",
-                "url": "https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw"
-            }
-
-
-    print(simulate_redditor_response_flask(DummyRequest()))
+    username = 'spez'
+    url = 'https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw'
+    print(simulate_redditor_response(DummyRequest()))
