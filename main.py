@@ -64,4 +64,4 @@ def simulate_redditor_response(username, url):
 if __name__ == '__main__':
     username = 'spez'
     url = 'https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw'
-    print(simulate_redditor_response(DummyRequest()))
+    print(simulate_redditor_response(username, url))
