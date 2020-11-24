@@ -14,10 +14,11 @@ app = FastAPI()
 client = storage.Client()
 config_bucket = client.bucket('astroturf-dev-configs')
 
-@app.get("/infer/{username}")
+
+@app.get("/{username}")
 def infer(username: str, url: str):
     return simulate_redditor_response(username, url)
 
 # holy shit this is indeed fast
 # uvicorn infer:app --reload
-# 127.0.0.1:8000/infer/spez?url=https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw
+# 127.0.0.1:8000/spez?url=https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw
