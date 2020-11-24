@@ -4,6 +4,7 @@ import json
 import os
 from datetime import datetime, timedelta, timezone
 
+import requests
 from flask import Flask, flash, redirect, render_template, request, url_for
 from google.cloud import pubsub_v1, storage
 
@@ -55,7 +56,6 @@ def infer(username):
     if usr_last_trained is None:
         flash('No model found for User: {}. Request model training?'.format(username))
         return redirect(url_for('refresh', username=username))
-    refresh_local_models(username)
     if request.method == 'POST':
         url = request.form['url']
         if is_invalid_url(url):
@@ -63,8 +63,10 @@ def infer(username):
                 flash('Invalid url: {}'.format(url))
                 return redirect(url_for('infer', username=username))
             url = defaulturl
-        userresponse.update(
-            {'url': url, **simulate_redditor_response(username, url)})
+        inferresponse = requests.get('http://infer:8000/{username}?url={url}'.format(
+            username=username, url=url
+        ))
+        userresponse.update({'url': url, **inferresponse.json()})
     return render_template('infer.html', userinference=userresponse)
 
 
