@@ -1,24 +1,27 @@
 import json
 
-from flask import Flask
 from google.cloud import pubsub_v1
 from google.cloud import storage
 
 from scraper import refresh_user_comments
-from trainer import refresh_finetuned
 
 
 # some clients and variables
 client = storage.Client()
 config_bucket = client.bucket('astroturf-dev-configs')
-
-# subscribing to refresh requests
 path_config = json.loads(config_bucket.blob(
     'pathConfig.json').download_as_string())
 project_id = path_config['project_id']
+
+# subscribing to scraper requests
 subscriber = pubsub_v1.SubscriberClient()
 subscription_path = subscriber.subscription_path(
-    project_id, path_config['sub_refresh_request'])
+    project_id, path_config['sub_scraper_request'])
+
+# publishing to trainer requests
+publisher = pubsub_v1.PublisherClient()
+topic_path = publisher.topic_path(
+    project_id, path_config['pub_trainer_request'])
 
 if __name__ == '__main__':
     import argparse
@@ -27,9 +30,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='search comments by new for user.')
     parser.add_argument('--limit', type=int, default=100)
-    parser.add_argument('--blocksize', type=int, default=16)
-    parser.add_argument('--maxsteps', type=int, default=10)
-    parser.add_argument('--forceupdate', type=bool, default=False)
     args = parser.parse_args()
 
     reddit = get_reddit(client, 'astroturf-dev-configs')
@@ -52,6 +52,7 @@ if __name__ == '__main__':
             # run the updates
             print('\nrefresh_user_comments...\n')
             status = refresh_user_comments(user_name, reddit, limit=args.limit)
-            print('\nrefresh_finetuned...\n')
-            ran = refresh_finetuned(user_name, blocksize=args.blocksize, maxsteps=args.maxsteps,
-                                    force_update=args.forceupdate)
+
+            future = publisher.publish(topic_path, str.encode(username))
+            message_id = future.result()
+            print(f'\npublished trainer request, id: {message_id}\n')
