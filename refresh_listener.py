@@ -17,7 +17,7 @@ config_bucket = client.bucket('astroturf-dev-configs')
 path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_string())
 project_id = path_config['project_id']
 subscriber = pubsub_v1.SubscriberClient()
-subscription_path = subscriber.subscription_path(project_id, 'model_refresh_servicer')
+subscription_path = subscriber.subscription_path(project_id, path_config['sub_refresh_request'])
 
 if __name__ == '__main__':
     import argparse

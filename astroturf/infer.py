@@ -19,6 +19,6 @@ def make_package_infer_url(url: str, reddit: Reddit):
         return make_package_infer_comment(refobj, reddit)
 
 
-def get_text_generation_pipeline(modeloutputpath):
+def get_text_generation_pipeline(modeloutputpath) -> pipeline:
     tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
     return pipeline('text-generation', model=modeloutputpath, tokenizer=tokenizer)
