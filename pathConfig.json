@@ -8,6 +8,6 @@
     "sub_refresh_request": "sub_refresh_request",
     "pub_scraper_request": "pub_scraper_request",
     "sub_scraper_request": "sub_scraper_request",
-    "pub_retrain_request": "pub_trainer_request",
-    "sub_retrain_request": "sub_trainer_request"
+    "pub_trainer_request": "pub_trainer_request",
+    "sub_trainer_request": "sub_trainer_request"
 }
