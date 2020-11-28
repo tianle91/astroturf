@@ -18,11 +18,19 @@ services:
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=astroturf-ui.json
     entrypoint: uvicorn --host 0.0.0.0 --port 8000 --workers 1 infer:app
-  refreshlistener:
+  scraper:
     build:
       context: .
     volumes:
       - .:/astroturf
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=astroturf-update.json
-    entrypoint: python refresh_listener.py
+    entrypoint: python scraper_listener.py
+  trainer:
+    build:
+      context: .
+    volumes:
+      - .:/astroturf
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=astroturf-update.json
+    entrypoint: python trainer_listener.py
