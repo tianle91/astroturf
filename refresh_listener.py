@@ -45,7 +45,7 @@ if __name__ == '__main__':
         ack_ids = [msg.ack_id for msg in response.received_messages]
         if len(ack_ids) > 0:
             # there's something to do!
-            # ack the message first
+            # ack the message first because i don't care about user
             subscriber.acknowledge(
                 request={"subscription": subscription_path, "ack_ids": ack_ids})
             # print('ack_ids: {}'.format(ack_ids))
