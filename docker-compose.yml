@@ -25,7 +25,7 @@ services:
       - .:/astroturf
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=astroturf-update.json
-    entrypoint: python scraper_listener.py
+    entrypoint: python scraper_listener.py --limit 1000
   trainer:
     build:
       context: .
@@ -33,4 +33,4 @@ services:
       - .:/astroturf
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=astroturf-update.json
-    entrypoint: python trainer_listener.py
+    entrypoint: python trainer_listener.py --blocksize 128 --maxsteps 100 --forceupdate True
