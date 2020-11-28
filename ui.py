@@ -29,7 +29,7 @@ publisher = pubsub_v1.PublisherClient()
 topic_path = publisher.topic_path(project_id, path_config['pub_refresh_request'])
 status_bucket = client.bucket(path_config['status_bucket'])
 
-defaulturl = 'https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw'
+defaulturl = path_config['defaulturl']
 
 
 def is_invalid_url(url):
