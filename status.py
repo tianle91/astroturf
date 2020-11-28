@@ -40,7 +40,7 @@ def get_compact_time_since(dt: Optional[datetime]) -> str:
         return f'{minutes_since} minutes ago'
     hours_since = minutes_since // 60
     if hours_since < 60:
-        return f'{minutes_since} hours ago'
+        return f'{hours_since} hours ago'
     days_since = hours_since // 24
     if days_since < 60:
         return f'{days_since} days ago'
