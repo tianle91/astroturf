@@ -4,8 +4,8 @@ from flask import Flask
 from google.cloud import pubsub_v1
 from google.cloud import storage
 
-from refresh_comments import refresh_user_comments
-from refresh_finetuned import refresh_finetuned
+from scraper import refresh_user_comments
+from trainer import refresh_finetuned
 
 
 # some clients and variables
