@@ -3,6 +3,7 @@
 import json
 import os
 from datetime import datetime, timedelta, timezone
+from textwrap import wrap
 
 import requests
 from flask import Flask, flash, redirect, render_template, request, url_for
@@ -30,6 +31,13 @@ topic_path = publisher.topic_path(project_id, path_config['pub_refresh_request']
 status_bucket = client.bucket(path_config['status_bucket'])
 
 defaulturl = path_config['defaulturl']
+
+
+def get_wrapped(s: str) -> str:
+    resl = []
+    for ssub in s.split('\n'):
+        resl += wrap(ssub)
+    return '\n'.join(resl)
 
 
 def is_invalid_url(url):
@@ -64,8 +72,12 @@ def infer(username):
             url = defaulturl
         inferresponse = requests.get('http://infer:8000/{username}?url={url}'.format(
             username=username, url=url
-        ))
-        userresponse.update({'url': url, **inferresponse.json()})
+        )).json()
+        userresponse.update({
+            'url': url, 
+            'prompt': get_wrapped(inferresponse['prompt']),
+            'response': get_wrapped(inferresponse['response']),
+        })
     return render_template('infer.html', userinference=userresponse)
 
 
