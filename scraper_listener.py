@@ -39,8 +39,8 @@ if __name__ == '__main__':
         response = subscriber.pull(
             request={"subscription": subscription_path, "max_messages": 1})
         for msg in response.received_messages:
-            user_name = msg.message.data.decode('utf-8')
-            print("Received message:", user_name)
+            username = msg.message.data.decode('utf-8')
+            print(f"Received message: {username}")
 
         ack_ids = [msg.ack_id for msg in response.received_messages]
         if len(ack_ids) > 0:
@@ -51,7 +51,7 @@ if __name__ == '__main__':
             # print('ack_ids: {}'.format(ack_ids))
             # run the updates
             print('\nrefresh_user_comments...\n')
-            status = refresh_user_comments(user_name, reddit, limit=args.limit)
+            status = refresh_user_comments(username, reddit, limit=args.limit)
 
             future = publisher.publish(topic_path, str.encode(username))
             message_id = future.result()
