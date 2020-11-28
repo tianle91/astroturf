@@ -26,7 +26,7 @@ path_config = json.loads(config_bucket.blob(
     'pathConfig.json').download_as_string())
 project_id = path_config['project_id']
 publisher = pubsub_v1.PublisherClient()
-topic_path = publisher.topic_path(project_id, 'model_refresh_requests')
+topic_path = publisher.topic_path(project_id, path_config['pub_refresh_request'])
 status_bucket = client.bucket(path_config['status_bucket'])
 
 defaulturl = 'https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw'
