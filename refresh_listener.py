@@ -7,23 +7,25 @@ from google.cloud import storage
 from refresh_comments import refresh_user_comments
 from refresh_finetuned import refresh_finetuned
 
-app = Flask(__name__)
 
 # some clients and variables
 client = storage.Client()
 config_bucket = client.bucket('astroturf-dev-configs')
 
 # subscribing to refresh requests
-path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_string())
+path_config = json.loads(config_bucket.blob(
+    'pathConfig.json').download_as_string())
 project_id = path_config['project_id']
 subscriber = pubsub_v1.SubscriberClient()
-subscription_path = subscriber.subscription_path(project_id, path_config['sub_refresh_request'])
+subscription_path = subscriber.subscription_path(
+    project_id, path_config['sub_refresh_request'])
 
 if __name__ == '__main__':
     import argparse
     from praw_utils import get_reddit
 
-    parser = argparse.ArgumentParser(description='search comments by new for user.')
+    parser = argparse.ArgumentParser(
+        description='search comments by new for user.')
     parser.add_argument('--limit', type=int, default=100)
     parser.add_argument('--blocksize', type=int, default=16)
     parser.add_argument('--maxsteps', type=int, default=10)
@@ -34,7 +36,8 @@ if __name__ == '__main__':
 
     while True:
         print('Listening')
-        response = subscriber.pull(request={"subscription": subscription_path, "max_messages": 1})
+        response = subscriber.pull(
+            request={"subscription": subscription_path, "max_messages": 1})
         for msg in response.received_messages:
             user_name = msg.message.data.decode('utf-8')
             print("Received message:", user_name)
@@ -43,11 +46,12 @@ if __name__ == '__main__':
         if len(ack_ids) > 0:
             # there's something to do!
             # ack the message first
-            subscriber.acknowledge(request={"subscription": subscription_path, "ack_ids": ack_ids})
+            subscriber.acknowledge(
+                request={"subscription": subscription_path, "ack_ids": ack_ids})
             # print('ack_ids: {}'.format(ack_ids))
             # run the updates
-            print ('\nrefresh_user_comments...\n')
+            print('\nrefresh_user_comments...\n')
             status = refresh_user_comments(user_name, reddit, limit=args.limit)
-            print ('\nrefresh_finetuned...\n')
+            print('\nrefresh_finetuned...\n')
             ran = refresh_finetuned(user_name, blocksize=args.blocksize, maxsteps=args.maxsteps,
                                     force_update=args.forceupdate)
