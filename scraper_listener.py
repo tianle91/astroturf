@@ -1,10 +1,8 @@
 import json
 
-from google.cloud import pubsub_v1
-from google.cloud import storage
+from google.cloud import pubsub_v1, storage
 
 from scraper import refresh_user_comments
-
 
 # some clients and variables
 client = storage.Client()
@@ -25,6 +23,7 @@ topic_path = publisher.topic_path(
 
 if __name__ == '__main__':
     import argparse
+
     from praw_utils import get_reddit
 
     parser = argparse.ArgumentParser(

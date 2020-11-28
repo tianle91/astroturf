@@ -44,6 +44,7 @@ def refresh_user_comments(user_name: str, reddit: praw.Reddit, limit: int = 1000
 if __name__ == '__main__':
 
     import argparse
+
     from praw_utils import get_reddit
 
     parser = argparse.ArgumentParser(description='search comments by new for user.')

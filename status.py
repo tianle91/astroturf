@@ -1,8 +1,7 @@
 import json
 import os
 from datetime import datetime, timezone
-from typing import List
-from typing import Optional
+from typing import List, Optional
 
 from google.cloud import storage
 from google.cloud.storage import Blob
