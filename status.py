@@ -32,18 +32,18 @@ def get_compact_time_since(dt: Optional[datetime]) -> str:
     utcnow = datetime.now(timezone.utc)
     if dt is None:
         return '?'
-    seconds_since = None if dt is None else (utcnow - dt).seconds
+    seconds_since = (utcnow - dt).seconds
     if seconds_since < 60:
-        return 'f{seconds_since} seconds ago'
+        return f'{seconds_since} seconds ago'
     minutes_since = seconds_since // 60
     if minutes_since < 60:
-        return 'f{minutes_since} minutes ago'
+        return f'{minutes_since} minutes ago'
     hours_since = minutes_since // 60
     if hours_since < 60:
-        return 'f{minutes_since} hours ago'
+        return f'{minutes_since} hours ago'
     days_since = hours_since // 24
     if days_since < 60:
-        return 'f{days_since} days ago'
+        return f'{days_since} days ago'
     return 'more than 60 days ago'
 
 
