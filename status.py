@@ -28,56 +28,66 @@ def get_reloaded_if_exists(blob: Blob) -> Blob:
     return blob
 
 
+def get_compact_timedelta_str_from_seconds(seconds: int) -> str:
+    s = seconds
+    if s < 60:
+        return f'{s} seconds ago'
+    m = s // 60
+    if m < 60:
+        return f'{m} minutes ago'
+    h = m // 60
+    if h < 60:
+        return f'{h} hours ago'
+    d = h // 24
+    if d < 60:
+        return f'{d} days ago'
+    return 'more than 60 days ago'
+
+
 def get_compact_time_since(dt: Optional[datetime]) -> str:
     utcnow = datetime.now(timezone.utc)
     if dt is None:
         return '?'
-    seconds_since = (utcnow - dt).seconds
-    if seconds_since < 60:
-        return f'{seconds_since} seconds ago'
-    minutes_since = seconds_since // 60
-    if minutes_since < 60:
-        return f'{minutes_since} minutes ago'
-    hours_since = minutes_since // 60
-    if hours_since < 60:
-        return f'{hours_since} hours ago'
-    days_since = hours_since // 24
-    if days_since < 60:
-        return f'{days_since} days ago'
-    return 'more than 60 days ago'
-
+    return get_compact_timedelta_str_from_seconds((utcnow - dt).seconds)
 
 def status(username: str) -> str:
     refresh_request = get_reloaded_if_exists(status_bucket.blob(
         os.path.join(username, StatusFlags.refresh_request)
     ))
+    # data refresh
     data_refresh_success = get_reloaded_if_exists(status_bucket.blob(
         os.path.join(username, StatusFlags.data_refresh_success)
     ))
     data_refresh_progress = get_reloaded_if_exists(status_bucket.blob(
         os.path.join(username, StatusFlags.data_refresh_progress)
     ))
+    data_refresh_progress_str = ''
+    if data_refresh_progress.exists():
+        data_refresh_progress_str = data_refresh_progress.download_as_string().decode("utf-8")
+    # model training
     model_training_progress = get_reloaded_if_exists(status_bucket.blob(
         os.path.join(username, StatusFlags.model_training_progress)
     ))
     model_training_success = get_reloaded_if_exists(status_bucket.blob(
         os.path.join(username, StatusFlags.model_training_success)
     ))
+    n = len('more than 60 days ago')
     return '\n'.join([
         'refresh_request:         {}'.format(
-            get_compact_time_since(refresh_request.updated)
+            get_compact_time_since(refresh_request.updated).rjust(n)
         ),
-        'data_refresh_progress:   {}'.format(
-            get_compact_time_since(data_refresh_progress.updated)
+        'data_refresh_progress:   {} {}'.format(
+            get_compact_time_since(data_refresh_progress.updated).rjust(n),
+            data_refresh_progress_str
         ),
         'data_refresh_success:    {}'.format(
-            get_compact_time_since(data_refresh_success.updated)
+            get_compact_time_since(data_refresh_success.updated).rjust(n)
         ),
         'model_training_progress: {}'.format(
-            get_compact_time_since(model_training_progress.updated)
+            get_compact_time_since(model_training_progress.updated).rjust(n)
         ),
         'model_training_success:  {}'.format(
-            get_compact_time_since(model_training_success.updated)
+            get_compact_time_since(model_training_success.updated).rjust(n)
         ),
     ])
 
