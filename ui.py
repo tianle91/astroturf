@@ -26,6 +26,7 @@ path_config = json.loads(config_bucket.blob(
     'pathConfig.json').download_as_string())
 project_id = path_config['project_id']
 defaulturl = path_config['defaulturl']
+infer_endpoint = path_config['infer_endpoint']
 
 # publishing refresh requests
 publisher = pubsub_v1.PublisherClient()
@@ -71,8 +72,8 @@ def infer(username):
                 flash('Invalid url: {}'.format(url))
                 return redirect(url_for('infer', username=username))
             url = defaulturl
-        inferresponse = requests.get('http://infer:8000/{username}?url={url}'.format(
-            username=username, url=url
+        inferresponse = requests.get('{infer_endpoint}/{username}?url={url}'.format(
+            infer_endpoint=infer_endpoint, username=username, url=url
         )).json()
         userresponse.update({
             'url': url,

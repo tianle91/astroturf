@@ -1,7 +1,7 @@
 import json
 
 from google.cloud import pubsub_v1, storage
-
+import requests
 from trainer import refresh_finetuned
 
 # some clients and variables
@@ -10,6 +10,7 @@ config_bucket = client.bucket('astroturf-dev-configs')
 path_config = json.loads(config_bucket.blob(
     'pathConfig.json').download_as_string())
 project_id = path_config['project_id']
+infer_endpoint = path_config['infer_endpoint']
 
 # subscribing to refresh requests
 subscriber = pubsub_v1.SubscriberClient()
@@ -49,3 +50,7 @@ if __name__ == '__main__':
             print('\nrefresh_finetuned...\n')
             ran = refresh_finetuned(username, blocksize=args.blocksize, maxsteps=args.maxsteps,
                                     force_update=args.forceupdate)
+            inferresponse = requests.get('{infer_endpoint}/{username}?refresh=True'.format(
+                infer_endpoint=infer_endpoint,
+                username=username
+            )).json()
