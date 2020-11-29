@@ -46,11 +46,12 @@ def get_compact_timedelta_str_from_seconds(seconds: int) -> str:
 
 def get_compact_time_since(dt: Optional[datetime]) -> str:
     utcnow = datetime.now(timezone.utc)
-    if dt is None:
-        return '?'
-    return '{} ago'.format(
-        get_compact_timedelta_str_from_seconds((utcnow - dt).seconds).rjust(len('>60d'))
-    )
+    s = '?'
+    if dt is not None:
+        s = '{} ago'.format(get_compact_timedelta_str_from_seconds(
+            (utcnow - dt).seconds
+        ))
+    return s.rjust(len('>60d'))
 
 def status(username: str) -> str:
     refresh_request = get_reloaded_if_exists(status_bucket.blob(
