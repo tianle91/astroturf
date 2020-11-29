@@ -7,7 +7,8 @@ def get_context(comment: Comment, reddit: Reddit):
     parent_comment = None
     if not comment.parent_id == comment.link_id:
         # not a top level comment, try to retrieve parent comment
-        parent_comment = reddit.comment(id=comment.parent_id.replace('t1_', ''))
+        parent_comment = reddit.comment(
+            id=comment.parent_id.replace('t1_', ''))
     return parent_comment, submission
 
 

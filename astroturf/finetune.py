@@ -84,7 +84,8 @@ def dump_finetuned(inputpath, outputpath, blocksize=16, max_steps=50):
     fnames = glob(os.path.join(inputpath, '*.json'))
     assert len(fnames) > 0, 'check inputpath: {} is not empty!'.format(inputpath)
     valid_prop = .1
-    shuffled_indices = list(np.random.choice(range(len(fnames)), len(fnames), replace=False))
+    shuffled_indices = list(np.random.choice(
+        range(len(fnames)), len(fnames), replace=False))
     valid_size = max(1, int(valid_prop * len(fnames)))
 
     fnames_shuffled = [fnames[i] for i in shuffled_indices]
@@ -105,11 +106,15 @@ def dump_finetuned(inputpath, outputpath, blocksize=16, max_steps=50):
 
     # model training
 
-    train_dataset = get_dataset(file_path_train, tokenizer=tokenizer, block_size=blocksize)
-    valid_dataset = get_dataset(file_path_valid, tokenizer=tokenizer, block_size=blocksize)
-    test_dataset = get_dataset(file_path_test, tokenizer=tokenizer, block_size=blocksize)
+    train_dataset = get_dataset(
+        file_path_train, tokenizer=tokenizer, block_size=blocksize)
+    valid_dataset = get_dataset(
+        file_path_valid, tokenizer=tokenizer, block_size=blocksize)
+    test_dataset = get_dataset(
+        file_path_test, tokenizer=tokenizer, block_size=blocksize)
 
-    data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
+    data_collator = DataCollatorForLanguageModeling(
+        tokenizer=tokenizer, mlm=False)
 
     modeloutputpath = os.path.join(outputpath, 'model')
     training_args = TrainingArguments(
