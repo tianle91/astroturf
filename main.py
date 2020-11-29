@@ -35,8 +35,7 @@ def get_local_models(username, force_update=False):
         return local_model_path_user
     # refresh
     downloaded_fnames = download_all_cloud_files_with_prefix(
-        local_model_path_user, model_bucket.name, cloud_model_path_user, client,
-        refresh_local=force_update
+        local_model_path_user, model_bucket.name, cloud_model_path_user, client
     )
     if not len(downloaded_fnames) > 0:
         raise ValueError('{} has no model files.'.format(username))
