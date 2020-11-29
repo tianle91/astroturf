@@ -26,19 +26,15 @@ reddit = get_reddit(client, 'astroturf-dev-configs')
 
 def get_local_models(username, force_update=False):
     """return local path for model files for user==user_name"""
-    cloud_model_path_user = os.path.join(username, 'model')
     local_model_path_user = os.path.join(local_model_path, username, 'model')
-    # skip refresh
-    targets_exist = [os.path.isfile(os.path.join(
-        local_model_path_user, fname)) for fname in model_output_fnames]
-    if not force_update and all(targets_exist):
-        return local_model_path_user
-    # refresh
-    downloaded_fnames = download_all_cloud_files_with_prefix(
-        local_model_path_user, model_bucket.name, cloud_model_path_user, client
-    )
-    if not len(downloaded_fnames) > 0:
-        raise ValueError('{} has no model files.'.format(username))
+    if not os.path.isdir(local_model_path_user) or force_update:
+        cloud_model_path_user = os.path.join(username, 'model')
+        fnames = download_all_cloud_files_with_prefix(
+            local_model_path_user, model_bucket.name, cloud_model_path_user, client,
+            refresh_local=force_update
+        )
+        if not len(fnames) > 0:
+            raise ValueError('{} has no model files.'.format(username))
     return local_model_path_user
 
 
