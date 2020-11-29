@@ -41,7 +41,7 @@ def get_compact_timedelta_str_from_seconds(seconds: int) -> str:
     d = h // 24
     if d < 60:
         return f'{d} days ago'
-    return 'more than 60 days ago'
+    return '>60 days ago'
 
 
 def get_compact_time_since(dt: Optional[datetime]) -> str:
@@ -71,7 +71,7 @@ def status(username: str) -> str:
     model_training_success = get_reloaded_if_exists(status_bucket.blob(
         os.path.join(username, StatusFlags.model_training_success)
     ))
-    n = len('more than 60 days ago')
+    n = len('>60 days ago')
     return '\n'.join([
         'refresh_request:         {}'.format(
             get_compact_time_since(refresh_request.updated).rjust(n)
