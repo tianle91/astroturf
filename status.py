@@ -31,17 +31,17 @@ def get_reloaded_if_exists(blob: Blob) -> Blob:
 def get_compact_timedelta_str_from_seconds(seconds: int) -> str:
     s = seconds
     if s < 60:
-        return f'{s} seconds ago'
+        return f'{s}s ago'
     m = s // 60
     if m < 60:
-        return f'{m} minutes ago'
+        return f'{m}m ago'
     h = m // 60
     if h < 60:
-        return f'{h} hours ago'
+        return f'{h}h ago'
     d = h // 24
     if d < 60:
-        return f'{d} days ago'
-    return '>60 days ago'
+        return f'{d}d ago'
+    return '>60d ago'
 
 
 def get_compact_time_since(dt: Optional[datetime]) -> str:
