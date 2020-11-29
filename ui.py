@@ -10,8 +10,9 @@ from flask import Flask, flash, redirect, render_template, request, url_for
 from google.cloud import pubsub_v1, storage
 
 from praw_utils import get_reddit
-from status import (get_trained_usernames, is_invalid, last_progress,
-                    last_request, last_success, status)
+from status import (get_compact_timedelta_str_from_seconds, get_trained_usernames,
+                    is_invalid, last_progress, last_request, last_success,
+                    status)
 from statusflags import StatusFlags
 
 app = Flask(__name__)
@@ -27,7 +28,8 @@ path_config = json.loads(config_bucket.blob(
     'pathConfig.json').download_as_string())
 project_id = path_config['project_id']
 publisher = pubsub_v1.PublisherClient()
-topic_path = publisher.topic_path(project_id, path_config['pub_refresh_request'])
+topic_path = publisher.topic_path(
+    project_id, path_config['pub_refresh_request'])
 status_bucket = client.bucket(path_config['status_bucket'])
 
 defaulturl = path_config['defaulturl']
@@ -74,7 +76,7 @@ def infer(username):
             username=username, url=url
         )).json()
         userresponse.update({
-            'url': url, 
+            'url': url,
             'prompt': get_wrapped(inferresponse['prompt']),
             'response': get_wrapped(inferresponse['response']),
         })
@@ -98,7 +100,8 @@ def refresh(username):
             timezone.utc) - timedelta(minutes=5)
         if len(last_update) > 0 and max(last_update) >= earliest_update_possible:
             flash('Invalid request for User: {} Try again in: {} seconds.'.format(
-                username, (min(last_update) - earliest_update_possible).seconds
+                username, get_compact_timedelta_str_from_seconds(
+                    (min(last_update) - earliest_update_possible).seconds)
             ))
         else:
             future = publisher.publish(topic_path, str.encode(username))
