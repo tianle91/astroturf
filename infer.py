@@ -14,10 +14,12 @@ app = FastAPI()
 # some clients and variables
 client = storage.Client()
 config_bucket = client.bucket('astroturf-dev-configs')
-path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_string())
+path_config = json.loads(config_bucket.blob(
+    'pathConfig.json').download_as_string())
 defaulturl = path_config['defaulturl']
 
 cached_text_generation_pipelines = {}
+
 
 @app.get("/{username}")
 def infer(username: str, url: str):

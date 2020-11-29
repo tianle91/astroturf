@@ -13,7 +13,8 @@ from statusflags import StatusFlags
 
 client = storage.Client()
 config_bucket = client.bucket('astroturf-dev-configs')
-path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_string())
+path_config = json.loads(config_bucket.blob(
+    'pathConfig.json').download_as_string())
 model_bucket = client.bucket(path_config['model_bucket'])
 status_bucket = client.bucket(path_config['status_bucket'])
 
@@ -126,7 +127,8 @@ def last_progress(username: str) -> Optional[datetime]:
     model_training_progress_updated = get_reloaded_if_exists(status_bucket.blob(
         os.path.join(username, StatusFlags.model_training_progress)
     )).updated
-    progresses = [data_refresh_progress_updated, model_training_progress_updated]
+    progresses = [data_refresh_progress_updated,
+                  model_training_progress_updated]
     progresses = [dt for dt in progresses if dt is not None]
     return None if len(progresses) == 0 else max(progresses)
 

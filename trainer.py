@@ -10,7 +10,8 @@ from statusflags import StatusFlags
 
 client = storage.Client()
 config_bucket = client.bucket('astroturf-dev-configs')
-path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_string())
+path_config = json.loads(config_bucket.blob(
+    'pathConfig.json').download_as_string())
 data_bucket = client.bucket(path_config['data_bucket'])
 model_bucket = client.bucket(path_config['model_bucket'])
 status_bucket = client.bucket(path_config['status_bucket'])
@@ -33,7 +34,8 @@ def refresh_finetuned(
     os.makedirs(local_data_path_user, exist_ok=True)
 
     # progress status tracker
-    status_progress = status_bucket.blob(os.path.join(user_name, StatusFlags.model_training_progress))
+    status_progress = status_bucket.blob(os.path.join(
+        user_name, StatusFlags.model_training_progress))
     status_progress.upload_from_string('starting')
 
     # set up some output flags for completion check
@@ -41,7 +43,8 @@ def refresh_finetuned(
 
     # skip if not force_update and model exists
     if not force_update and all(model_bucket.blob(s).exists() for s in output_flags):
-        print('Skip refresh_finetuned due to existing output_flags:\n{}'.format('\n'.join(output_flags)))
+        print('Skip refresh_finetuned due to existing output_flags:\n{}'.format(
+            '\n'.join(output_flags)))
         return user_name
     # download files for training
     downloaded_data_fnames = download_all_cloud_files_with_prefix(
@@ -68,7 +71,8 @@ def refresh_finetuned(
 
     # status cleanup
     status_progress.delete()
-    status_success = status_bucket.blob(os.path.join(user_name, StatusFlags.model_training_success))
+    status_success = status_bucket.blob(os.path.join(
+        user_name, StatusFlags.model_training_success))
     status_success.upload_from_string('done')
     return user_name
 

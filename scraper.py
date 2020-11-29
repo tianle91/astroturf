@@ -9,24 +9,28 @@ from statusflags import StatusFlags
 
 client = storage.Client()
 config_bucket = client.bucket('astroturf-dev-configs')
-path_config = json.loads(config_bucket.blob('pathConfig.json').download_as_string())
+path_config = json.loads(config_bucket.blob(
+    'pathConfig.json').download_as_string())
 data_bucket = client.bucket(path_config['data_bucket'])
 status_bucket = client.bucket(path_config['status_bucket'])
 
 
 def refresh_user_comments(user_name: str, reddit: praw.Reddit, limit: int = 1000):
     # progress status tracker
-    status_progress = status_bucket.blob(os.path.join(user_name, StatusFlags.data_refresh_progress))
+    status_progress = status_bucket.blob(os.path.join(
+        user_name, StatusFlags.data_refresh_progress))
     status_progress.upload_from_string('starting')
-    print (reddit.auth.limits)
+    print(reddit.auth.limits)
     # completion checker
-    exist_blob_paths = [blob.name for blob in client.list_blobs(data_bucket, prefix=user_name)]
+    exist_blob_paths = [blob.name for blob in client.list_blobs(
+        data_bucket, prefix=user_name)]
     i = 0
     for comment in reddit.redditor(user_name).comments.new(limit=limit):
         blob_path = os.path.join(user_name, '{}.json'.format(comment.id))
         if not blob_path in exist_blob_paths:
             status_str = '[{i}/{limit}] id: {id}, body: {body}'.format(
-                i=i, limit=limit, id=comment.id, body=comment.body.replace('\n', ' ').replace('\t', ' ')[:50]
+                i=i, limit=limit, id=comment.id, body=comment.body.replace(
+                    '\n', ' ').replace('\t', ' ')[:50]
             )
             print(status_str)
             if i % 10 == 0:
@@ -38,7 +42,8 @@ def refresh_user_comments(user_name: str, reddit: praw.Reddit, limit: int = 1000
     # status cleanup
     print(reddit.auth.limits)
     status_progress.delete()
-    status_success = status_bucket.blob(os.path.join(user_name, StatusFlags.data_refresh_success))
+    status_success = status_bucket.blob(os.path.join(
+        user_name, StatusFlags.data_refresh_success))
     status_success.upload_from_string('done')
     return True
 
@@ -49,7 +54,8 @@ if __name__ == '__main__':
 
     from praw_utils import get_reddit
 
-    parser = argparse.ArgumentParser(description='search comments by new for user.')
+    parser = argparse.ArgumentParser(
+        description='search comments by new for user.')
     parser.add_argument('--users', type=str, nargs='*')
     parser.add_argument('--limit', type=int, default=100)
     args = parser.parse_args()
