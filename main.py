@@ -52,9 +52,9 @@ def simulate_pipeline_response(pipeline: pipeline, url: str) -> Dict[str, str]:
     }
 
 
-def simulate_redditor_response(username, url):
+def simulate_redditor_response(username, url, force_update: bool = False):
     try:
-        local_model_path_user = get_local_models(username, force_update=True)
+        local_model_path_user = get_local_models(username, force_update=force_update)
     except Exception as e:
         return str(e)
     return simulate_pipeline_response(
