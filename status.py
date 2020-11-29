@@ -31,24 +31,26 @@ def get_reloaded_if_exists(blob: Blob) -> Blob:
 def get_compact_timedelta_str_from_seconds(seconds: int) -> str:
     s = seconds
     if s < 60:
-        return f'{s}s ago'
+        return f'{s}s'
     m = s // 60
     if m < 60:
-        return f'{m}m ago'
+        return f'{m}m'
     h = m // 60
     if h < 60:
-        return f'{h}h ago'
+        return f'{h}h'
     d = h // 24
     if d < 60:
-        return f'{d}d ago'
-    return '>60d ago'
+        return f'{d}d'
+    return '>60d'
 
 
 def get_compact_time_since(dt: Optional[datetime]) -> str:
     utcnow = datetime.now(timezone.utc)
     if dt is None:
         return '?'
-    return get_compact_timedelta_str_from_seconds((utcnow - dt).seconds)
+    return '{} ago'.format(
+        get_compact_timedelta_str_from_seconds((utcnow - dt).seconds).rjust(len('>60d'))
+    )
 
 def status(username: str) -> str:
     refresh_request = get_reloaded_if_exists(status_bucket.blob(
@@ -71,23 +73,22 @@ def status(username: str) -> str:
     model_training_success = get_reloaded_if_exists(status_bucket.blob(
         os.path.join(username, StatusFlags.model_training_success)
     ))
-    n = len('>60 days ago')
     return '\n'.join([
         'refresh_request:         {}'.format(
-            get_compact_time_since(refresh_request.updated).rjust(n)
+            get_compact_time_since(refresh_request.updated)
         ),
         'data_refresh_progress:   {} {}'.format(
-            get_compact_time_since(data_refresh_progress.updated).rjust(n),
+            get_compact_time_since(data_refresh_progress.updated),
             data_refresh_progress_str
         ),
         'data_refresh_success:    {}'.format(
-            get_compact_time_since(data_refresh_success.updated).rjust(n)
+            get_compact_time_since(data_refresh_success.updated)
         ),
         'model_training_progress: {}'.format(
-            get_compact_time_since(model_training_progress.updated).rjust(n)
+            get_compact_time_since(model_training_progress.updated)
         ),
         'model_training_success:  {}'.format(
-            get_compact_time_since(model_training_success.updated).rjust(n)
+            get_compact_time_since(model_training_success.updated)
         ),
     ])
 
