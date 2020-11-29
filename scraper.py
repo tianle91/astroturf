@@ -29,6 +29,8 @@ def refresh_user_comments(user_name: str, reddit: praw.Reddit, limit: int = 1000
                 i=i, limit=limit, id=comment.id, body=comment.body.replace('\n', ' ').replace('\t', ' ')[:50]
             )
             print(status_str)
+            if i % 10 == 0:
+                status_progress.upload_from_string(status_str)
             package = make_package_training(comment, reddit)
             blob = data_bucket.blob(blob_path)
             blob.upload_from_string(json.dumps(package, indent=4))
