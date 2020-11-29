@@ -51,7 +51,7 @@ def get_compact_time_since(dt: Optional[datetime]) -> str:
         s = '{} ago'.format(get_compact_timedelta_str_from_seconds(
             (utcnow - dt).seconds
         ))
-    return s.rjust(len('>60d'))
+    return s.rjust(len('>60d ago'))
 
 def status(username: str) -> str:
     refresh_request = get_reloaded_if_exists(status_bucket.blob(
