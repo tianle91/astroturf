@@ -10,9 +10,9 @@ from flask import Flask, flash, redirect, render_template, request, url_for
 from google.cloud import pubsub_v1, storage
 
 from praw_utils import get_reddit
-from status import (get_compact_timedelta_str_from_seconds, get_trained_usernames,
-                    is_invalid, last_progress, last_request, last_success,
-                    status)
+from status import (get_compact_timedelta_str_from_seconds,
+                    get_trained_usernames, is_invalid, last_progress,
+                    last_request, last_success, status)
 from statusflags import StatusFlags
 
 app = Flask(__name__)
