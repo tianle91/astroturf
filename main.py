@@ -24,7 +24,7 @@ local_model_path = '/tmp/models/'
 reddit = get_reddit(client, 'astroturf-dev-configs')
 
 
-def refresh_local_models(username, force_update=False):
+def get_local_models(username, force_update=False):
     """return local path for model files for user==user_name"""
     cloud_model_path_user = os.path.join(username, 'model')
     local_model_path_user = os.path.join(local_model_path, username, 'model')
@@ -54,7 +54,7 @@ def simulate_pipeline_response(pipeline: pipeline, url: str) -> Dict[str, str]:
 
 def simulate_redditor_response(username, url):
     try:
-        local_model_path_user = refresh_local_models(username)
+        local_model_path_user = get_local_models(username, force_update=True)
     except Exception as e:
         return str(e)
     return simulate_pipeline_response(

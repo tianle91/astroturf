@@ -22,17 +22,16 @@ client = storage.Client()
 reddit = get_reddit(client, 'astroturf-dev-configs')
 config_bucket = client.bucket('astroturf-dev-configs')
 app.secret_key = config_bucket.blob('app_secret_key').download_as_string()
-
-# publishing refresh requests
 path_config = json.loads(config_bucket.blob(
     'pathConfig.json').download_as_string())
 project_id = path_config['project_id']
+defaulturl = path_config['defaulturl']
+
+# publishing refresh requests
 publisher = pubsub_v1.PublisherClient()
 topic_path = publisher.topic_path(
     project_id, path_config['pub_refresh_request'])
 status_bucket = client.bucket(path_config['status_bucket'])
-
-defaulturl = path_config['defaulturl']
 
 
 def get_wrapped(s: str) -> str:

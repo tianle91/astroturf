@@ -53,6 +53,7 @@ def get_compact_time_since(dt: Optional[datetime]) -> str:
         ))
     return s.rjust(len('>60d ago'))
 
+
 def status(username: str) -> str:
     refresh_request = get_reloaded_if_exists(status_bucket.blob(
         os.path.join(username, StatusFlags.refresh_request)
