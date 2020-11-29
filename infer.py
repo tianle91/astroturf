@@ -22,8 +22,8 @@ cached_text_generation_pipelines = {}
 
 
 @app.get("/{username}")
-def infer(username: str, url: str):
-    return simulate_redditor_response(username, url)
+def infer(username: str, url: str = defaulturl, refresh: bool = False):
+    return simulate_redditor_response(username, url, force_update=refresh)
 
 # holy shit this is indeed fast
 # uvicorn infer:app --reload
