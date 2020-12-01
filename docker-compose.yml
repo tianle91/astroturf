@@ -33,4 +33,4 @@ services:
       - .:/astroturf
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=astroturf-update.json
-    entrypoint: python trainer_listener.py --blocksize 128 --maxsteps 100 --forceupdate True
+    entrypoint: python trainer_listener.py --blocksize 128 --maxsteps 1000 --forceupdate True
