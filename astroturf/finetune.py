@@ -79,37 +79,35 @@ def dump_finetuned(inputpath: str, outputpath: str,
     print(f'blocksize: {blocksize}, max_steps: {max_steps}, learning_rate: {learning_rate}')
     print(f'inputpath: {inputpath} --> outputpath: {outputpath}')
 
-    # model data
-
     fnames = glob(os.path.join(inputpath, '*.json'))
     assert len(fnames) > 0, 'check inputpath: {} is not empty!'.format(inputpath)
+
+    # massage valid_size
     valid_prop = .1
     shuffled_indices = list(np.random.choice(
         range(len(fnames)), len(fnames), replace=False))
     valid_size = max(1, int(valid_prop * len(fnames)))
+    valid_size = min(20, valid_size)
 
+    # write train/test to a path
+    modeldatapath = os.path.join(outputpath, 'data')
+    os.makedirs(modeldatapath, exist_ok=True)
     fnames_shuffled = [fnames[i] for i in shuffled_indices]
     fnames_test = fnames_shuffled[:valid_size]
     fnames_train = fnames_shuffled[valid_size:]
-
-    modeldatapath = os.path.join(outputpath, 'data')
-    os.makedirs(modeldatapath, exist_ok=True)
-
     file_path_train = os.path.join(modeldatapath, 'train.txt')
     file_path_test = os.path.join(modeldatapath, 'test.txt')
-
     write_to_text(fnames_train, file_path_train)
     write_to_text(fnames_test, file_path_test)
 
     # model training
+    modeloutputpath = os.path.join(outputpath, 'model')
     train_dataset = get_dataset(
         file_path_train, tokenizer=tokenizer, block_size=blocksize)
     test_dataset = get_dataset(
         file_path_test, tokenizer=tokenizer, block_size=blocksize)
     data_collator = DataCollatorForLanguageModeling(
         tokenizer=tokenizer, mlm=False)
-
-    modeloutputpath = os.path.join(outputpath, 'model')
     training_args = TrainingArguments(
         output_dir=modeloutputpath,
         do_train=True,
