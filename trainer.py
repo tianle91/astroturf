@@ -25,6 +25,7 @@ def refresh_finetuned(
         user_name,
         blocksize=16,
         maxsteps=10,
+        learning_rate=1e-4,
         force_update=False
 ) -> str:
     # set up local directories
@@ -59,7 +60,8 @@ def refresh_finetuned(
     # this guy dumps model files in os.path.join(local_model_path_user, 'model')
     dump_finetuned(
         local_data_path_user, local_model_path_user,
-        blocksize=blocksize, max_steps=maxsteps
+        blocksize=blocksize, max_steps=maxsteps,
+        learning_rate=learning_rate
     )
 
     # upload results
@@ -85,6 +87,7 @@ if __name__ == '__main__':
     parser.add_argument('--users', type=str, nargs='*')
     parser.add_argument('--blocksize', type=int, default=16)
     parser.add_argument('--maxsteps', type=int, default=10)
+    parser.add_argument('--learning-rate', type=float, default=1e-4)
     parser.add_argument('--forceupdate', type=bool, default=False)
     args = parser.parse_args()
 
@@ -98,5 +101,5 @@ if __name__ == '__main__':
     for user_name in users:
         print('user_name: {} running...'.format(user_name))
         ran = refresh_finetuned(user_name, blocksize=args.blocksize, maxsteps=args.maxsteps,
-                                force_update=args.forceupdate)
+                                learning_rate=args.learning_rate, force_update=args.forceupdate)
         print('user_name: {} ran: {}'.format(user_name, ran))
