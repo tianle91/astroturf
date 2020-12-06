@@ -9,7 +9,7 @@ services:
       - .:/astroturf
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=astroturf-ui.json
-    entrypoint: gunicorn -w 1 -b 0.0.0.0:5000 ui:app
+    entrypoint: gunicorn -w 2 -b 0.0.0.0:5000 ui:app
   infer:
     build:
       context: .
