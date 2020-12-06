@@ -98,10 +98,11 @@ def refresh(username):
         last_update = [dt for dt in last_update if dt is not None]
         earliest_update_possible = datetime.now(
             timezone.utc) - timedelta(minutes=5)
-        if len(last_update) > 0 and max(last_update) >= earliest_update_possible:
-            flash('Invalid request for User: {} Try again in: {} seconds.'.format(
+        latest_update = max(last_update)
+        if len(last_update) > 0 and latest_update >= earliest_update_possible:
+            flash('Invalid request for User: {} Try again in: {}.'.format(
                 username, get_compact_timedelta_str_from_seconds(
-                    (min(last_update) - earliest_update_possible).seconds)
+                    (latest_update - earliest_update_possible).seconds)
             ))
         else:
             future = publisher.publish(topic_path, str.encode(username))
