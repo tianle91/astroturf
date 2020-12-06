@@ -17,15 +17,16 @@ def upload_all_local_files_with_prefix(
     bucket = client.bucket(cloud_bucket)
     fnames = []
     for local_path_temp in glob(os.path.join(local_prefix, '*')):
-        fname = local_path_temp.split('/')[-1]
-        print('Uploading: {fname} to bucket: {bkt} at prefix: {prfx}'.format(
-            fname=fname,
-            bkt=cloud_bucket,
-            prfx=cloud_prefix
-        ))
-        blob = bucket.blob(os.path.join(cloud_prefix, fname))
-        blob.upload_from_filename(local_path_temp)
-        fnames.append(fname)
+        if os.path.isfile(local_path_temp):
+            fname = local_path_temp.split('/')[-1]
+            print('Uploading: {fname} to bucket: {bkt} at prefix: {prfx}'.format(
+                fname=fname,
+                bkt=cloud_bucket,
+                prfx=cloud_prefix
+            ))
+            blob = bucket.blob(os.path.join(cloud_prefix, fname))
+            blob.upload_from_filename(local_path_temp)
+            fnames.append(fname)
     return fnames
 
 
