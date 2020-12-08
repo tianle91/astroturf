@@ -98,8 +98,8 @@ def refresh(username):
         last_update = [dt for dt in last_update if dt is not None]
         earliest_update_possible = datetime.now(
             timezone.utc) - timedelta(minutes=5)
-        latest_update = max(last_update)
-        if len(last_update) > 0 and latest_update >= earliest_update_possible:
+        latest_update = max(last_update) if len(last_update) > 0 else None
+        if latest_update is not None and latest_update >= earliest_update_possible:
             flash('Invalid request for User: {} Try again in: {}.'.format(
                 username, get_compact_timedelta_str_from_seconds(
                     (latest_update - earliest_update_possible).seconds)
