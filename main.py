@@ -44,7 +44,7 @@ def simulate_pipeline_response(pipeline: pipeline, url: str) -> Dict[str, str]:
     responses = pipeline(prompt, max_length=len(prompt.split(' ')) + 128)
     return {
         'prompt': prompt,
-        'response': responses[0]['generated_text'].replace(prompt, '').strip().split('\n')[0]
+        'response': responses[0]['generated_text'].replace(prompt, '').strip() #.split('\n')[0]
     }
 
 
