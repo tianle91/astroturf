@@ -49,7 +49,7 @@ def is_invalid_url(url):
 @app.route('/', methods=('GET', 'POST'))
 def index():
     if request.method == 'POST':
-        username = request.form['requestedusername']
+        username = request.form['requestedusername'].strip()
         if is_invalid(username, reddit):
             flash('User: {} is invalid or not found!'.format(username))
             return redirect(url_for('index'))
