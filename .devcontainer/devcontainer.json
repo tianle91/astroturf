@@ -13,7 +13,15 @@
 	},
 
 	// Add the IDs of extensions you want installed when the container is created.
-	"extensions": []
+	"extensions": [
+		"hediet.vscode-drawio",
+		"ms-python.python",
+		"ms-python.vscode-pylance",
+		"ms-azuretools.vscode-docker",
+		"p1c2u.docker-compose",
+		"grapecity.gc-excelviewer",
+		"visualstudioexptteam.vscodeintellicode"
+	]
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
