@@ -29,7 +29,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='search comments by new for user.')
     parser.add_argument('--limit', type=int, default=100)
-    parser.add_argument('--site', type=str, default='not-a-stats-boi')
+    parser.add_argument('--site', type=str, default='tianle91astroturf')
     args = parser.parse_args()
 
     reddit = get_reddit(client, 'astroturf-dev-configs', site=args.site)
