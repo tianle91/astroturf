@@ -1,8 +1,7 @@
 version: '3'
 services:
   ui:
-    build:
-      context: .
+    image: tianlechen/astroturf
     ports:
       - "5000:5000"
     volumes:
@@ -11,26 +10,21 @@ services:
       - GOOGLE_APPLICATION_CREDENTIALS=astroturf-ui.json
     entrypoint: gunicorn -w 2 -b 0.0.0.0:5000 ui:app
   infer:
-    build:
-      context: .
-      dockerfile: Dockerfile.gpu
+    image: tianlechen/astroturf:gpu
     volumes: 
       - .:/astroturf
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=astroturf-ui.json
     entrypoint: uvicorn --host 0.0.0.0 --port 8000 --workers 1 infer:app
   scraper:
-    build:
-      context: .
+    image: tianlechen/astroturf
     volumes:
       - .:/astroturf
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=astroturf-update.json
     entrypoint: python scraper_listener.py --limit 1000
   trainer:
-    build:
-      context: .
-      dockerfile: Dockerfile.gpu
+    image: tianlechen/astroturf:gpu
     volumes:
       - .:/astroturf
     environment:
