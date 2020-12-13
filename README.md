@@ -9,4 +9,3 @@ To be updated.
 
 `gsutil cp pathConfig.json gs://astroturf-dev-configs/pathConfig.json`
 `gsutil cp astroturf-praw.ini gs://astroturf-dev-configs/astroturf-praw.ini`
-`export imagepath=tianlechen/astroturf && docker build -f Dockerfile.gpu -t $imagepath . && docker push $imagepath`
