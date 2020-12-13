@@ -85,6 +85,7 @@ log/*
 # service account json
 astroturf-update.json
 astroturf-ui.json
+*.ini
 
 # pycharm
 .idea/*
