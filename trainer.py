@@ -17,8 +17,8 @@ model_bucket = client.bucket(path_config['model_bucket'])
 status_bucket = client.bucket(path_config['status_bucket'])
 
 # some local variables
-local_data_path = 'data'
-local_model_path = 'models'
+local_data_path = '/tmp/astroturf/data'
+local_model_path = '/tmp/astroturf/models/'
 
 
 def refresh_finetuned(

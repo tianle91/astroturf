@@ -20,7 +20,7 @@ model_bucket = client.bucket(path_config['model_bucket'])
 status_bucket = client.bucket(path_config['status_bucket'])
 
 # some local variables
-local_model_path = '/tmp/models/'
+local_model_path = '/tmp/astroturf/models/'
 reddit = get_reddit(client, 'astroturf-dev-configs')
 
 
