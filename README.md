@@ -5,9 +5,8 @@ To be updated.
 <img src="./Architecture.svg">
 
 
-
 ## Ops
 
 `gsutil cp pathConfig.json gs://astroturf-dev-configs/pathConfig.json`
-
-`export imagepath=gcr.io/astroturf-280818/astroturf_infer && docker build -f Dockerfile.infer -t $imagepath . && docker push $imagepath`
+`gsutil cp astroturf-praw.ini gs://astroturf-dev-configs/astroturf-praw.ini`
+`export imagepath=tianlechen/astroturf && docker build -f Dockerfile.gpu -t $imagepath . && docker push $imagepath`
