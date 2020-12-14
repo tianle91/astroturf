@@ -27,3 +27,5 @@ Proposal
   - `PUT` allows for request to update model.
 - Infer endpoint has resource not available as response to a `GET`.
 - Deprecate status flags in ui in favour of getting info from Trainer/Infer endpoint.
+  - No more progress updates through flags in bucket (status bucket will be deprecated).
+  - Only model last update time using blob attributes.
