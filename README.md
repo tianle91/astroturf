@@ -22,12 +22,15 @@ Endpoint to-do
 - Waiting for retraining.
 
 Proposal
-- Trainer endpoint
-  - Workers subscribe to update pub/sub.
-    - Scraper + trainer
-    - Publish updates and statuses every X seconds.
-  - `GET` returns status (exists, last updated, updating).
-  - `PUT` allows for request to update model. Publishes.
 - Infer endpoint 
   - `GET` returns inference result, with statuses (exists, last updated, cached).
   - `PUT` refreshes local model with new one.
+- Trainer endpoint
+  - `GET` returns status (exists, last updated, updating). 
+    - Subscribes to `[pub/sub]: training_status`.
+  - `PUT` allows for request to update model. 
+    - Publishes to `[pub/sub]: training_request`.
+- Workers 
+  - Subscribe to `[pub/sub]: training_request`.
+  - Scraper + trainer
+  - Publish statuses to `[pub/sub]: training_status` every ? seconds.
