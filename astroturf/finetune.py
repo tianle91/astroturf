@@ -68,11 +68,16 @@ def get_dataset(file_path, tokenizer: PreTrainedTokenizer, block_size: int = Non
 
 
 def dump_finetuned(inputpath: str, outputpath: str,
-                   blocksize: int = 16, max_steps: int = 50, learning_rate: float = 1e-4):
-    '''Finetune GPT2LMHeadModel
-    inputpath: expect .json here as outputs of astroturf.prawtools.make_package_training
-    outputpath: to dump finetuned huggingface transformers
-    blocksize:
+                   blocksize: int = 16, max_steps: int = 50,
+                   learning_rate: float = 1e-4) -> str:
+    '''Finetune a LM and dump it locally.
+
+    Args:
+        inputpath: expect .json here as outputs of astroturf.prawtools.make_package_training
+        outputpath: to dump finetuned huggingface transformers
+        blocksize: ...
+        max_steps: ...
+        learning_rate: ...
     '''
     print(
         f'blocksize: {blocksize}, max_steps: {max_steps}, learning_rate: {learning_rate}')
