@@ -19,8 +19,6 @@ eos = tokenizer.eos_token
 model_output_fnames = ['pytorch_model.bin', 'config.json', 'training_args.bin']
 
 
-# data part
-
 def get_qa_string(package):
     '''format comment as question and answer'''
     context = 'In subreddit: {subname}\nTitle: {title}\n{body}'.format(
@@ -130,5 +128,4 @@ def dump_finetuned(inputpath: str, outputpath: str,
     )
     trainer.train()
     trainer.save_model()
-    # print (trainer.evaluate())
     return modeloutputpath
