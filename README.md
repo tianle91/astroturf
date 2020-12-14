@@ -20,3 +20,6 @@ Endpoint to-do
 - Query for untrained users.
 - Query for trained users with option to refresh.
 - Waiting for retraining.
+
+Proposal
+- Merge scraper and trainer together, put behind a trainer endpoint.
