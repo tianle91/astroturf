@@ -43,11 +43,13 @@ def write_to_text(fnames, outputfname, verbose=1):
     with open(outputfname, 'w+') as f:
         f.write('')
 
+    if verbose > 0:
+        print('Writing text files for training...')
     total = len(fnames)
     i = 0
     for fname in fnames:
         if i % 100 == 0 and verbose > 0:
-            print(f'writing fname [{i}/{total}]')
+            print(f'[{i}/{total}]')
         i += 1
         with open(fname) as f:
             package = json.load(f)
@@ -69,14 +71,15 @@ def get_dataset(file_path, tokenizer: PreTrainedTokenizer, block_size: int = Non
     )
 
 
-def dump_finetuned(inputpath: str, outputpath: str, 
+def dump_finetuned(inputpath: str, outputpath: str,
                    blocksize: int = 16, max_steps: int = 50, learning_rate: float = 1e-4):
     '''Finetune GPT2LMHeadModel
     inputpath: expect .json here as outputs of astroturf.prawtools.make_package_training
     outputpath: to dump finetuned huggingface transformers
     blocksize:
     '''
-    print(f'blocksize: {blocksize}, max_steps: {max_steps}, learning_rate: {learning_rate}')
+    print(
+        f'blocksize: {blocksize}, max_steps: {max_steps}, learning_rate: {learning_rate}')
     print(f'inputpath: {inputpath} --> outputpath: {outputpath}')
 
     fnames = glob(os.path.join(inputpath, '*.json'))
