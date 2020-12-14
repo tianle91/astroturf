@@ -73,8 +73,10 @@ def dump_finetuned(inputpath: str, outputpath: str,
     '''Finetune a LM and dump it locally.
 
     Args:
-        inputpath: expect .json here as outputs of astroturf.prawtools.make_package_training
-        outputpath: to dump finetuned huggingface transformers
+        inputpath: *.json here will be used to finetune.
+            The *.json should be outputs of astroturf.prawtools.make_package_training.
+        outputpath: local path to dump finetuned model.
+            Passed to TrainingArguments as output_dir.        
         blocksize: ...
         max_steps: ...
         learning_rate: ...
