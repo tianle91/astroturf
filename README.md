@@ -23,5 +23,6 @@ Endpoint to-do
 
 Proposal
 - Merge scraper and trainer together, put behind a new trainer endpoint.
-  - Option to limit to most recent `n` comments.
-- Infer endpoint has resource not available as response.
+  - `GET` returns some info regarding status such as exists or not, last updated, updating, etc.
+  - `PUT` allows for request to update model.
+- Infer endpoint has resource not available as response to a `GET`.
