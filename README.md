@@ -26,3 +26,4 @@ Proposal
   - `GET` returns some info regarding status such as exists or not, last updated, updating, etc.
   - `PUT` allows for request to update model.
 - Infer endpoint has resource not available as response to a `GET`.
+- Deprecate status flags in ui in favour of getting info from Trainer/Infer endpoint.
