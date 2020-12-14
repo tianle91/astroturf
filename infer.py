@@ -27,7 +27,7 @@ def infer(username: str, url: str = defaulturl, refresh: bool = False):
         cached_txtgen[username] = (txtgen, 1)
         if len(cached_txtgen.keys()) > cached_max_count:
             # pop the least used key
-            min_n = min(v[1] for k, v in cached_txtgen.items())
+            min_n = min(v[1] for _, v in cached_txtgen.items())
             for k, n in cached_txtgen:
                 if n == min_n:
                     cached_txtgen.pop(k)
