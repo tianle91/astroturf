@@ -2,11 +2,10 @@ import json
 import os
 from typing import Dict
 
-import flask
 from google.cloud import storage
 from transformers import pipeline
 
-from astroturf.finetune import get_qa_string, model_output_fnames
+from astroturf.finetune import get_qa_string
 from astroturf.infer import (get_text_generation_pipeline,
                              make_package_infer_url)
 from gcp_utils import download_all_cloud_files_with_prefix
