@@ -23,9 +23,9 @@ Endpoint to-do
 
 Proposal
 - Merge scraper and trainer together, put behind a new trainer endpoint.
-  - `GET` returns some info regarding status such as exists or not, last updated, updating, etc.
+  - How to interface this with workers?
+  - `GET` returns status (exists, last updated, updating).
   - `PUT` allows for request to update model.
-- Infer endpoint has resource not available as response to a `GET`.
-- Deprecate status flags in ui in favour of getting info from Trainer/Infer endpoint.
-  - No more progress updates through flags in bucket (status bucket will be deprecated).
-  - Only model last update time using blob attributes.
+- Infer endpoint 
+  - `GET` returns inference result, with statuses (exists, last updated, cached).
+  - `PUT` refreshes local model with new one.
