@@ -23,4 +23,5 @@ Endpoint to-do
 
 Proposal
 - Merge scraper and trainer together, put behind a new trainer endpoint.
-- Option to limit to most recent `n` comments.
+  - Option to limit to most recent `n` comments.
+- Infer endpoint has resource not available as response.
