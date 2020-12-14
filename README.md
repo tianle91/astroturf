@@ -22,10 +22,10 @@ Endpoint to-do
 - Waiting for retraining.
 
 Proposal
-- Merge scraper and trainer together, put behind a new trainer endpoint.
-  - Interface with workers through statuses and Pub/Sub.
+- Merge scraper and trainer together in single worker, put behind a new trainer endpoint.
+  - Workers publish updates and statuses every X seconds.
   - `GET` returns status (exists, last updated, updating).
-  - `PUT` allows for request to update model.
+  - `PUT` allows for request to update model. Publishes.
 - Infer endpoint 
   - `GET` returns inference result, with statuses (exists, last updated, cached).
   - `PUT` refreshes local model with new one.
