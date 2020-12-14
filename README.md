@@ -23,7 +23,7 @@ Endpoint to-do
 
 Proposal
 - Merge scraper and trainer together, put behind a new trainer endpoint.
-  - How to interface this with workers? With statuses?
+  - Interface with workers through statuses and Pub/Sub.
   - `GET` returns status (exists, last updated, updating).
   - `PUT` allows for request to update model.
 - Infer endpoint 
