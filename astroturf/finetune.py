@@ -60,8 +60,6 @@ def write_to_text(fnames, outputfname, verbose=1):
             ))
 
 
-# training part
-
 def get_dataset(file_path, tokenizer: PreTrainedTokenizer, block_size: int = None):
     return TextDataset(
         tokenizer=tokenizer,
