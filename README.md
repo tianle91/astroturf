@@ -22,4 +22,5 @@ Endpoint to-do
 - Waiting for retraining.
 
 Proposal
-- Merge scraper and trainer together, put behind a trainer endpoint.
+- Merge scraper and trainer together, put behind a new trainer endpoint.
+- Option to limit to most recent `n` comments.
