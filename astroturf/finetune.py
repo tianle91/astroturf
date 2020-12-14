@@ -39,12 +39,12 @@ def get_qa_string(package):
 
 
 def write_to_text(fnames, outputfname, verbose=1):
+    if verbose > 0:
+        print('Writing text files for training...')
     # clear destination
     with open(outputfname, 'w+') as f:
         f.write('')
-
-    if verbose > 0:
-        print('Writing text files for training...')
+    # start writing...
     total = len(fnames)
     i = 0
     for fname in fnames:
