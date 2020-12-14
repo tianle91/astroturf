@@ -19,8 +19,12 @@ eos = tokenizer.eos_token
 model_output_fnames = ['pytorch_model.bin', 'config.json', 'training_args.bin']
 
 
-def get_qa_string(package):
-    '''format comment as question and answer'''
+def get_qa_string(package: dict) -> str:
+    '''Format reddit package as text in form of question and answer.
+
+    Args:
+        package: should be outputs of astroturf.prawtools.make_package_training.
+    '''
     context = 'In subreddit: {subname}\nTitle: {title}\n{body}'.format(
         subname=package['submission']['subreddit'],
         title=package['submission']['title'],
@@ -58,7 +62,7 @@ def write_to_text(fnames, outputfname, verbose=1):
             ))
 
 
-def get_dataset(file_path, tokenizer: PreTrainedTokenizer, block_size: int = None):
+def get_dataset(file_path, tokenizer: PreTrainedTokenizer, block_size: int = None) -> TextDataset:
     return TextDataset(
         tokenizer=tokenizer,
         file_path=file_path,
