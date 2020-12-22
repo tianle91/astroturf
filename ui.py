@@ -25,7 +25,7 @@ update_endpoint = path_config['update_endpoint']
 
 
 def clean_string(s: str) -> str:
-    return ''.join([c for c in s.lower() if c.isalnum()])
+    return s.lower()
 
 
 def get_wrapped(s: str) -> str:
@@ -94,7 +94,7 @@ def refresh(username):
 
     userrefresh = {
         'username': username,
-        'status': str(updateresponse),
+        'status': '\n'.join([f'{k}: {v}' for k, v in updateresponse.items()]),
     }
     if request.method == 'POST':
         updateresponse = requests.get('{update_endpoint}/update/{username}'.format(
