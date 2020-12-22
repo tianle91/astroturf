@@ -17,6 +17,8 @@ status_bucket = client.bucket(path_config['status_bucket'])
 
 
 def refresh_user_comments(user_name: str, reddit: praw.Reddit, limit: int = 1000) -> List[str]:
+    """Update cloud comments and return list of refreshed comment ids.
+    """
     # progress status tracker
     status_progress = status_bucket.blob(os.path.join(
         user_name, StatusFlags.data_refresh_progress))
