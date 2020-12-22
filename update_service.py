@@ -5,6 +5,8 @@ from fastapi import FastAPI
 from google.api_core.exceptions import DeadlineExceeded
 from google.cloud import pubsub_v1, storage
 
+from status import is_invalid
+
 app = FastAPI()
 
 # some clients and variables
@@ -80,6 +82,7 @@ def status(username: str):
 def update(username: str):
     """publish update request
     """
-    future = publisher.publish(topic_path, data=str.encode(username))
-    message_id = future.result()
-    return message_id
+    if not is_invalid(username):
+        future = publisher.publish(topic_path, data=str.encode(username))
+        message_id = future.result()
+        return message_id
