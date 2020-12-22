@@ -1,4 +1,5 @@
 import json
+import os
 
 import pandas as pd
 from fastapi import FastAPI
@@ -15,6 +16,8 @@ config_bucket = client.bucket('astroturf-dev-configs')
 path_config = json.loads(config_bucket.blob(
     'pathConfig.json').download_as_string())
 project_id = path_config['project_id']
+model_bucket = client.bucket(path_config['model_bucket'])
+
 
 # subscribing to sub_update_status
 subscriber = pubsub_v1.SubscriberClient()
@@ -27,6 +30,13 @@ topic_path = publisher.topic_path(
     project_id, path_config['pub_update_request'])
 
 status_df = pd.DataFrame({'username': [], 'dt': [], 'status': []})
+
+
+def get_model_update_dt(username):
+    blob = model_bucket.blob(os.path.join(
+        username, 'models/pytorch_model.bin'))
+    blob = blob.reload() if blob.exists() else blob
+    return blob.updated
 
 
 def get_last_status_dt_per_user(status_df: pd.DataFrame) -> pd.DataFrame:
@@ -71,11 +81,13 @@ def status(username: str):
     if len(new_statuses) > 0:
         status_df = status_df.append(new_statuses, ignore_index=True)
         status_df = get_last_status_dt_per_user(status_df)
+    resd = {'model_update_dt': get_model_update_dt(username)}
     if username in status_df['username'].values:
-        return {
+        resd.update({
             row['status']: row['dt']
             for _, row in status_df[status_df['username'] == username].iterrows()
-        }
+        })
+    return resd
 
 
 @app.get("/update/{username}")
