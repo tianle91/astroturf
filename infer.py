@@ -16,7 +16,6 @@ config_bucket = client.bucket('astroturf-dev-configs')
 path_config = json.loads(config_bucket.blob(
     'pathConfig.json').download_as_string())
 model_bucket = client.bucket(path_config['model_bucket'])
-status_bucket = client.bucket(path_config['status_bucket'])
 
 # some local variables
 local_model_path = '/tmp/astroturf/models/'
@@ -43,13 +42,15 @@ def simulate_pipeline_response(pipeline: pipeline, url: str) -> Dict[str, str]:
     responses = pipeline(prompt, max_length=len(prompt.split(' ')) + 128)
     return {
         'prompt': prompt,
-        'response': responses[0]['generated_text'].replace(prompt, '').strip() #.split('\n')[0]
+        # .split('\n')[0]
+        'response': responses[0]['generated_text'].replace(prompt, '').strip()
     }
 
 
 def simulate_redditor_response(username, url, force_update: bool = False):
     try:
-        local_model_path_user = get_local_models(username, force_update=force_update)
+        local_model_path_user = get_local_models(
+            username, force_update=force_update)
     except Exception as e:
         return str(e)
     return simulate_pipeline_response(
