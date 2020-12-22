@@ -5,7 +5,7 @@ from textwrap import wrap
 
 import requests
 from flask import Flask, flash, redirect, render_template, request, url_for
-from google.cloud import pubsub_v1, storage
+from google.cloud import storage
 
 from praw_utils import get_reddit
 from status import get_trained_usernames, is_invalid
@@ -14,7 +14,6 @@ app = Flask(__name__)
 
 # some clients and variables
 client = storage.Client()
-reddit = get_reddit(client, 'astroturf-dev-configs')
 config_bucket = client.bucket('astroturf-dev-configs')
 app.secret_key = config_bucket.blob('app_secret_key').download_as_string()
 path_config = json.loads(config_bucket.blob(
@@ -23,12 +22,6 @@ project_id = path_config['project_id']
 defaulturl = path_config['defaulturl']
 infer_endpoint = path_config['infer_endpoint']
 update_endpoint = path_config['update_endpoint']
-
-# publishing refresh requests
-publisher = pubsub_v1.PublisherClient()
-topic_path = publisher.topic_path(
-    project_id, path_config['pub_refresh_request'])
-status_bucket = client.bucket(path_config['status_bucket'])
 
 
 def clean_string(s: str) -> str:
@@ -104,28 +97,9 @@ def refresh(username):
         'status': str(updateresponse),
     }
     if request.method == 'POST':
-        # last_update = [last_request(username), last_success(
-        #     username), last_progress(username)]
-        # last_update = [dt for dt in last_update if dt is not None]
-        # earliest_update_possible = datetime.now(
-        #     timezone.utc) - timedelta(minutes=5)
-        # latest_update = max(last_update) if len(last_update) > 0 else None
-        # if latest_update is not None and latest_update >= earliest_update_possible:
-        #     flash('Invalid request for User: {} Try again in: {}.'.format(
-        #         username, get_compact_timedelta_str_from_seconds(
-        #             (latest_update - earliest_update_possible).seconds)
-        #     ))
-        # else:
-        #     future = publisher.publish(topic_path, str.encode(username))
-        #     message_id = future.result()
-        #     refresh_request = status_bucket.blob(
-        #         os.path.join(username, StatusFlags.refresh_request)
-        #     )
-        #     refresh_request.upload_from_string(message_id)
-        #     flash('Submitted request to refresh User: {}. Published Message ID: {}'.format(
-        #         username, message_id))
         updateresponse = requests.get('{update_endpoint}/update/{username}'.format(
             update_endpoint=update_endpoint,
             username=username
         )).json()
+        flash('Requested! Message ID: {}'.format(updateresponse))
     return render_template('refresh.html', userrefresh=userrefresh)
