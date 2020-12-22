@@ -4,7 +4,6 @@ from typing import List, Optional
 
 from google.cloud import storage
 from google.cloud.storage import Blob
-from praw import Reddit
 from prawcore.exceptions import NotFound
 
 from praw_utils import get_reddit
