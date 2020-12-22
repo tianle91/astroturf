@@ -37,10 +37,12 @@ Updating cloud configs.
 `gsutil cp pathConfig.json gs://astroturf-dev-configs/pathConfig.json`
 `gsutil cp astroturf-praw.ini gs://astroturf-dev-configs/astroturf-praw.ini`
 
-For testing.
+Build the image.
+`docker build -t astroturf .`
+
+All-in-one.
 `docker-compose up`
 
 For WSL and GPU.
 `docker-compose -f docker-compose-noworker.yml up`
-`docker build -t astroturf .`
 `docker run -it --gpus=all astroturf python update_worker.py --limit 100 --blocksize 128 --maxsteps 1000 --forceupdate True`
