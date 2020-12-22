@@ -5,11 +5,6 @@ To be updated.
 <img src="./Architecture.svg">
 
 
-## Ops
-
-`gsutil cp pathConfig.json gs://astroturf-dev-configs/pathConfig.json`
-`gsutil cp astroturf-praw.ini gs://astroturf-dev-configs/astroturf-praw.ini`
-
 # Reddit bot
 Description
 - Responds to “what would u/xxx say”.
@@ -34,3 +29,17 @@ Proposal
   - Subscribe to `[pub/sub]: training_request`.
   - Scraper + trainer
   - Publish statuses to `[pub/sub]: training_status` every ? seconds.
+
+
+# Ops
+
+Updating cloud configs.
+`gsutil cp pathConfig.json gs://astroturf-dev-configs/pathConfig.json`
+`gsutil cp astroturf-praw.ini gs://astroturf-dev-configs/astroturf-praw.ini`
+
+For testing.
+`docker-compose up`
+
+For WSL and GPU.
+`docker-compose -f docker-compose-noworker.yml up`
+`docker build -t astroturf . & docker run -it --gpus=all entrypoint ...`
