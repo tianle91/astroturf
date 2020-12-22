@@ -39,7 +39,7 @@ def get_txtgen_cached_or_otherwise(username, force_update=False):
     return txtgen
 
 
-@app.get("/{username}")
+@app.get("/infer/{username}")
 def infer(username: str, url: str = defaulturl):
     txtgen = get_txtgen_cached_or_otherwise(username)
     response = simulate_pipeline_response(txtgen, url)
@@ -47,7 +47,7 @@ def infer(username: str, url: str = defaulturl):
     return response
 
 
-@app.put("/{username}")
+@app.get("/refresh/{username}")
 def refresh(username: str):
     cached_txtgen.pop(username)
     _ = get_txtgen_cached_or_otherwise(username, force_update=True)
