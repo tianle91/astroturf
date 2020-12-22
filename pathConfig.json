@@ -5,7 +5,7 @@
     "data_bucket": "astroturf-dev-data",
     "defaulturl": "https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw",
     "infer_endpoint": "http://inferservice:8000",
-    "update_endpoint": "http://updateservice:8001",
+    "update_endpoint": "http://updateservice:8000",
     "pub_update_request": "pub_update_request",
     "sub_update_request": "sub_update_request",
     "pub_update_status": "pub_update_status",
