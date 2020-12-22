@@ -3,13 +3,8 @@
     "config_bucket": "astroturf-dev-configs",
     "model_bucket": "astroturf-dev-models",
     "data_bucket": "astroturf-dev-data",
-    "status_bucket": "astroturf-dev-status",
     "defaulturl": "https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw",
     "infer_endpoint": "http://infer:8000",
-    "pub_refresh_request": "pub_refresh_request",
-    "sub_refresh_request": "sub_refresh_request",
-    "pub_scraper_request": "pub_scraper_request",
-    "sub_scraper_request": "sub_scraper_request",
-    "pub_trainer_request": "pub_trainer_request",
-    "sub_trainer_request": "sub_trainer_request"
+    "pub_update_request": "pub_update_request",
+    "sub_update_request": "sub_update_request"
 }
