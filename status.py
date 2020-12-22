@@ -57,3 +57,15 @@ def is_invalid(username: str) -> bool:
     except NotFound:
         return True
     return False
+
+
+def get_trained_usernames() -> List[str]:
+    resl = []
+    for blob in client.list_blobs(model_bucket, prefix=''):
+        user_name = blob.name.split('/')[0]
+        resl.append(user_name)
+    return sorted(list(set(resl)))
+
+
+if __name__ == '__main__':
+    print (get_trained_usernames())
