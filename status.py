@@ -14,7 +14,6 @@ config_bucket = client.bucket('astroturf-dev-configs')
 path_config = json.loads(config_bucket.blob(
     'pathConfig.json').download_as_string())
 model_bucket = client.bucket(path_config['model_bucket'])
-status_bucket = client.bucket(path_config['status_bucket'])
 reddit = get_reddit(client, 'astroturf-dev-configs')
 
 
