@@ -1,8 +1,8 @@
 import os
+from datetime import datetime, timezone
 from glob import glob
 
 from google.cloud import storage
-from datetime import datetime, timezone
 
 
 def mtime_to_utc_datetime(mtime: float) -> datetime:
