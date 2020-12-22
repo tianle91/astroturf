@@ -1,9 +1,9 @@
 import json
 
-from fastapi import FastAPI
 import pandas as pd
+from fastapi import FastAPI
+from google.api_core.exceptions import DeadlineExceeded
 from google.cloud import pubsub_v1, storage
-
 
 app = FastAPI()
 
@@ -40,9 +40,12 @@ def get_last_status_dt_per_user(status_df: pd.DataFrame) -> pd.DataFrame:
 
 
 def get_new_statuses() -> pd.DataFrame:
-    response = subscriber.pull(
-        request={"subscription": subscription_path, "max_messages": 100})
     resl = []
+    try:
+        response = subscriber.pull(
+            request={"subscription": subscription_path, "max_messages": 100}, timeout=1)
+    except DeadlineExceeded:
+        return pd.DataFrame(resl)
     ack_ids = []
     for msg in response.received_messages:
         resl.append({
