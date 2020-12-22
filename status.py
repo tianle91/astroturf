@@ -50,12 +50,12 @@ def get_compact_time_since(dt: Optional[datetime]) -> str:
     return s.rjust(len('>60d ago'))
 
 
-def is_invalid(username: str, r: Reddit) -> bool:
+def is_invalid(username: str) -> bool:
     if len(username) == 0:
         # not catched by NotFound (as of 2020-11-04)
         return True
     try:
-        r.redditor(name=username).id
+        reddit.redditor(name=username).id
     except NotFound:
         return True
     return False
