@@ -1,6 +1,5 @@
 import json
 
-import requests
 from google.cloud import pubsub_v1, storage
 
 from scraper import refresh_user_comments_cloud
@@ -12,7 +11,6 @@ config_bucket = client.bucket('astroturf-dev-configs')
 path_config = json.loads(config_bucket.blob(
     'pathConfig.json').download_as_string())
 project_id = path_config['project_id']
-infer_endpoint = path_config['infer_endpoint']
 
 # subscribing to sub_update_request
 subscriber = pubsub_v1.SubscriberClient()
@@ -23,6 +21,15 @@ subscription_path = subscriber.subscription_path(
 publisher = pubsub_v1.PublisherClient()
 topic_path = publisher.topic_path(
     project_id, path_config['pub_update_status'])
+
+
+def get_future_from_publish_status_message(username, status):
+    return publisher.publish(
+        topic_path,
+        data=str.encode(username),
+        status=str.encode(status)
+    )
+
 
 if __name__ == '__main__':
     import argparse
@@ -50,27 +57,19 @@ if __name__ == '__main__':
             print(f"Received message: {username}")
 
         ack_ids = [msg.ack_id for msg in response.received_messages]
+        pub_futures = []
+
         if len(ack_ids) > 0 and username is not None:
-            # publish to pub_update_status
-            future = publisher.publish(
-                topic_path,
-                data=str.encode(username),
-                status=str.encode('received_request')
-            )
-            message_id = future.result()
+            pub_futures.append(get_future_from_publish_status_message(
+                username, status='received_request'))
             # there's something to do! ack it to remove from queue.
             subscriber.acknowledge(
                 request={"subscription": subscription_path, "ack_ids": ack_ids})
             # update comments
             refreshed_comment_ids = refresh_user_comments_cloud(
                 username, reddit, limit=args.limit)
-            # publish to pub_update_status
-            future = publisher.publish(
-                topic_path,
-                data=str.encode(username),
-                status=str.encode('comments_refreshed')
-            )
-            message_id = future.result()
+            pub_futures.append(get_future_from_publish_status_message(
+                username, status='refresh_user_comments_cloud'))
             if len(refreshed_comment_ids) > 0:
                 # update finetuned
                 username_finedtuned = refresh_finetuned_cloud(
@@ -79,31 +78,14 @@ if __name__ == '__main__':
                     maxsteps=args.maxsteps,
                     force_update=args.forceupdate
                 )
-                # update model at infer endpoint
-                inferresponse = requests.put('{infer_endpoint}/{username}'.format(
-                    infer_endpoint=infer_endpoint,
-                    username=username
-                )).json()
-                # publish to pub_update_status
-                future = publisher.publish(
-                    topic_path,
-                    data=str.encode(username),
-                    status=str.encode('finetuned')
-                )
-                message_id = future.result()
+                pub_futures.append(get_future_from_publish_status_message(
+                    username, status='refresh_finetuned_cloud'))
             else:
-                # publish to pub_update_status
-                future = publisher.publish(
-                    topic_path,
-                    data=str.encode(username),
-                    status=str.encode('no_new_comments')
-                )
-                message_id = future.result()
+                pub_futures.append(get_future_from_publish_status_message(
+                    username, status='no_new_comments'))
             # done!
-            # publish to pub_update_status
-            future = publisher.publish(
-                topic_path,
-                data=str.encode(username),
-                status=str.encode('success')
-            )
-            message_id = future.result()
+            pub_futures.append(get_future_from_publish_status_message(
+                username, status='success'))
+
+        message_ids = [f.result() for f in pub_futures]
+        print(message_ids)
