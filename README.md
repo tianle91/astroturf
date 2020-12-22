@@ -42,4 +42,5 @@ For testing.
 
 For WSL and GPU.
 `docker-compose -f docker-compose-noworker.yml up`
-`docker build -t astroturf . & docker run -it --gpus=all entrypoint ...`
+`docker build -t astroturf .`
+`docker run -it --gpus=all astroturf python update_worker.py --limit 100 --blocksize 128 --maxsteps 1000 --forceupdate True`
