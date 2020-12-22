@@ -3,8 +3,8 @@ import json
 from fastapi import FastAPI
 from google.cloud import storage
 
-from main import (get_local_models, get_text_generation_pipeline,
-                  simulate_pipeline_response)
+from infer import (get_local_models, get_text_generation_pipeline,
+                   simulate_pipeline_response)
 
 app = FastAPI()
 
