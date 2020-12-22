@@ -6,7 +6,6 @@ from google.cloud import storage
 from astroturf.finetune import dump_finetuned, model_output_fnames
 from gcp_utils import (download_all_cloud_files_with_prefix,
                        upload_all_local_files_with_prefix)
-from statusflags import StatusFlags
 
 client = storage.Client()
 config_bucket = client.bucket('astroturf-dev-configs')
@@ -14,30 +13,26 @@ path_config = json.loads(config_bucket.blob(
     'pathConfig.json').download_as_string())
 data_bucket = client.bucket(path_config['data_bucket'])
 model_bucket = client.bucket(path_config['model_bucket'])
-status_bucket = client.bucket(path_config['status_bucket'])
 
 # some local variables
 local_data_path = '/tmp/astroturf/data/'
 local_model_path = '/tmp/astroturf/models/'
 
 
-def refresh_finetuned(
+def refresh_finetuned_cloud(
         user_name,
         blocksize=16,
         maxsteps=10,
         learning_rate=1e-4,
         force_update=False
 ) -> str:
+    """Download all comments, finetunes on them and then upload finetuned model.
+    """
     # set up local directories
     local_model_path_user = os.path.join(local_model_path, user_name)
     local_data_path_user = os.path.join(local_data_path, user_name)
     os.makedirs(local_model_path_user, exist_ok=True)
     os.makedirs(local_data_path_user, exist_ok=True)
-
-    # progress status tracker
-    status_progress = status_bucket.blob(os.path.join(
-        user_name, StatusFlags.model_training_progress))
-    status_progress.upload_from_string('starting')
 
     # set up some output flags for completion check
     output_flags = [os.path.join(user_name, s) for s in model_output_fnames]
@@ -49,15 +44,16 @@ def refresh_finetuned(
         return user_name
     # download files for training
     downloaded_data_fnames = download_all_cloud_files_with_prefix(
-        local_data_path_user,
-        data_bucket.name, user_name,
-        client, refresh_local=False
+        local_prefix=local_data_path_user,
+        cloud_bucket=data_bucket.name,
+        cloud_prefix=user_name,
+        client=client,
+        refresh_local=False
     )
     if not len(downloaded_data_fnames) > 0:
         raise ValueError('no data for user_name: {}'.format(user_name))
 
-    # run the finetuning
-    # this guy dumps model files in os.path.join(local_model_path_user, 'model')
+    # run the finetuning. this guy dumps model files in os.path.join(local_model_path_user, 'model')
     dump_finetuned(
         local_data_path_user, local_model_path_user,
         blocksize=blocksize, max_steps=maxsteps,
@@ -70,12 +66,6 @@ def refresh_finetuned(
         model_bucket.name, os.path.join(user_name, 'model'),
         client
     )
-
-    # status cleanup
-    status_progress.delete()
-    status_success = status_bucket.blob(os.path.join(
-        user_name, StatusFlags.model_training_success))
-    status_success.upload_from_string('done')
     return user_name
 
 
@@ -100,6 +90,11 @@ if __name__ == '__main__':
 
     for user_name in users:
         print('user_name: {} running...'.format(user_name))
-        ran = refresh_finetuned(user_name, blocksize=args.blocksize, maxsteps=args.maxsteps,
-                                learning_rate=args.learning_rate, force_update=args.forceupdate)
+        ran = refresh_finetuned_cloud(
+            user_name,
+            blocksize=args.blocksize,
+            maxsteps=args.maxsteps,
+            learning_rate=args.learning_rate,
+            force_update=args.forceupdate
+        )
         print('user_name: {} ran: {}'.format(user_name, ran))

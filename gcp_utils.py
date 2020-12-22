@@ -1,8 +1,8 @@
 import os
+from datetime import datetime, timezone
 from glob import glob
 
 from google.cloud import storage
-from datetime import datetime, timezone
 
 
 def mtime_to_utc_datetime(mtime: float) -> datetime:
@@ -11,7 +11,8 @@ def mtime_to_utc_datetime(mtime: float) -> datetime:
 
 def upload_all_local_files_with_prefix(
         local_prefix: str,
-        cloud_bucket: str, cloud_prefix: str,
+        cloud_bucket: str,
+        cloud_prefix: str,
         client: storage.Client
 ):
     bucket = client.bucket(cloud_bucket)
@@ -32,7 +33,8 @@ def upload_all_local_files_with_prefix(
 
 def download_all_cloud_files_with_prefix(
         local_prefix: str,
-        cloud_bucket: str, cloud_prefix: str,
+        cloud_bucket: str,
+        cloud_prefix: str,
         client: storage.Client,
         refresh_local: bool = True
 ):
@@ -47,9 +49,10 @@ def download_all_cloud_files_with_prefix(
                 will_download = False
             elif blob.exists():
                 blob.reload()
-                local_updated = mtime_to_utc_datetime(os.path.getmtime(local_path))
-                remote_updated = blob.updated # this guy is timezone aware
-                if local_updated >= remote_updated: 
+                local_updated = mtime_to_utc_datetime(
+                    os.path.getmtime(local_path))
+                remote_updated = blob.updated  # this guy is timezone aware
+                if local_updated >= remote_updated:
                     will_download = False
         if will_download:
             print('Downloading: {fname} to local prefix: {prfx}'.format(
