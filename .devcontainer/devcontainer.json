@@ -20,7 +20,8 @@
 		"ms-azuretools.vscode-docker",
 		"p1c2u.docker-compose",
 		"grapecity.gc-excelviewer",
-		"visualstudioexptteam.vscodeintellicode"
+		"visualstudioexptteam.vscodeintellicode",
+		"yzhang.markdown-all-in-one"
 	]
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
