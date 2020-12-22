@@ -34,8 +34,8 @@ status_df = pd.DataFrame({'username': [], 'dt': [], 'status': []})
 
 def get_model_update_dt(username):
     blob = model_bucket.blob(os.path.join(
-        username, 'models/pytorch_model.bin'))
-    blob = blob.reload() if blob.exists() else blob
+        username, 'model/pytorch_model.bin'))
+    _ = blob.reload() if blob.exists() else None
     return blob.updated
 
 
