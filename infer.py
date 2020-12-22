@@ -1,14 +1,10 @@
 import json
-import os
-from datetime import datetime, timedelta, timezone
 
 from fastapi import FastAPI
-from flask import Flask, flash, redirect, render_template, request, url_for
-from google.cloud import pubsub_v1, storage
+from google.cloud import storage
 
 from main import (get_local_models, get_text_generation_pipeline,
                   simulate_pipeline_response)
-from status import last_success
 
 app = FastAPI()
 
@@ -31,7 +27,7 @@ def infer(username: str, url: str = defaulturl, refresh: bool = False):
         cached_txtgen[username] = (txtgen, 1)
         if len(cached_txtgen.keys()) > cached_max_count:
             # pop the least used key
-            min_n = min(v[1] for k, v in cached_txtgen.items())
+            min_n = min(v[1] for _, v in cached_txtgen.items())
             for k, n in cached_txtgen:
                 if n == min_n:
                     cached_txtgen.pop(k)
@@ -39,10 +35,5 @@ def infer(username: str, url: str = defaulturl, refresh: bool = False):
         txtgen, n = cached_txtgen[username]
         cached_txtgen[username] = (txtgen, n+1)
     response = simulate_pipeline_response(txtgen, url)
-    print (cached_txtgen)
+    print(cached_txtgen)
     return response
-
-
-# holy shit this is indeed fast
-# uvicorn infer:app --reload
-# 127.0.0.1:8000/spez?url=https://www.reddit.com/r/toronto/comments/hkjyjn/city_issues_trespassing_orders_to_demonstrators/fwt4ifw

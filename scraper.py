@@ -1,5 +1,6 @@
 import json
 import os
+from typing import List
 
 import praw
 from google.cloud import storage
@@ -15,7 +16,7 @@ data_bucket = client.bucket(path_config['data_bucket'])
 status_bucket = client.bucket(path_config['status_bucket'])
 
 
-def refresh_user_comments(user_name: str, reddit: praw.Reddit, limit: int = 1000):
+def refresh_user_comments(user_name: str, reddit: praw.Reddit, limit: int = 1000) -> List[str]:
     # progress status tracker
     status_progress = status_bucket.blob(os.path.join(
         user_name, StatusFlags.data_refresh_progress))
@@ -25,8 +26,10 @@ def refresh_user_comments(user_name: str, reddit: praw.Reddit, limit: int = 1000
     exist_blob_paths = [blob.name for blob in client.list_blobs(
         data_bucket, prefix=user_name)]
     i = 0
+    comment_ids = []
     for comment in reddit.redditor(user_name).comments.new(limit=limit):
         blob_path = os.path.join(user_name, '{}.json'.format(comment.id))
+        comment_ids.append(comment.id)
         if not blob_path in exist_blob_paths:
             status_str = '[{i}/{limit}] id: {id}, body: {body}'.format(
                 i=i, limit=limit, id=comment.id, body=comment.body.replace(
@@ -45,7 +48,7 @@ def refresh_user_comments(user_name: str, reddit: praw.Reddit, limit: int = 1000
     status_success = status_bucket.blob(os.path.join(
         user_name, StatusFlags.data_refresh_success))
     status_success.upload_from_string('done')
-    return True
+    return comment_ids
 
 
 if __name__ == '__main__':

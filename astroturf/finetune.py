@@ -19,10 +19,12 @@ eos = tokenizer.eos_token
 model_output_fnames = ['pytorch_model.bin', 'config.json', 'training_args.bin']
 
 
-# data part
+def get_qa_string(package: dict) -> str:
+    '''Format reddit package as text in form of question and answer.
 
-def get_qa_string(package):
-    '''format comment as question and answer'''
+    Args:
+        package: should be outputs of astroturf.prawtools.make_package_training.
+    '''
     context = 'In subreddit: {subname}\nTitle: {title}\n{body}'.format(
         subname=package['submission']['subreddit'],
         title=package['submission']['title'],
@@ -39,15 +41,17 @@ def get_qa_string(package):
 
 
 def write_to_text(fnames, outputfname, verbose=1):
+    if verbose > 0:
+        print('Writing text files for training...')
     # clear destination
     with open(outputfname, 'w+') as f:
         f.write('')
-
+    # start writing...
     total = len(fnames)
     i = 0
     for fname in fnames:
         if i % 100 == 0 and verbose > 0:
-            print(f'writing fname [{i}/{total}]')
+            print(f'[{i}/{total}]')
         i += 1
         with open(fname) as f:
             package = json.load(f)
@@ -58,9 +62,7 @@ def write_to_text(fnames, outputfname, verbose=1):
             ))
 
 
-# training part
-
-def get_dataset(file_path, tokenizer: PreTrainedTokenizer, block_size: int = None):
+def get_dataset(file_path, tokenizer: PreTrainedTokenizer, block_size: int = None) -> TextDataset:
     return TextDataset(
         tokenizer=tokenizer,
         file_path=file_path,
@@ -69,14 +71,22 @@ def get_dataset(file_path, tokenizer: PreTrainedTokenizer, block_size: int = Non
     )
 
 
-def dump_finetuned(inputpath: str, outputpath: str, 
-                   blocksize: int = 16, max_steps: int = 50, learning_rate: float = 1e-4):
-    '''Finetune GPT2LMHeadModel
-    inputpath: expect .json here as outputs of astroturf.prawtools.make_package_training
-    outputpath: to dump finetuned huggingface transformers
-    blocksize:
+def dump_finetuned(inputpath: str, outputpath: str,
+                   blocksize: int = 16, max_steps: int = 50,
+                   learning_rate: float = 1e-4) -> str:
+    '''Finetune a LM and dump it locally.
+
+    Args:
+        inputpath: *.json here will be used to finetune.
+            The *.json should be outputs of astroturf.prawtools.make_package_training.
+        outputpath: local path to dump finetuned model.
+            Passed to TrainingArguments as output_dir.        
+        blocksize: ...
+        max_steps: ...
+        learning_rate: ...
     '''
-    print(f'blocksize: {blocksize}, max_steps: {max_steps}, learning_rate: {learning_rate}')
+    print(
+        f'blocksize: {blocksize}, max_steps: {max_steps}, learning_rate: {learning_rate}')
     print(f'inputpath: {inputpath} --> outputpath: {outputpath}')
 
     fnames = glob(os.path.join(inputpath, '*.json'))
@@ -129,5 +139,4 @@ def dump_finetuned(inputpath: str, outputpath: str,
     )
     trainer.train()
     trainer.save_model()
-    # print (trainer.evaluate())
     return modeloutputpath
