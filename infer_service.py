@@ -15,14 +15,19 @@ path_config = json.loads(config_bucket.blob(
     'pathConfig.json').download_as_string())
 defaulturl = path_config['defaulturl']
 
-cached_txtgen = {}
+cached_txtgen = {}  # {text_generation_pipeline: count of calls}
 cached_max_count = 10
 
 
-@app.get("/{username}")
-def infer(username: str, url: str = defaulturl, refresh: bool = False):
-    if refresh or username not in cached_txtgen:
-        local_model_path_user = get_local_models(username, force_update=True)
+def get_txtgen_cached_or_otherwise(username, force_update=False):
+    """Gets model and updates cache with it.
+    """
+    if username in cached_txtgen:
+        txtgen, n = cached_txtgen[username]
+        cached_txtgen[username] = (txtgen, n+1)
+    else:
+        local_model_path_user = get_local_models(
+            username, force_update=force_update)
         txtgen = get_text_generation_pipeline(local_model_path_user)
         cached_txtgen[username] = (txtgen, 1)
         if len(cached_txtgen.keys()) > cached_max_count:
@@ -31,9 +36,19 @@ def infer(username: str, url: str = defaulturl, refresh: bool = False):
             for k, n in cached_txtgen:
                 if n == min_n:
                     cached_txtgen.pop(k)
-    else:
-        txtgen, n = cached_txtgen[username]
-        cached_txtgen[username] = (txtgen, n+1)
+    return txtgen
+
+
+@app.get("/{username}")
+def infer(username: str, url: str = defaulturl):
+    txtgen = get_txtgen_cached_or_otherwise(username)
     response = simulate_pipeline_response(txtgen, url)
     print(cached_txtgen)
     return response
+
+
+@app.put("/{username}")
+def refresh(username: str):
+    cached_txtgen.pop(username)
+    _ = get_txtgen_cached_or_otherwise(username, force_update=True)
+    return True
