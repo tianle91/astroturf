@@ -24,6 +24,6 @@ Build the image.
 All-in-one.
 `docker-compose up`
 
-For WSL and GPU.
+For WSL and GPU. https://www.docker.com/blog/wsl-2-gpu-support-is-here/
 - `docker-compose -f docker-compose-noworker.yml up`
 - `docker run -it --gpus=all astroturf python update_worker.py --limit 100 --blocksize 128 --maxsteps 1000 --forceupdate True`
