@@ -72,7 +72,7 @@ def respond_to_trigger_comment(
     comment: Comment,
     reddit: Reddit,
     submit_reply=True,
-    sleep_wait=30,
+    sleep_wait=60,
     max_wait=300,
     verbose=1
 ) -> None:
@@ -123,14 +123,8 @@ def respond_to_trigger_comment(
             comment.reply(reply_text)
             submitted_reply = True
         except RedditAPIException as e:
-            wait_mins = e.message\
-                .replace('you are doing that too much. try again in', '')\
-                .replace('minutes.', '')\
-                .strip()
-            print(e.message)
-            wait_secs = 60.*float(wait_mins)
-            print(f'Waiting for {wait_secs}')
-            sleep(wait_secs)
+            print(f'{e.message} Waiting for {sleep_wait}')
+            sleep(sleep_wait)
         if submitted_reply:
             break
     return reply_text
