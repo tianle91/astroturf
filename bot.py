@@ -134,8 +134,7 @@ if __name__ == '__main__':
     # respond_to_trigger_comment(trigger_comment, reddit, submit_reply=False)
 
     for comment in reddit.subreddit(args.subreddit).stream.comments(skip_existing=True):
-        print(f'Steaming comments from {args.subreddit}')
-        print(
-            f'''reddit.auth.limits['remaining']: {reddit.auth.limits['remaining']}''')
+        api_remaining = reddit.auth.limits['remaining']
+        print(f'Steaming comments from {args.subreddit}. Remaining: {api_remaining}')
         if is_relevant(comment):
             respond_to_trigger_comment(comment, reddit, submit_reply=True)
