@@ -26,4 +26,4 @@ All-in-one.
 
 For WSL and GPU. https://www.docker.com/blog/wsl-2-gpu-support-is-here/
 - `docker-compose -f docker-compose-noworker.yml up`
-- `docker run -it --gpus=all astroturf python update_worker.py --limit 100 --blocksize 128 --maxsteps 1000 --forceupdate True`
+- `docker run -it --gpus=all astroturf python -u update_worker.py --site astroturf_update_worker`
