@@ -80,7 +80,7 @@ def respond_to_trigger_comment(
     """Given a trigger comment, reply to the comment with a prediction.
     """
     if verbose > 0:
-        print(f'Triggered comment body: {comment.body}')
+        print(f'Triggered comment body: {comment.body} url: {comment.permalink}')
     username = get_username_from_comment_body(comment.body)
     if is_invalid(username):
         print(f'Invalid username parsed: {username}')
@@ -104,7 +104,8 @@ def respond_to_trigger_comment(
         if wait >= max_wait:
             print(f'Waiting for training timed out: {wait} >= {max_wait}')
         else:
-            sleep(f'Waiting for training to complete. Sleep for {sleep_wait}')
+            print(f'Waiting for training to complete. Sleep for {sleep_wait}')
+            sleep(sleep_wait)
 
     # get url of parent, because that's the prompt
     parent_comment, submission = get_context(comment, reddit)
