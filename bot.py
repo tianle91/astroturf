@@ -98,6 +98,7 @@ def respond_to_trigger_comment(
             training_requested = True
             if verbose > 0:
                 print(f'training requested!\n{updateresponse}')
+        print(f'Waiting for {sleep_wait}')
         sleep(sleep_wait)
         wait += sleep_wait
         if wait >= max_wait:
