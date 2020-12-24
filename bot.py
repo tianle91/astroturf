@@ -1,5 +1,5 @@
 import json
-from time import sleep
+from time import sleep, time
 
 import requests
 from google.cloud import storage
@@ -20,14 +20,12 @@ update_endpoint = path_config['update_endpoint']
 reply_template = """
 u/{username} might reply:
 
----
 {response}
 
----
-About:
-- I'm a DistilGPT2 bot finetuned using user comments with [Huggingface's Transformers](https://github.com/huggingface/transformers).
-- Play around with the UI at [64.137.143.175](http://64.137.143.175).
-- Source code at [tianle91/astroturf](https://github.com/tianle91/astroturf) (currently private).
+I'm a DistilGPT2 bot finetuned using user comments with 
+[Huggingface's Transformers](https://github.com/huggingface/transformers).
+Play around with the UI at [64.137.143.175](http://64.137.143.175).
+Source code at [tianle91/astroturf](https://github.com/tianle91/astroturf) (currently private).
 """
 
 trigger_prefixes = ['what would u/',
@@ -120,13 +118,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='bot for astroturf.')
     parser.add_argument('--subreddit', type=str, default='AskReddit')
+    parser.add_argument('--site', type=str, default='astroturf_bot')
     args = parser.parse_args()
 
     sleep(30)  # infer service takes some time to spin up
     print('Ready')
 
     from praw_utils import get_reddit
-    reddit = get_reddit(client, config_bucket='astroturf-dev-configs')
+    reddit = get_reddit(
+        client, config_bucket='astroturf-dev-configs', site=args.site)
 
     # # testing on a triggering comment
     # trigger_comment = reddit.comment(
@@ -135,6 +135,11 @@ if __name__ == '__main__':
 
     for comment in reddit.subreddit(args.subreddit).stream.comments(skip_existing=True):
         api_remaining = reddit.auth.limits['remaining']
-        print(f'Steaming comments from {args.subreddit}. Remaining: {api_remaining}')
+        print(
+            f'Steaming comments from {args.subreddit}. Remaining: {api_remaining}')
         if is_relevant(comment):
             respond_to_trigger_comment(comment, reddit, submit_reply=True)
+        if api_remaining < 100:
+            while time() <= reddit.auth.limits['reset_timestamp']:
+                print (f"Waiting for reset. {time()} <= {reddit.auth.limits['reset_timestamp']}")
+                sleep(10)
