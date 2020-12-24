@@ -80,10 +80,10 @@ def respond_to_trigger_comment(
     """Given a trigger comment, reply to the comment with a prediction.
     """
     if verbose > 0:
-        print(f'comment.body: {comment.body}')
+        print(f'Triggered comment body: {comment.body}')
     username = get_username_from_comment_body(comment.body)
     if is_invalid(username):
-        print(f'invalid username: {username}')
+        print(f'Invalid username parsed: {username}')
         return None
 
     # check that user has a model
@@ -91,7 +91,7 @@ def respond_to_trigger_comment(
     wait = 0
     while username not in get_trained_usernames() and wait < max_wait:
         if verbose > 0:
-            print(f'username:{username} not trained')
+            print(f'Valid username has no trained model: {username}')
         if not training_requested:
             updateresponse = requests.get('{update_endpoint}/update/{username}'.format(
                 update_endpoint=update_endpoint,
@@ -99,13 +99,12 @@ def respond_to_trigger_comment(
             )).json()
             training_requested = True
             if verbose > 0:
-                print(f'training requested!\n{updateresponse}')
-        print(f'waiting for training to complete.')
+                print(f'Training requested: \n{updateresponse}')
         wait += sleep_wait
         if wait >= max_wait:
-            print(f'timeout. {wait} >= {max_wait}')
+            print(f'Waiting for training timed out: {wait} >= {max_wait}')
         else:
-            sleep(f'sleep for {sleep_wait}')
+            sleep(f'Waiting for training to complete. Sleep for {sleep_wait}')
 
     # get url of parent, because that's the prompt
     parent_comment, submission = get_context(comment, reddit)
@@ -121,7 +120,7 @@ def respond_to_trigger_comment(
     # format and reply
     reply_text = format_reply(username, inferresponse['response'])
     if verbose > 0:
-        print(f'reply_text:\n{reply_text}')
+        print(f'Reply text:\n{reply_text}')
 
     # wait to reply
     while submit_reply:
@@ -131,7 +130,7 @@ def respond_to_trigger_comment(
             submitted_reply = True
         except RedditAPIException as e:
         	# this will eventually get through.. i think
-            print(f'{e.message} Waiting for {sleep_wait}')
+            print(f'Exception: {e.message}. Waiting for {sleep_wait}')
             sleep(sleep_wait)
         if submitted_reply:
             break
@@ -162,7 +161,7 @@ if __name__ == '__main__':
     for comment in reddit.subreddit(args.subreddit).stream.comments(skip_existing=True):
         api_remaining = reddit.auth.limits['remaining']
         print(
-            f'Steaming comments from {args.subreddit}. Remaining: {api_remaining}')
+            f'Streaming comments from {args.subreddit}. Remaining: {api_remaining}')
         if is_relevant(comment):
             respond_to_trigger_comment(comment, reddit, submit_reply=True)
         if api_remaining < 100:
