@@ -42,9 +42,10 @@ if __name__ == '__main__':
     parser.add_argument('--blocksize', type=int, default=16)
     parser.add_argument('--maxsteps', type=int, default=10)
     parser.add_argument('--forceupdate', type=bool, default=False)
+    parser.add_argument('--site', type=str, default='astroturf_bot')
     args = parser.parse_args()
 
-    reddit = get_reddit(client, 'astroturf-dev-configs')
+    reddit = get_reddit(client, 'astroturf-dev-configs', site=args.site)
 
     while True:
         print('Listening')
