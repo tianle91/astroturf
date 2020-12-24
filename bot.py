@@ -19,7 +19,7 @@ update_endpoint = path_config['update_endpoint']
 
 
 reply_template = """
-u/{username} might reply:
+[u/{username}](https://reddit-user-analyser.netlify.app/#{username}) might reply:
 
 {response}
 
