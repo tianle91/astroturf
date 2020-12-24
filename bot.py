@@ -29,10 +29,10 @@ Play around with the UI at [64.137.143.175](http://64.137.143.175).
 Source code at [tianle91/astroturf](https://github.com/tianle91/astroturf) (currently private).
 """
 
-trigger_prefixes = ['what would u/',
-                    'what will u/',
-                    'what might u/',
-                    'how may u/']
+trigger_prefixes = ['what would',
+                    'what will',
+                    'what might',
+                    'how may']
 trigger_suffixes = ['say',
                     'respond',
                     'think']
@@ -41,10 +41,12 @@ trigger_suffixes = ['say',
 def get_username_from_comment_body(s: str):
     """Return {username} when given string of form * u/{username} *.
     """
-    username_candidates = [
+    username_candidate_str_l = [
         subs for subs in s.lower().split() if subs.startswith('u/')]
-    if len(username_candidates) > 0:
-        return username_candidates[0].replace('u/', '')
+    for username_candidate_str in username_candidate_str_l:
+        username = username_candidate_str.replace('u/', '')
+        if not is_invalid(username):
+            return username
 
 
 def is_relevant(comment: Comment) -> bool:
@@ -53,7 +55,7 @@ def is_relevant(comment: Comment) -> bool:
     s = comment.body.lower()
     prefix_hit = any(subs in s for subs in trigger_prefixes)
     suffix_hit = any(subs in s for subs in trigger_suffixes)
-    return prefix_hit and suffix_hit
+    return prefix_hit and suffix_hit and 'u/' in s
 
 
 def format_reply(username: str, response: str) -> str:
