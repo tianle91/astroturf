@@ -105,7 +105,7 @@ def respond_to_trigger_comment(
             print(f'Waiting for training timed out: {wait} >= {max_wait}')
             return None
         else:
-            print(f'Waiting for training to complete. Sleep for {sleep_wait}')
+            print(f'Waiting for training to complete: {wait} < {max_wait} Sleep for {sleep_wait}')
             sleep(sleep_wait)
 
     # get url of parent, because that's the prompt
