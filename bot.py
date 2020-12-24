@@ -56,6 +56,11 @@ def is_relevant(comment: Comment) -> bool:
     return prefix_hit and suffix_hit
 
 
+def format_reply(username: str, response: str) -> str:
+    quoted_response = '\n'.join(['> ' + s for s in response.split('\n')])
+    return reply_template.format(username=username, response=quoted_response)
+
+
 def respond_to_trigger_comment(
     comment: Comment,
     reddit: Reddit,
@@ -100,8 +105,7 @@ def respond_to_trigger_comment(
         infer_endpoint=infer_endpoint, username=username, url=url
     )).json()
     # format and reply
-    reply_text = reply_template.format(
-        username=username, response=inferresponse['response'])
+    reply_text = format_reply(username, inferresponse['response'])
     if verbose > 0:
         print(f'reply_text:\n{reply_text}')
     if submit_reply:
