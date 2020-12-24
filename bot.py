@@ -36,6 +36,8 @@ trigger_suffixes = ['say',
 
 
 def get_username_from_comment_body(s: str):
+    """Return {username} when given string of form * u/{username} *.
+    """
     username_candidates = [
         subs for subs in s.lower().split() if subs.startswith('u/')]
     if len(username_candidates) > 0:
@@ -43,13 +45,24 @@ def get_username_from_comment_body(s: str):
 
 
 def is_relevant(comment: Comment) -> bool:
+    """Return True iff any prefixes triggered and any suffixes triggered.
+    """
     s = comment.body.lower()
     prefix_hit = any(subs in s for subs in trigger_prefixes)
     suffix_hit = any(subs in s for subs in trigger_suffixes)
     return prefix_hit and suffix_hit
 
 
-def respond_to_trigger_comment(comment: Comment, reddit: Reddit, submit_reply=True, sleep_wait=10, max_wait=3600, verbose=1) -> None:
+def respond_to_trigger_comment(
+    comment: Comment,
+    reddit: Reddit,
+    submit_reply=True,
+    sleep_wait=10,
+    max_wait=3600,
+    verbose=1
+) -> None:
+    """Given a trigger comment, reply to the comment with a prediction.
+    """
     username = get_username_from_comment_body(comment.body)
     if is_invalid(username):
         return None
