@@ -18,12 +18,15 @@ update_endpoint = path_config['update_endpoint']
 
 
 reply_template = """
-u/{username} might reply: {response}
+u/{username} might reply:
+
+{response}
+
 ---
-I'm a DistilGPT2 bot finetuned using user comments with 
-[Huggingface's Transformers](https://github.com/huggingface/transformers).
-Play around with the UI at [64.137.143.175](http://64.137.143.175).
-Source code at [tianle91/astroturf](https://github.com/tianle91/astroturf) (currently private).
+About:
+- I'm a DistilGPT2 bot finetuned using user comments with [Huggingface's Transformers](https://github.com/huggingface/transformers).
+- Play around with the UI at [64.137.143.175](http://64.137.143.175).
+- Source code at [tianle91/astroturf](https://github.com/tianle91/astroturf) (currently private).
 """
 
 trigger_prefixes = ['what would u/',
@@ -125,8 +128,9 @@ if __name__ == '__main__':
     #     url='https://www.reddit.com/r/AskReddit/comments/kjbam6/youre_78_years_old_youve_reached_the_end_of_your/ggx2nmb')
     # respond_to_trigger_comment(trigger_comment, reddit, submit_reply=False)
 
-    for comment in reddit.subreddit(args.subreddit).stream.comments():
+    for comment in reddit.subreddit(args.subreddit).stream.comments(skip_existing=True):
         print(f'Steaming comments from {args.subreddit}')
-        print(f'reddit.auth.limits: {reddit.auth.limits}')
+        print(
+            f'''reddit.auth.limits['remaining']: {reddit.auth.limits['remaining']}''')
         if is_relevant(comment):
             respond_to_trigger_comment(comment, reddit, submit_reply=True)
