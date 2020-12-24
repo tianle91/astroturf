@@ -67,7 +67,7 @@ def infer(username):
         inferresponse = requests.get('{infer_endpoint}/refresh/{username}'.format(
             infer_endpoint=infer_endpoint, username=username
         )).json()
-        
+
     if request.method == 'POST':
         url = request.form['url']
         if is_invalid_url(url):

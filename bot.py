@@ -74,13 +74,14 @@ def respond_to_trigger_comment(
     reddit: Reddit,
     submit_reply=True,
     sleep_wait=60,
-    max_wait=900, # 15mins
+    max_wait=900,  # 15mins
     verbose=1
 ) -> None:
     """Given a trigger comment, reply to the comment with a prediction.
     """
     if verbose > 0:
-        print(f'Triggered comment body: {comment.body} url: {comment.permalink}')
+        print(
+            f'Triggered comment body: {comment.body} url: {comment.permalink}')
     username = get_username_from_comment_body(comment.body)
     if is_invalid(username):
         print(f'Invalid username parsed: {username}')
@@ -105,7 +106,8 @@ def respond_to_trigger_comment(
             print(f'Waiting for training timed out: {wait} >= {max_wait}')
             return None
         else:
-            print(f'Waiting for training to complete: {wait} < {max_wait} Sleep for {sleep_wait}')
+            print(
+                f'Waiting for training to complete: {wait} < {max_wait} Sleep for {sleep_wait}')
             sleep(sleep_wait)
 
     # get url of parent, because that's the prompt
@@ -131,7 +133,7 @@ def respond_to_trigger_comment(
             comment.reply(reply_text)
             submitted_reply = True
         except RedditAPIException as e:
-        	# this will eventually get through.. i think
+            # this will eventually get through.. i think
             print(f'Exception: {e.message}. Waiting for {sleep_wait}')
             sleep(sleep_wait)
         if submitted_reply:
