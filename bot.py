@@ -167,5 +167,5 @@ if __name__ == '__main__':
         if api_remaining < 100:
             while time() <= reddit.auth.limits['reset_timestamp']:
                 print(
-                    f"Waiting for reset. {time()} <= {reddit.auth.limits['reset_timestamp']}")
+                    f"Waiting for limit reset. {time()} <= {reddit.auth.limits['reset_timestamp']}")
                 sleep(10)
