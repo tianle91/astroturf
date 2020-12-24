@@ -165,7 +165,8 @@ if __name__ == '__main__':
         if is_relevant(comment):
             respond_to_trigger_comment(comment, reddit, submit_reply=True)
         if api_remaining < 100:
-            while time() <= reddit.auth.limits['reset_timestamp']:
+            api_reset = reddit.auth.limits['reset_timestamp']
+            while time() <= api_reset:
                 print(
                     f"Waiting for limit reset. {time()} <= {reddit.auth.limits['reset_timestamp']}")
                 sleep(10)
