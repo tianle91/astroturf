@@ -4,6 +4,7 @@ from time import sleep, time
 import requests
 from google.cloud import storage
 from praw.reddit import Comment, Reddit
+from praw.objector import RedditAPIException
 
 from astroturf.prawtools import get_context
 from status import get_trained_usernames, is_invalid
@@ -107,8 +108,23 @@ def respond_to_trigger_comment(
     reply_text = format_reply(username, inferresponse['response'])
     if verbose > 0:
         print(f'reply_text:\n{reply_text}')
-    if submit_reply:
-        comment.reply(reply_text)
+    # can i reply?
+    while submit_reply:
+        submitted_reply = False
+        try: 
+            comment.reply(reply_text)
+            submitted_reply = True
+        except RedditAPIException as e:
+            wait_mins = e.message\
+                .replace('you are doing that too much. try again in', '')\
+                .replace('minutes.', '')\
+                .strip()
+            print (e.message)
+            wait_secs = 60.*float(wait_mins)
+            print (f'Waiting for {wait_secs}')
+            sleep(wait_secs)
+        if submitted_reply:
+            break
     return reply_text
 
 
