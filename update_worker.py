@@ -91,4 +91,5 @@ if __name__ == '__main__':
                 username, status='success'))
 
         message_ids = [f.result() for f in pub_futures]
-        print(message_ids)
+        if len(message_ids) > 0:
+            print(message_ids)
