@@ -7,7 +7,7 @@ services:
     entrypoint: gunicorn -w 1 -b 0.0.0.0:5000 ui:app
   bot:
     image: astroturf
-    entrypoint: python -u bot.py --subreddit askreddit
+    entrypoint: python -u bot.py --subreddit askreddit --site astroturf_bot
   infer:
     image: astroturf
     entrypoint: uvicorn --host 0.0.0.0 --port 8000 --workers 1 infer_service:app
@@ -18,4 +18,4 @@ services:
     entrypoint: uvicorn --host 0.0.0.0 --port 8000 --workers 1 update_service:app
   updateworker:
     image: astroturf
-    entrypoint: python -u update_worker.py --limit 100 --blocksize 128 --maxsteps 1000 --forceupdate True
+    entrypoint: python -u update_worker.py --site astroturf_update_worker

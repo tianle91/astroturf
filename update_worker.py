@@ -39,9 +39,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='search comments by new for user.')
     parser.add_argument('--limit', type=int, default=100)
-    parser.add_argument('--blocksize', type=int, default=16)
-    parser.add_argument('--maxsteps', type=int, default=10)
-    parser.add_argument('--forceupdate', type=bool, default=False)
+    parser.add_argument('--blocksize', type=int, default=128)
+    parser.add_argument('--maxsteps', type=int, default=1000)
+    parser.add_argument('--forceupdate', type=bool, default=True)
     parser.add_argument('--site', type=str, default='astroturf_bot')
     args = parser.parse_args()
 
