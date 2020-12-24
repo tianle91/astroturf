@@ -103,6 +103,7 @@ def respond_to_trigger_comment(
         wait += sleep_wait
         if wait >= max_wait:
             print(f'Waiting for training timed out: {wait} >= {max_wait}')
+            return None
         else:
             print(f'Waiting for training to complete. Sleep for {sleep_wait}')
             sleep(sleep_wait)
