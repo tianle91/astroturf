@@ -73,7 +73,7 @@ def respond_to_trigger_comment(
     reddit: Reddit,
     submit_reply=True,
     sleep_wait=60,
-    max_wait=300,
+    max_wait=600,
     verbose=1
 ) -> None:
     """Given a trigger comment, reply to the comment with a prediction.
@@ -84,6 +84,7 @@ def respond_to_trigger_comment(
     if is_invalid(username):
         print(f'Did not find valid username: {username}')
         return None
+
     # check that user has a model
     training_requested = False
     wait = 0
@@ -98,17 +99,20 @@ def respond_to_trigger_comment(
             training_requested = True
             if verbose > 0:
                 print(f'training requested!\n{updateresponse}')
-        print(f'Waiting for {sleep_wait}')
-        sleep(sleep_wait)
+        print(f'waiting for training to complete.')
         wait += sleep_wait
         if wait >= max_wait:
-            print(f'Timeout!\ncomment.id:{comment.id}, username:{username}')
+            print(f'timeout. {wait} >= {max_wait}')
+        else:
+            sleep(f'sleep for {sleep_wait}')
+
     # get parent of comment, because that's the prompt
     parent_comment, submission = get_context(comment, reddit)
     url = parent_comment.permalink if parent_comment is not None else submission.permalink
     url = 'https://www.reddit.com' + url
     if verbose > 0:
         print(f'username: {username}, url:{url}')
+
     # get response from infer_endpoint
     inferresponse = requests.get('{infer_endpoint}/infer/{username}?url={url}'.format(
         infer_endpoint=infer_endpoint, username=username, url=url
@@ -117,7 +121,8 @@ def respond_to_trigger_comment(
     reply_text = format_reply(username, inferresponse['response'])
     if verbose > 0:
         print(f'reply_text:\n{reply_text}')
-    # can i reply?
+
+    # wait to reply
     while submit_reply:
         submitted_reply = False
         try:
