@@ -2,6 +2,7 @@ import json
 from datetime import datetime, timezone
 from typing import List, Optional
 
+import pandas as pd
 from google.cloud import storage
 from google.cloud.storage import Blob
 from prawcore.exceptions import NotFound
@@ -14,6 +15,8 @@ path_config = json.loads(config_bucket.blob(
     'pathConfig.json').download_as_string())
 model_bucket = client.bucket(path_config['model_bucket'])
 reddit = get_reddit(client, 'astroturf-dev-configs')
+
+model_output_fnames = ['pytorch_model.bin', 'config.json', 'training_args.bin']
 
 
 def get_reloaded_if_exists(blob: Blob) -> Blob:
@@ -62,10 +65,19 @@ def is_invalid(username: str) -> bool:
 def get_trained_usernames() -> List[str]:
     resl = []
     for blob in client.list_blobs(model_bucket, prefix=''):
-        user_name = blob.name.split('/')[0]
-        resl.append(user_name)
-    return sorted(list(set(resl)))
+        # {username}/model/{fname}
+        blob_name_split = blob.name.split('/')
+        resl.append({
+            'username': blob_name_split[0],
+            'fname': blob_name_split[2]
+        })
+    usernames = []
+    for username, subdf in pd.DataFrame(resl).groupby('username'):
+        subdf_fnames = subdf['fname'].unique()
+        if all([s in subdf_fnames for s in model_output_fnames]):
+            usernames.append(username)
+    return sorted(usernames)
 
 
 if __name__ == '__main__':
-    print (get_trained_usernames())
+    print(get_trained_usernames())
