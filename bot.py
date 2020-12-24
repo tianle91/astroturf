@@ -113,7 +113,7 @@ def respond_to_trigger_comment(
     # can i reply?
     while submit_reply:
         submitted_reply = False
-        try: 
+        try:
             comment.reply(reply_text)
             submitted_reply = True
         except RedditAPIException as e:
@@ -121,9 +121,9 @@ def respond_to_trigger_comment(
                 .replace('you are doing that too much. try again in', '')\
                 .replace('minutes.', '')\
                 .strip()
-            print (e.message)
+            print(e.message)
             wait_secs = 60.*float(wait_mins)
-            print (f'Waiting for {wait_secs}')
+            print(f'Waiting for {wait_secs}')
             sleep(wait_secs)
         if submitted_reply:
             break
@@ -159,5 +159,6 @@ if __name__ == '__main__':
             respond_to_trigger_comment(comment, reddit, submit_reply=True)
         if api_remaining < 100:
             while time() <= reddit.auth.limits['reset_timestamp']:
-                print (f"Waiting for reset. {time()} <= {reddit.auth.limits['reset_timestamp']}")
+                print(
+                    f"Waiting for reset. {time()} <= {reddit.auth.limits['reset_timestamp']}")
                 sleep(10)
