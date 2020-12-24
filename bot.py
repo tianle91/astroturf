@@ -20,6 +20,7 @@ update_endpoint = path_config['update_endpoint']
 reply_template = """
 u/{username} might reply:
 
+---
 {response}
 
 ---
@@ -72,7 +73,7 @@ def respond_to_trigger_comment(
     """Given a trigger comment, reply to the comment with a prediction.
     """
     if verbose > 0:
-        print(f'comment.body:{comment.body}')
+        print(f'comment.body: {comment.body}')
     username = get_username_from_comment_body(comment.body)
     if is_invalid(username):
         return None
