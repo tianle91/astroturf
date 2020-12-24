@@ -62,6 +62,12 @@ def infer(username):
     if usr_last_trained is None:
         flash('No model found for User: {}. Request model training?'.format(username))
         return redirect(url_for('refresh', username=username))
+    else:
+        # refresh model at infer_endpoint
+        inferresponse = requests.get('{infer_endpoint}/refresh/{username}'.format(
+            infer_endpoint=infer_endpoint, username=username
+        )).json()
+        
     if request.method == 'POST':
         url = request.form['url']
         if is_invalid_url(url):
