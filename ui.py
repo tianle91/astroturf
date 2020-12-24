@@ -7,7 +7,6 @@ import requests
 from flask import Flask, flash, redirect, render_template, request, url_for
 from google.cloud import storage
 
-from praw_utils import get_reddit
 from status import get_trained_usernames, is_invalid
 
 app = Flask(__name__)
