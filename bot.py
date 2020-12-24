@@ -41,12 +41,17 @@ trigger_suffixes = ['say',
 def get_username_from_comment_body(s: str):
     """Return {username} when given string of form * u/{username} *.
     """
-    username_candidate_str_l = [
-        subs for subs in s.lower().split() if subs.startswith('u/')]
-    for username_candidate_str in username_candidate_str_l:
-        username = username_candidate_str.replace('u/', '')
-        if not is_invalid(username):
-            return username
+    if 'https://www.reddit.com/u/' in s:
+        # https://www.reddit.com/u/{username}/
+        prefix = 'https://www.reddit.com/u/'
+        username = s[s.find(prefix)+len(prefix):].split('/')[0]
+    else:
+        # <whitespace> u/{username} <whitespace>
+        username = [
+            subs.replace('u/', '')
+            for subs in s.lower().split() if subs.startswith('u/')
+        ][0]
+    return username.lower().strip()
 
 
 def is_relevant(comment: Comment) -> bool:
@@ -77,6 +82,7 @@ def respond_to_trigger_comment(
         print(f'comment.body: {comment.body}')
     username = get_username_from_comment_body(comment.body)
     if is_invalid(username):
+        print(f'Did not find valid username: {username}')
         return None
     # check that user has a model
     training_requested = False
