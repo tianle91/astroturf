@@ -63,6 +63,8 @@ def respond_to_trigger_comment(
 ) -> None:
     """Given a trigger comment, reply to the comment with a prediction.
     """
+    if verbose > 0:
+        print(f'comment.body:{comment.body}')
     username = get_username_from_comment_body(comment.body)
     if is_invalid(username):
         return None
@@ -105,15 +107,26 @@ def respond_to_trigger_comment(
 
 
 if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description='bot for astroturf.')
+    parser.add_argument('--subreddit', type=str, default='AskReddit')
+    args = parser.parse_args()
+
+    sleep(30)  # infer service takes some time to spin up
+    print('Ready')
+
     from praw_utils import get_reddit
     reddit = get_reddit(client, config_bucket='astroturf-dev-configs')
 
-    sleep(30)  # infer service takes some time to spin up
+    # # testing on a triggering comment
+    # trigger_comment = reddit.comment(
+    #     url='https://www.reddit.com/r/AskReddit/comments/kjbam6/youre_78_years_old_youve_reached_the_end_of_your/ggx2nmb')
+    # respond_to_trigger_comment(trigger_comment, reddit, submit_reply=False)
 
-    trigger_comment = reddit.comment(
-        url='https://www.reddit.com/r/AskReddit/comments/kjbam6/youre_78_years_old_youve_reached_the_end_of_your/ggx2nmb')
-    respond_to_trigger_comment(trigger_comment, reddit, submit_reply=False)
-
-    # for comment in reddit.subreddit('AskReddit').stream.comments():
-    #     if is_relevant(comment):
-    #         respond_to_trigger_comment(comment, reddit, submit_reply=False)
+    for comment in reddit.subreddit(args.subreddit).stream.comments():
+        print(f'Steaming comments from {args.subreddit}')
+        print(f'reddit.auth.limits: {reddit.auth.limits}')
+        if is_relevant(comment):
+            respond_to_trigger_comment(comment, reddit, submit_reply=True)
