@@ -1,7 +1,7 @@
 import configparser
 
-from praw import Reddit
 from google.cloud import storage
+from praw import Reddit
 
 
 def get_reddit(

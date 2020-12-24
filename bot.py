@@ -3,8 +3,8 @@ from time import sleep, time
 
 import requests
 from google.cloud import storage
-from praw.reddit import Comment, Reddit
 from praw.objector import RedditAPIException
+from praw.reddit import Comment, Reddit
 
 from astroturf.prawtools import get_context
 from status import get_trained_usernames, is_invalid
