@@ -1,6 +1,5 @@
 # Astroturf
 Hosted at [http://64.137.143.175](http://64.137.143.175) sometimes (when I'm not gaming).
-<img src="./ui_screenshot.png">
 
 ## Architecture
 <img src="./Architecture.svg">
