@@ -23,6 +23,7 @@ u/{username} might reply:
 
 {response}
 
+---
 I'm a DistilGPT2 bot finetuned using user comments with 
 [Huggingface's Transformers](https://github.com/huggingface/transformers).
 Play around with the UI at [64.137.143.175](http://64.137.143.175).
