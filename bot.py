@@ -83,7 +83,7 @@ def respond_to_trigger_comment(
         print(f'comment.body: {comment.body}')
     username = get_username_from_comment_body(comment.body)
     if is_invalid(username):
-        print(f'Did not find valid username: {username}')
+        print(f'invalid username: {username}')
         return None
 
     # check that user has a model
