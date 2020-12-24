@@ -3,6 +3,7 @@
 {% block content %}
 <h1>{% block title %} {{ userinference['username'] }} {% endblock %}</h1>
 <a href="{{ url_for('refresh', username=userinference['username']) }}">Refresh?</a>
+<a href="https://reddit-user-analyser.netlify.app/#{{ userinference['username'] }}">User stats.</a>
 <hr>
 
 Paste a Reddit submission or comment and simulate a Redditor's response!

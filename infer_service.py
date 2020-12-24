@@ -49,6 +49,7 @@ def infer(username: str, url: str = defaulturl):
 
 @app.get("/refresh/{username}")
 def refresh(username: str):
-    cached_txtgen.pop(username)
-    _ = get_txtgen_cached_or_otherwise(username, force_update=True)
+    if username in cached_txtgen:
+        cached_txtgen.pop(username)
+    get_txtgen_cached_or_otherwise(username, force_update=True)
     return True

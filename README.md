@@ -1,6 +1,5 @@
 # Astroturf
 Hosted at [http://64.137.143.175](http://64.137.143.175) sometimes (when I'm not gaming).
-<img src="./ui_screenshot.png">
 
 ## Architecture
 <img src="./Architecture.svg">
@@ -15,8 +14,8 @@ Description
 # Ops
 
 Updating cloud configs.
-`gsutil cp pathConfig.json gs://astroturf-dev-configs/pathConfig.json`
-`gsutil cp astroturf-praw.ini gs://astroturf-dev-configs/astroturf-praw.ini`
+- `gsutil cp pathConfig.json gs://astroturf-dev-configs/pathConfig.json`
+- `gsutil cp astroturf-praw.ini gs://astroturf-dev-configs/astroturf-praw.ini`
 
 Build the image.
 `docker build -t astroturf .`
@@ -24,6 +23,6 @@ Build the image.
 All-in-one.
 `docker-compose up`
 
-For WSL and GPU.
-`docker-compose -f docker-compose-noworker.yml up`
-`docker run -it --gpus=all astroturf python update_worker.py --limit 100 --blocksize 128 --maxsteps 1000 --forceupdate True`
+For WSL and GPU. https://www.docker.com/blog/wsl-2-gpu-support-is-here/
+- `docker-compose -f docker-compose-noworker.yml up`
+- `docker run -it --gpus=all astroturf python -u update_worker.py --site astroturf_update_worker`

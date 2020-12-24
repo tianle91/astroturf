@@ -39,12 +39,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='search comments by new for user.')
     parser.add_argument('--limit', type=int, default=100)
-    parser.add_argument('--blocksize', type=int, default=16)
-    parser.add_argument('--maxsteps', type=int, default=10)
-    parser.add_argument('--forceupdate', type=bool, default=False)
+    parser.add_argument('--blocksize', type=int, default=256)
+    parser.add_argument('--maxsteps', type=int, default=500)
+    parser.add_argument('--forceupdate', type=bool, default=True)
+    parser.add_argument('--site', type=str, default='astroturf_bot')
     args = parser.parse_args()
 
-    reddit = get_reddit(client, 'astroturf-dev-configs')
+    reddit = get_reddit(client, 'astroturf-dev-configs', site=args.site)
 
     while True:
         print('Listening')
@@ -55,6 +56,8 @@ if __name__ == '__main__':
         for msg in response.received_messages:
             username = msg.message.data.decode('utf-8')
             print(f"Received message: {username}")
+            api_remaining = reddit.auth.limits['remaining']
+            print(f'api_remaining: {api_remaining}')
 
         ack_ids = [msg.ack_id for msg in response.received_messages]
         pub_futures = []
@@ -88,4 +91,5 @@ if __name__ == '__main__':
                 username, status='success'))
 
         message_ids = [f.result() for f in pub_futures]
-        print(message_ids)
+        if len(message_ids) > 0:
+            print(message_ids)
