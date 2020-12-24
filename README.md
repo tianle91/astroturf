@@ -7,9 +7,8 @@ Hosted at [http://64.137.143.175](http://64.137.143.175) sometimes (when I'm not
 
 # Reddit bot (TODO)
 Description
-- Responds to “what would u/xxx say”.
-- While loop for streaming by new. Submits request for user and link, waits for response.
-- Move retrain request into api
+- Responds to “what would u/xxx say” or something similar.
+
 
 # Ops
 
