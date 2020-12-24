@@ -107,7 +107,7 @@ def respond_to_trigger_comment(
         else:
             sleep(f'sleep for {sleep_wait}')
 
-    # get parent of comment, because that's the prompt
+    # get url of parent, because that's the prompt
     parent_comment, submission = get_context(comment, reddit)
     url = parent_comment.permalink if parent_comment is not None else submission.permalink
     url = 'https://www.reddit.com' + url
