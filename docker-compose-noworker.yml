@@ -4,7 +4,7 @@ services:
     image: astroturf
     ports:
       - "5000:5000"
-    entrypoint: gunicorn -w 1 -b 0.0.0.0:5000 ui:app
+    entrypoint: gunicorn -w 2 -b 0.0.0.0:5000 ui:app
   bot:
     image: astroturf
     entrypoint: python -u bot.py --subreddit askreddit --site astroturf_bot
