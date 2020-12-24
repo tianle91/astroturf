@@ -73,7 +73,7 @@ def respond_to_trigger_comment(
     comment: Comment,
     reddit: Reddit,
     submit_reply=True,
-    sleep_wait=60,
+    sleep_wait=5,
     max_wait=900,  # 15mins
     verbose=1
 ) -> None:
