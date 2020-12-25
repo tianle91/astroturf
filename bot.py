@@ -143,6 +143,7 @@ def respond_to_trigger_comment(
 
 if __name__ == '__main__':
     import argparse
+    from praw_utils import get_reddit
 
     parser = argparse.ArgumentParser(
         description='bot for astroturf.')
@@ -153,14 +154,8 @@ if __name__ == '__main__':
     sleep(30)  # infer service takes some time to spin up
     print('Ready')
 
-    from praw_utils import get_reddit
     reddit = get_reddit(
         client, config_bucket='astroturf-dev-configs', site=args.site)
-
-    # # testing on a triggering comment
-    # trigger_comment = reddit.comment(
-    #     url='https://www.reddit.com/r/AskReddit/comments/kjbam6/youre_78_years_old_youve_reached_the_end_of_your/ggx2nmb')
-    # respond_to_trigger_comment(trigger_comment, reddit, submit_reply=False)
 
     for comment in reddit.subreddit(args.subreddit).stream.comments(skip_existing=True):
         api_remaining = reddit.auth.limits['remaining']
