@@ -97,7 +97,7 @@ def respond_to_trigger_comment(
         if verbose > 0:
             print(f'Training requested: {updateresponse}')
 
-    # wait for user to have model available
+    # wait for user to have model available, note that no wait if last_update_is_too_old
     wait = 0
     while username not in get_trained_usernames():
         if verbose > 0:
