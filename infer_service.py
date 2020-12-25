@@ -36,6 +36,7 @@ def get_txtgen_cached_or_otherwise(username, force_update=False):
             for username_temp in cached_txtgen:
                 _, count_temp = cached_txtgen[username_temp]
                 if count_temp == min_n:
+                    print (f'Evicting {username_temp} from cached_txtgen.')
                     cached_txtgen.pop(username_temp)
     return txtgen
 
