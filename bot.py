@@ -158,14 +158,14 @@ if __name__ == '__main__':
         client, config_bucket='astroturf-dev-configs', site=args.site)
 
     for comment in reddit.subreddit(args.subreddit).stream.comments(skip_existing=True):
-        api_remaining = reddit.auth.limits['remaining']
-        print(
-            f'Streaming comments from {args.subreddit}. Remaining: {api_remaining}')
+        # api_remaining = reddit.auth.limits['remaining']
+        # print(
+        #     f'Streaming comments from {args.subreddit}. Remaining: {api_remaining}')
         if is_relevant(comment):
             respond_to_trigger_comment(comment, reddit, submit_reply=True)
-        if api_remaining < 1:
-            api_reset = reddit.auth.limits['reset_timestamp']
-            while time() <= api_reset:
-                print(
-                    f"Waiting for limit reset. {time()} <= {reddit.auth.limits['reset_timestamp']}")
-                sleep(10)
+        # if api_remaining < 1:
+        #     api_reset = reddit.auth.limits['reset_timestamp']
+        #     while time() <= api_reset:
+        #         print(
+        #             f"Waiting for limit reset. {time()} <= {reddit.auth.limits['reset_timestamp']}")
+        #         sleep(10)
