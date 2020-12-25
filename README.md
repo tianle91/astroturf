@@ -10,6 +10,8 @@ Curious how users might respond to a submission or comment? Me too.
 # Ops
 This project is developed on GCP and relies on Storage and Pub/Sub.
 
+Compute is local and runs on a 8-core device, 32Gb ram and a GTX 1080 Ti with WSL2 and Docker Desktop.
+
 1. Build the image. `docker build -t astroturf .`
 2. Deployment
 	- All-in-one (testing only). `docker-compose up`
