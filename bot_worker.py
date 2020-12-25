@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timedelta, timezone
 from time import sleep
 
 import requests
@@ -59,6 +60,10 @@ def format_reply(username: str, response: str) -> str:
     return reply_template.format(username=username, response=quoted_response)
 
 
+def json_dt_to_utc_datetime(s: str) -> datetime:
+    return
+
+
 def respond_to_trigger_comment(
     comment: Comment,
     reddit: Reddit,
@@ -77,27 +82,37 @@ def respond_to_trigger_comment(
         print(f'Invalid username parsed: {username}')
         return None
 
-    # check that user has a model
-    training_requested = False
+    # status on the user
+    updateresponse = requests.get('{update_endpoint}/status/{username}'.format(
+        update_endpoint=update_endpoint,
+        username=username
+    )).json()
+    model_update_dt = updateresponse['model_update_dt']
+    now_dt = datetime.now(tz=timezone.utc)
+    last_update_is_too_old = datetime.fromisoformat(
+        model_update_dt) + timedelta(days=1) <= now_dt
+    to_update = model_update_dt is None or last_update_is_too_old
+
+    if to_update:
+        updateresponse = requests.get('{update_endpoint}/update/{username}'.format(
+            update_endpoint=update_endpoint,
+            username=username
+        )).json()
+        if verbose > 0:
+            print(f'Training requested: {updateresponse}')
+
+    # wait for user to have model available
     wait = 0
-    while username not in get_trained_usernames() and wait < max_wait:
+    while username not in get_trained_usernames():
         if verbose > 0:
             print(f'Valid username has no trained model: {username}')
-        if not training_requested:
-            updateresponse = requests.get('{update_endpoint}/update/{username}'.format(
-                update_endpoint=update_endpoint,
-                username=username
-            )).json()
-            training_requested = True
-            if verbose > 0:
-                print(f'Training requested: \n{updateresponse}')
         wait += sleep_wait
         if wait >= max_wait:
-            print(f'Waiting for training timed out: {wait} >= {max_wait}')
+            print(f'Waiting for trained model timed out: {wait} >= {max_wait}')
             return None
         else:
             print(
-                f'Waiting for training to complete: {wait} < {max_wait} Sleep for {sleep_wait}')
+                f'Waiting for trained model: {wait} < {max_wait}. Sleep for {sleep_wait}')
             sleep(sleep_wait)
 
     # get url of parent, because that's the prompt
