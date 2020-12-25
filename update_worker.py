@@ -53,15 +53,13 @@ if __name__ == '__main__':
             request={"subscription": subscription_path, "max_messages": 1})
 
         username = None
+        ack_ids = []
         for msg in response.received_messages:
             username = msg.message.data.decode('utf-8')
             print(f"Received message: {username}")
-            api_remaining = reddit.auth.limits['remaining']
-            print(f'api_remaining: {api_remaining}')
+            ack_ids.append(msg.ack_id)
 
-        ack_ids = [msg.ack_id for msg in response.received_messages]
         pub_futures = []
-
         if len(ack_ids) > 0 and username is not None:
             pub_futures.append(get_future_from_publish_status_message(
                 username, status='received_request'))
