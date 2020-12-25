@@ -15,7 +15,7 @@ data_bucket = client.bucket(path_config['data_bucket'])
 
 
 def refresh_user_comments_cloud(user_name: str, reddit: praw.Reddit, limit: int = 1000) -> List[str]:
-    """Update cloud comments and return list of refreshed comment ids.
+    """Update cloud comments and return list of new comment ids.
     """
     print(reddit.auth.limits)
     exist_blob_paths = [
@@ -26,7 +26,6 @@ def refresh_user_comments_cloud(user_name: str, reddit: praw.Reddit, limit: int 
     comment_ids = []
     for comment in reddit.redditor(user_name).comments.new(limit=limit):
         blob_path = os.path.join(user_name, '{}.json'.format(comment.id))
-        comment_ids.append(comment.id)
         if not blob_path in exist_blob_paths:
             status_str = '[{i}/{limit}] id: {id}, body: {body}'.format(
                 i=i, limit=limit, id=comment.id, body=comment.body.replace(
@@ -36,8 +35,8 @@ def refresh_user_comments_cloud(user_name: str, reddit: praw.Reddit, limit: int 
             package = make_package_training(comment, reddit)
             blob = data_bucket.blob(blob_path)
             blob.upload_from_string(json.dumps(package, indent=4))
+            comment_ids.append(comment.id)
         i += 1
-    print(reddit.auth.limits)
     return comment_ids
 
 
