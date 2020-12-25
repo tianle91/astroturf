@@ -2,7 +2,7 @@ import json
 from time import sleep
 
 import requests
-from google.cloud import storage
+from google.cloud import pubsub_v1, storage
 from praw.objector import RedditAPIException
 from praw.reddit import Comment, Reddit
 
@@ -14,8 +14,15 @@ client = storage.Client()
 config_bucket = client.bucket('astroturf-dev-configs')
 path_config = json.loads(config_bucket.blob(
     'pathConfig.json').download_as_string())
+project_id = path_config['project_id']
 infer_endpoint = path_config['infer_endpoint']
 update_endpoint = path_config['update_endpoint']
+
+
+# subscribing to sub_bot_response_request
+subscriber = pubsub_v1.SubscriberClient()
+subscription_path = subscriber.subscription_path(
+    project_id, path_config['sub_bot_response_request'])
 
 
 reply_template = """
@@ -29,14 +36,6 @@ I'm a DistilGPT2 bot finetuned using user comments with
 Play around with the UI at [64.137.143.175](http://64.137.143.175).
 Source code at [tianle91/astroturf](https://github.com/tianle91/astroturf) (currently private).
 """
-
-trigger_prefixes = ['what would',
-                    'what will',
-                    'what might',
-                    'how may']
-trigger_suffixes = ['say',
-                    'respond',
-                    'think']
 
 
 def get_username_from_comment_body(s: str):
@@ -53,15 +52,6 @@ def get_username_from_comment_body(s: str):
             for subs in s.lower().split() if subs.startswith('u/')
         ][0]
     return username.lower().strip()
-
-
-def is_relevant(comment: Comment) -> bool:
-    """Return True iff any prefixes triggered and any suffixes triggered.
-    """
-    s = comment.body.lower()
-    prefix_hit = any(subs in s for subs in trigger_prefixes)
-    suffix_hit = any(subs in s for subs in trigger_suffixes)
-    return prefix_hit and suffix_hit and 'u/' in s
 
 
 def format_reply(username: str, response: str) -> str:
@@ -143,20 +133,32 @@ def respond_to_trigger_comment(
 
 if __name__ == '__main__':
     import argparse
+
     from praw_utils import get_reddit
 
     parser = argparse.ArgumentParser(
-        description='bot for astroturf.')
-    parser.add_argument('--subreddit', type=str, default='AskReddit')
+        description='bot worker for astroturf.')
     parser.add_argument('--site', type=str, default='astroturf_bot')
     args = parser.parse_args()
-
-    sleep(30)  # infer service takes some time to spin up
-    print('Ready')
 
     reddit = get_reddit(
         client, config_bucket='astroturf-dev-configs', site=args.site)
 
-    for comment in reddit.subreddit(args.subreddit).stream.comments(skip_existing=True):
-        if is_relevant(comment):
+    url = 'https://www.reddit.com/r/AskReddit/comments/kjbam6/youre_78_years_old_youve_reached_the_end_of_your/ggxfsmb'
+    while True:
+        print('Listening')
+        response = subscriber.pull(
+            request={"subscription": subscription_path, "max_messages": 1})
+
+        ack_ids = []
+        url = None
+        for msg in response.received_messages:
+            url = msg.message.data.decode('utf-8')
+            print(f"Received message: {url}")
+            ack_ids.append(msg.ack_id)
+
+        if len(ack_ids) > 0 and url is not None:
+            subscriber.acknowledge(
+                request={"subscription": subscription_path, "ack_ids": ack_ids})
+            comment = reddit.comment(url=url)
             respond_to_trigger_comment(comment, reddit, submit_reply=True)
