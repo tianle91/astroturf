@@ -16,6 +16,7 @@ path_config = json.loads(config_bucket.blob(
 model_bucket = client.bucket(path_config['model_bucket'])
 reddit = get_reddit(client, 'astroturf-dev-configs')
 
+# this is the same as astroturf.finetune.model_output_fnames, don't want to load the entire module
 model_output_fnames = ['pytorch_model.bin', 'config.json', 'training_args.bin']
 
 
