@@ -12,7 +12,7 @@ This project is developed on GCP and relies on Storage and Pub/Sub.
 
 1. Build the image. `docker build -t astroturf .`
 2. Deployment
-	- All-in-one (not a good idea). `docker-compose up`
+	- All-in-one (testing only). `docker-compose up`
 	- For WSL and GPU. https://www.docker.com/blog/wsl-2-gpu-support-is-here/
 		- `docker-compose -f docker-compose-noworker.yml up`
 		- `docker run -it --gpus=all astroturf python -u update_worker.py --site astroturf_update_worker`
