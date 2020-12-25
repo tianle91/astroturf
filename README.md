@@ -3,6 +3,14 @@ Curious how users might respond to a submission or comment? Me too.
 - Hosted at [http://64.137.143.175](http://64.137.143.175) sometimes (when I'm not gaming).
 - Bot responds to “what would u/xxx say” or something similar. Currently only monitors [r/AskReddit](https://www.reddit.com/r/AskReddit).
 
+## Demo
+
+### UI
+<img src="./ui_screenshot.png">
+
+### Bot
+<img src="./bot_screenshot.png">
+
 ## Architecture
 <img src="./Architecture.svg">
 
