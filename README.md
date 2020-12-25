@@ -14,6 +14,7 @@ Check out the amazing and insightful responses!
 
 ## Architecture
 Ok so mostly this is how it works.
+
 <img src="./Architecture.svg" width="500">
 
 
