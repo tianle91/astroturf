@@ -86,7 +86,7 @@ def respond_to_trigger_comment(
     model_update_dt = updateresponse['model_update_dt']
     now_dt = datetime.now(tz=timezone.utc)
     last_update_is_too_old = datetime.fromisoformat(
-        model_update_dt) + timedelta(days=1) <= now_dt
+        model_update_dt) + timedelta(days=1) <= now_dt if model_update_dt is not None else False
     to_update = model_update_dt is None or last_update_is_too_old
 
     if to_update:
