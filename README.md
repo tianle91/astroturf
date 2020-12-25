@@ -20,7 +20,7 @@ Bot responds to “what would u/xxx say” or something similar. Currently only 
 # Technical Stuff
 This project is developed on GCP and relies on Storage and Pub/Sub.
 
-Compute is local and runs on a 8-core device, 64Gb ram and a GTX 1080 Ti.
+Compute is local (it's my personal project) and runs on a 8-core device, 64Gb ram and a GTX 1080 Ti.
 Runs on top of Windows 10 (dev build), WSL2, Nvidia for WSL and Docker Desktop.
 
 ## Architecture
