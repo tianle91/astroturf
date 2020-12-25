@@ -44,8 +44,7 @@ def get_txtgen_cached_or_otherwise(username, force_update=False):
             print(f'Evicting {to_drop_username} from cached_txtgen.')
             cached_txtgen = {
                 u: (v[0], 0)
-                for u, v in cached_txtgen
-                if u != to_drop_username
+                for u, v in cached_txtgen.items() if u != to_drop_username
             }
     return txtgen
 
