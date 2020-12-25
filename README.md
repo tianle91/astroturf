@@ -10,7 +10,7 @@ Curious how users might respond to a submission or comment? Me too.
 # Ops
 This project is developed on GCP and relies on Storage and Pub/Sub.
 
-Compute is local and runs on a 8-core device, 32Gb ram and a GTX 1080 Ti.
+Compute is local and runs on a 8-core device, 64Gb ram and a GTX 1080 Ti.
 Runs on top of Windows 10 (dev build), WSL2, Nvidia for WSL and Docker Desktop.
 
 1. Build the image. `docker build -t astroturf .`
