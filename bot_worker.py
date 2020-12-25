@@ -60,10 +60,6 @@ def format_reply(username: str, response: str) -> str:
     return reply_template.format(username=username, response=quoted_response)
 
 
-def json_dt_to_utc_datetime(s: str) -> datetime:
-    return
-
-
 def respond_to_trigger_comment(
     comment: Comment,
     reddit: Reddit,
