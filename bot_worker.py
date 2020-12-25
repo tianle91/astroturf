@@ -124,8 +124,8 @@ def respond_to_trigger_comment(
             submitted_reply = True
         except RedditAPIException as e:
             # this will eventually get through.. i think
-            print(f'Exception: {e.message}. Waiting for {sleep_wait}')
-            sleep(sleep_wait)
+            print(f'Exception: {e.message}. Waiting for 1min.')
+            sleep(60)
         if submitted_reply:
             break
     return reply_text
