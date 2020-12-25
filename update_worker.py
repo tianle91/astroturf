@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
         description='search comments by new for user.')
-    parser.add_argument('--limit', type=int, default=100)
+    parser.add_argument('--limit', type=int, default=250)
     parser.add_argument('--blocksize', type=int, default=256)
     parser.add_argument('--maxsteps', type=int, default=500)
     parser.add_argument('--forceupdate', type=bool, default=True)
