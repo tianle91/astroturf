@@ -1,15 +1,19 @@
 # Astroturf
-Curious how users might respond to a submission or comment? Me too.
-- Hosted at [http://64.137.143.175](http://64.137.143.175) sometimes (when I'm not gaming).
-- Bot responds to “what would u/xxx say” or something similar. Currently only monitors [r/AskReddit](https://www.reddit.com/r/AskReddit).
+Are you...
+- Curious how users might respond to a submission or comment?
+- Don't want to wait for a response?
+- Want a shitty bot to talk to?
 
-## Screenshots
-Check out the amazing and insightful responses!
+Look no further!
 
-### UI
+## UI
+Hosted at [http://64.137.143.175](http://64.137.143.175) sometimes (when I'm not gaming).
+
 <img src="./ui_screenshot.png" width="400">
 
-### Bot
+## Bot
+Bot responds to “what would u/xxx say” or something similar. Currently only monitors [r/AskReddit](https://www.reddit.com/r/AskReddit).
+
 <img src="./bot_screenshot.png" width="300">
 
 
