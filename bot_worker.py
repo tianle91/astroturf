@@ -141,6 +141,9 @@ if __name__ == '__main__':
     parser.add_argument('--site', type=str, default='astroturf_bot')
     args = parser.parse_args()
 
+    sleep(30)  # infer service takes some time to spin up
+    print('Ready')
+
     reddit = get_reddit(
         client, config_bucket='astroturf-dev-configs', site=args.site)
 
