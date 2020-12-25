@@ -33,9 +33,10 @@ def get_txtgen_cached_or_otherwise(username, force_update=False):
         if len(cached_txtgen.keys()) > cached_max_count:
             # pop the least used key
             min_n = min(v[1] for _, v in cached_txtgen.items())
-            for k, n in cached_txtgen:
-                if n == min_n:
-                    cached_txtgen.pop(k)
+            for username_temp in cached_txtgen:
+                _, count_temp = cached_txtgen[username_temp]
+                if count_temp == min_n:
+                    cached_txtgen.pop(username_temp)
     return txtgen
 
 
