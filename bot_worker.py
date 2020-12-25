@@ -64,7 +64,7 @@ def respond_to_trigger_comment(
     reddit: Reddit,
     submit_reply=True,
     sleep_wait=30,
-    max_wait=900,  # 15mins
+    max_wait=3600,  # 1h
     verbose=1
 ) -> None:
     """Given a trigger comment, reply to the comment with a prediction.
