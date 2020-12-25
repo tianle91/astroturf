@@ -163,7 +163,7 @@ if __name__ == '__main__':
             f'Streaming comments from {args.subreddit}. Remaining: {api_remaining}')
         if is_relevant(comment):
             respond_to_trigger_comment(comment, reddit, submit_reply=True)
-        if api_remaining < 100:
+        if api_remaining < 1:
             api_reset = reddit.auth.limits['reset_timestamp']
             while time() <= api_reset:
                 print(
