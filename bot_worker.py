@@ -154,15 +154,13 @@ if __name__ == '__main__':
     parser.add_argument('--site', type=str, default='astroturf_bot')
     args = parser.parse_args()
 
-    sleep(30)  # infer service takes some time to spin up
-    print('Ready')
-
     reddit = get_reddit(
         client, config_bucket='astroturf-dev-configs', site=args.site)
 
-    url = 'https://www.reddit.com/r/AskReddit/comments/kjbam6/youre_78_years_old_youve_reached_the_end_of_your/ggxfsmb'
+    sleep(30)  # infer service takes some time to spin up
+    
+    print('Ready')
     while True:
-        print('Listening')
         response = subscriber.pull(
             request={"subscription": subscription_path, "max_messages": 1})
 

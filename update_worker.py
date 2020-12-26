@@ -47,8 +47,8 @@ if __name__ == '__main__':
 
     reddit = get_reddit(client, 'astroturf-dev-configs', site=args.site)
 
+    print ('Ready')
     while True:
-        print('Listening')
         response = subscriber.pull(
             request={"subscription": subscription_path, "max_messages": 1})
 
