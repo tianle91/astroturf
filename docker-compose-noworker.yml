@@ -19,7 +19,7 @@ services:
     entrypoint: python -u bot_worker.py --site astroturf_bot
     deploy:
       mode: replicated
-      replicas: 5
+      replicas: 2
       restart_policy:
           condition: on-failure
           max_attempts: 3
