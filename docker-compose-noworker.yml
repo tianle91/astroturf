@@ -1,22 +1,33 @@
 version: '3'
 services:
+
   ui:
     image: astroturf
     ports:
       - "5000:5000"
     entrypoint: gunicorn -w 2 -b 0.0.0.0:5000 ui:app
+    deploy:
+      restart_policy:
+          condition: on-failure
+
   bot:
     image: astroturf
     entrypoint: python -u bot_service.py --subreddit askreddit --site astroturf_bot
+
   botworker:
     image: astroturf
     entrypoint: python -u bot_worker.py --site astroturf_bot
     deploy:
       mode: replicated
       replicas: 5
+      restart_policy:
+          condition: on-failure
+          max_attempts: 3
+
   infer:
     image: astroturf
     entrypoint: uvicorn --host 0.0.0.0 --port 8000 --workers 1 infer_service:app
+
   update:
     image: astroturf
     volumes:
