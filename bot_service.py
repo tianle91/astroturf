@@ -57,6 +57,7 @@ if __name__ == '__main__':
     pub_futures = []
     for comment in reddit.subreddit(args.subreddit).stream.comments(skip_existing=True):
         if is_relevant(comment):
+            print (f'Relevant!\ncomment.body:{comment.body}\ncomment.permalink:{comment.permalink}')
             future = publisher.publish(
                 topic_path,
                 data=str.encode('https://www.reddit.com/'+comment.permalink)
