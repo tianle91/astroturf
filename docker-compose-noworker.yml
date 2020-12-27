@@ -13,6 +13,9 @@ services:
   bot:
     image: astroturf
     entrypoint: python -u bot_service.py --subreddit askreddit --site astroturf_bot
+    deploy:
+      restart_policy:
+          condition: on-failure
 
   botworker:
     image: astroturf
@@ -22,7 +25,6 @@ services:
       replicas: 5
       restart_policy:
           condition: on-failure
-          max_attempts: 3
 
   infer:
     image: astroturf
