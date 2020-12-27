@@ -63,7 +63,10 @@ if __name__ == '__main__':
         pub_futures = []
         if len(ack_ids) > 0 and username is not None:
             pub_futures.append(get_future_from_publish_status_message(
-                username, status='received update request'))
+                username, 
+                status='received update request', 
+                topic_path=topic_path_status
+            ))
             # there's something to do! ack it to remove from queue.
             subscriber.acknowledge(
                 request={"subscription": subscription_path, "ack_ids": ack_ids})
@@ -71,15 +74,27 @@ if __name__ == '__main__':
             refreshed_comment_ids = refresh_user_comments_cloud(
                 username, reddit, limit=args.limit)
             pub_futures.append(get_future_from_publish_status_message(
-                username, status='refresh comments success', topic_path=topic_path_status))
+                username, 
+                status='refresh comments success',
+                topic_path=topic_path_status
+            ))
             if len(refreshed_comment_ids) > 0:
                 pub_futures.append(get_future_from_publish_status_message(
-                    username, status='', topic_path=topic_path_train))
+                    username, 
+                    status='', 
+                    topic_path=topic_path_train
+                ))
                 pub_futures.append(get_future_from_publish_status_message(
-                    username, status='submitted train request', topic_path=topic_path_status))
+                    username, 
+                    status='submitted train request', 
+                    topic_path=topic_path_status
+                ))
             else:
                 pub_futures.append(get_future_from_publish_status_message(
-                    username, status='no new comments', topic_path=topic_path_status))
+                    username, 
+                    status='no new comments', 
+                    topic_path=topic_path_status
+                ))
 
         message_ids = [f.result() for f in pub_futures]
         if len(message_ids) > 0:
