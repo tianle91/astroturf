@@ -43,6 +43,7 @@ Source code at [tianle91/astroturf](https://github.com/tianle91/astroturf) (curr
 def get_username_from_comment_body(s: str) -> Optional[str]:
     """Return {username} when given string of form * u/{username} *.
     """
+    username = None
     if 'https://www.reddit.com/u/' in s:
         # https://www.reddit.com/u/{username}/
         prefix = 'https://www.reddit.com/u/'
@@ -50,11 +51,15 @@ def get_username_from_comment_body(s: str) -> Optional[str]:
     else:
         # <whitespace> u/{username} <whitespace>
         # <whitespace> /u/{username} <whitespace>
-        username_candidates = [
-            subs.replace('u/', '')
-            for subs in s.lower().split().strip('/') if subs.startswith('u/')
-        ]
-        username = username_candidates[0] if len(username_candidates) > 0 else None
+        found_a_username = False
+        for word in s.lower().split():
+        	if found_a_username:
+        		break
+        	for prefix in ['u/', '/u/']:
+        		if word.startswith(prefix):
+        			username = word.replace(prefix, '')
+        			found_a_username = True
+        			break
     if username is not None:
         return username.lower().strip()
 
