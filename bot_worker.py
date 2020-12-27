@@ -55,7 +55,8 @@ def get_username_from_comment_body(s: str) -> Optional[str]:
             for subs in s.lower().split().strip('/') if subs.startswith('u/')
         ]
         username = username_candidates[0] if len(username_candidates) > 0 else None
-    return username.lower().strip() if username is not None
+    if username is not None:
+        return username.lower().strip()
 
 
 def format_reply(username: str, response: str) -> str:
