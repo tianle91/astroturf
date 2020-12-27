@@ -43,6 +43,7 @@ Source code at [tianle91/astroturf](https://github.com/tianle91/astroturf) (curr
 def get_username_from_comment_body(s: str) -> Optional[str]:
     """Return {username} when given string of form * u/{username} *.
     """
+    # TODO: unit test
     username = None
     if 'https://www.reddit.com/u/' in s:
         # https://www.reddit.com/u/{username}/
@@ -79,6 +80,7 @@ def respond_to_trigger_comment(
 ) -> None:
     """Given a trigger comment, reply to the comment with a prediction.
     """
+    # TODO: refactor
     if verbose > 0:
         print(
             f'Triggered comment body: {comment.body} url: {comment.permalink}')
