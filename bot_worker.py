@@ -1,6 +1,7 @@
 import json
 from datetime import datetime, timedelta, timezone
 from time import sleep
+from typing import Optional
 
 import requests
 from google.cloud import pubsub_v1, storage
@@ -39,7 +40,7 @@ Source code at [tianle91/astroturf](https://github.com/tianle91/astroturf) (curr
 """
 
 
-def get_username_from_comment_body(s: str):
+def get_username_from_comment_body(s: str) -> Optional[str]:
     """Return {username} when given string of form * u/{username} *.
     """
     if 'https://www.reddit.com/u/' in s:
@@ -48,11 +49,13 @@ def get_username_from_comment_body(s: str):
         username = s[s.find(prefix)+len(prefix):].split('/')[0]
     else:
         # <whitespace> u/{username} <whitespace>
-        username = [
+        # <whitespace> /u/{username} <whitespace>
+        username_candidates = [
             subs.replace('u/', '')
-            for subs in s.lower().split() if subs.startswith('u/')
-        ][0]
-    return username.lower().strip()
+            for subs in s.lower().split().strip('/') if subs.startswith('u/')
+        ]
+        username = username_candidates[0] if len(username_candidates) > 0 else None
+    return username.lower().strip() if username is not None
 
 
 def format_reply(username: str, response: str) -> str:
@@ -74,7 +77,7 @@ def respond_to_trigger_comment(
         print(
             f'Triggered comment body: {comment.body} url: {comment.permalink}')
     username = get_username_from_comment_body(comment.body)
-    if is_invalid(username):
+    if is_invalid(username) or username is None:
         print(f'Invalid username parsed: {username}')
         return None
 
