@@ -140,8 +140,11 @@ def respond_to_trigger_comment(
         print(f'Reply text:\n{reply_text}')
 
     # wait to reply
-    while submit_reply:
-        submitted_reply = False
+    submitted_reply = False
+    while submit_reply and not submitted_reply:
+        if wait >= max_wait:
+            print(f'Waiting to submit reply timed out: {wait} >= {max_wait}')
+            break
         try:
             comment.reply(reply_text)
             submitted_reply = True
@@ -150,15 +153,11 @@ def respond_to_trigger_comment(
                 print(f'{sube.error_type}: {sube.message}')
                 if 'has been deleted' in sube.message:
                     print('Triggering comment has been deleted')
-                    break
-            if wait >= max_wait:
-                print(f'Waiting to submit reply timed out: {wait} >= {max_wait}')
-                break
+                    submit_reply = False
+                    return reply_text
             print(f'Waiting to submit reply: {wait} >= {max_wait} sleep(60)')
             sleep(60)
             wait += sleep_wait
-        if submitted_reply:
-            break
     return reply_text
 
 
