@@ -10,6 +10,8 @@
     "sub_update_request": "sub_update_request",
     "pub_update_status": "pub_update_status",
     "sub_update_status": "sub_update_status",
+    "pub_train_request": "pub_train_request",
+    "sub_train_request": "sub_train_request",
     "pub_bot_response_request": "pub_bot_response_request",
     "sub_bot_response_request": "sub_bot_response_request"
 }

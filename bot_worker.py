@@ -33,8 +33,7 @@ reply_template = """
 {response}
 
 ---
-I'm a DistilGPT2 bot finetuned using user comments with 
-[Huggingface's Transformers](https://github.com/huggingface/transformers).
+I'm a DistilGPT2 model finetuned with user comments using [Huggingface's Transformers](https://github.com/huggingface/transformers).
 Play around with the UI at [64.137.143.175](http://64.137.143.175).
 Source code at [tianle91/astroturf](https://github.com/tianle91/astroturf) (currently private).
 """
@@ -147,9 +146,17 @@ def respond_to_trigger_comment(
             comment.reply(reply_text)
             submitted_reply = True
         except RedditAPIException as e:
-            # this will eventually get through.. i think
-            print(f'Exception: {e.message}. Waiting for 1min.')
+            for sube in e.items:
+                print(f'{sube.error_type}: {sube.message}')
+                if 'has been deleted' in sube.message:
+                    print('Triggering comment has been deleted')
+                    break
+            if wait >= max_wait:
+                print(f'Waiting to submit reply timed out: {wait} >= {max_wait}')
+                break
+            print(f'Waiting to submit reply: {wait} >= {max_wait} sleep(60)')
             sleep(60)
+            wait += sleep_wait
         if submitted_reply:
             break
     return reply_text

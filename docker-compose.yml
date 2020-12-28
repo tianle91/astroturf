@@ -39,3 +39,12 @@ services:
   updateworker:
     image: astroturf
     entrypoint: python -u update_worker.py --site astroturf_update_worker
+    deploy:
+      mode: replicated
+      replicas: 5
+      restart_policy:
+          condition: on-failure
+
+  trainworker:
+    image: astroturf
+    entrypoint: python -u train_worker.py

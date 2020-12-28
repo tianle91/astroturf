@@ -44,7 +44,10 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
         description='bot service for astroturf.')
-    parser.add_argument('--subreddit', type=str, default='AskReddit')
+    parser.add_argument(
+        '--subreddit', type=str, default='AskReddit',
+        help='https://praw.readthedocs.io/en/latest/code_overview/models/subreddit.html'
+    )
     parser.add_argument('--site', type=str, default='astroturf_bot')
     args = parser.parse_args()
 
@@ -57,6 +60,7 @@ if __name__ == '__main__':
     pub_futures = []
     for comment in reddit.subreddit(args.subreddit).stream.comments(skip_existing=True):
         if is_relevant(comment):
+            print (f'Relevant!\ncomment.body:{comment.body}\ncomment.permalink:{comment.permalink}')
             future = publisher.publish(
                 topic_path,
                 data=str.encode('https://www.reddit.com/'+comment.permalink)

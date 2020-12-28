@@ -34,7 +34,7 @@ Ok so mostly this is how it works.
 	- All-in-one (testing only). `docker-compose up`
 	- For WSL and GPU. https://www.docker.com/blog/wsl-2-gpu-support-is-here/
 		- `docker-compose -f docker-compose-noworker.yml up`
-		- `docker run -it --gpus=all astroturf python -u update_worker.py --site astroturf_update_worker`
+		- `docker run -it --gpus=all astroturf python -u train_worker.py`
 
 ## Configs
 Some configs are stored in a bucket.
