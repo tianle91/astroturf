@@ -22,7 +22,7 @@ services:
     entrypoint: python -u bot_worker.py --site astroturf_bot
     deploy:
       mode: replicated
-      replicas: 3
+      replicas: 5
       restart_policy:
           condition: on-failure
 
@@ -41,7 +41,7 @@ services:
     entrypoint: python -u update_worker.py --site astroturf_update_worker
     deploy:
       mode: replicated
-      replicas: 3
+      replicas: 5
       restart_policy:
           condition: on-failure
 
