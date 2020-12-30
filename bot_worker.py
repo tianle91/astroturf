@@ -34,9 +34,9 @@ reply_template = """
 
 ---
 I'm a DistilGPT2 model finetuned with user comments using [Huggingface's Transformers](https://github.com/huggingface/transformers).
-Play around with the UI at [64.137.143.175](http://64.137.143.175).
 Source code at [tianle91/astroturf](https://github.com/tianle91/astroturf) (currently private).
 """
+# Play around with the UI at [64.137.143.175](http://64.137.143.175).
 
 
 def get_username_from_comment_body(s: str) -> Optional[str]:
