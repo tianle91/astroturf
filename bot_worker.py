@@ -6,10 +6,10 @@ from typing import Optional
 import requests
 from google.cloud import pubsub_v1, storage
 from praw.objector import RedditAPIException
-from praw.reddit import Comment, Reddit
+from praw.reddit import Comment, Reddit, Redditor
 
 from astroturf.prawtools import get_context
-from status import get_trained_usernames, is_invalid, has_comments
+from status import get_trained_usernames, has_comments, is_invalid
 
 # some clients and variables
 client = storage.Client()
@@ -28,7 +28,7 @@ subscription_path = subscriber.subscription_path(
 
 
 reply_template = """
-[u/{username}](https://reddit-user-analyser.netlify.app/#{username}) might reply:
+In response to [this]({url}), [u/{username}](https://reddit-user-analyser.netlify.app/#{username}) might reply:
 
 {response}
 
@@ -53,20 +53,24 @@ def get_username_from_comment_body(s: str) -> Optional[str]:
         # <whitespace> /u/{username} <whitespace>
         found_a_username = False
         for word in s.lower().split():
-        	if found_a_username:
-        		break
-        	for prefix in ['u/', '/u/']:
-        		if word.startswith(prefix):
-        			username = word.replace(prefix, '')
-        			found_a_username = True
-        			break
+            if found_a_username:
+                break
+            for prefix in ['u/', '/u/']:
+                if word.startswith(prefix):
+                    username = word.replace(prefix, '')
+                    found_a_username = True
+                    break
     if username is not None:
         return username.lower().strip()
 
 
-def format_reply(username: str, response: str) -> str:
+def format_reply(username: str, response: str, url: str) -> str:
     quoted_response = '\n'.join(['> ' + s for s in response.split('\n')])
-    return reply_template.format(username=username, response=quoted_response)
+    return reply_template.format(
+        username=username,
+        url=url,
+        response=quoted_response
+    )
 
 
 def respond_to_trigger_comment(
@@ -82,14 +86,17 @@ def respond_to_trigger_comment(
     # TODO: refactor
     if verbose > 0:
         print(
-            f'Triggered comment body: {comment.body} url: {comment.permalink}')
+            f'Triggered comment body: {comment.body} by {comment.author.name})')
+        print(f'url: {comment.permalink}')
+
+    # get username for simulation
     username = get_username_from_comment_body(comment.body)
     if is_invalid(username) or username is None:
         print(f'Invalid username parsed: {username}')
         return None
     if not has_comments(username):
-    	print(f'No comments for username: {username}')
-    	return None
+        print(f'No comments for username: {username}')
+        return None
 
     # status on the user
     updateresponse = requests.get('{update_endpoint}/status/{username}'.format(
@@ -135,32 +142,33 @@ def respond_to_trigger_comment(
 
     # get response from infer_endpoint
     inferresponse = requests.get('{infer_endpoint}/infer/{username}?url={url}'.format(
-        infer_endpoint=infer_endpoint, username=username, url=url
+        infer_endpoint=infer_endpoint,
+        username=username,
+        url=url
     )).json()
     # format and reply
-    reply_text = format_reply(username, inferresponse['response'])
+    reply_text = format_reply(
+        username=username,
+        response=inferresponse['response'],
+        url=url
+    )
     if verbose > 0:
         print(f'Reply text:\n{reply_text}')
 
-    # wait to reply
-    submitted_reply = False
-    while submit_reply and not submitted_reply:
-        if wait >= max_wait:
-            print(f'Waiting to submit reply timed out: {wait} >= {max_wait}')
-            break
+    # message triggering user
+    if submit_reply:
+        trigger_redditor: Redditor = comment.author
         try:
-            comment.reply(reply_text)
-            submitted_reply = True
+            trigger_redditor.message(
+                subject=f'Simulated response for u/{username}',
+                message=reply_text
+            )
+            print(f'Messaged {trigger_redditor.name}')
         except RedditAPIException as e:
             for sube in e.items:
                 print(f'RedditAPIException. {sube.error_type}: {sube.message}')
-                if 'has been deleted' in sube.message:
-                    print('Will not reply.')
-                    submit_reply = False
-                    return reply_text
-            print(f'Waiting to submit reply: {wait} >= {max_wait} sleep(60)')
-            sleep(60)
-            wait += sleep_wait
+            print(f'Did not message {trigger_redditor.name} due to exceptions')
+
     return reply_text
 
 
@@ -178,7 +186,7 @@ if __name__ == '__main__':
         client, config_bucket='astroturf-dev-configs', site=args.site)
 
     sleep(30)  # infer service takes some time to spin up
-    
+
     print('Ready')
     while True:
         response = subscriber.pull(
