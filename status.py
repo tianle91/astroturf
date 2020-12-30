@@ -63,6 +63,12 @@ def is_invalid(username: str) -> bool:
     return False
 
 
+def has_comments(username: str) -> bool:
+    for comment in reddit.redditor(username).comments.new():
+        return True
+    return False
+
+
 def get_trained_usernames() -> List[str]:
     resl = []
     for blob in client.list_blobs(model_bucket, prefix=''):

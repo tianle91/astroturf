@@ -9,7 +9,7 @@ from praw.objector import RedditAPIException
 from praw.reddit import Comment, Reddit
 
 from astroturf.prawtools import get_context
-from status import get_trained_usernames, is_invalid
+from status import get_trained_usernames, is_invalid, has_comments
 
 # some clients and variables
 client = storage.Client()
@@ -87,6 +87,9 @@ def respond_to_trigger_comment(
     if is_invalid(username) or username is None:
         print(f'Invalid username parsed: {username}')
         return None
+    if not has_comments(username):
+    	print(f'No comments for username: {username}')
+    	return None
 
     # status on the user
     updateresponse = requests.get('{update_endpoint}/status/{username}'.format(
