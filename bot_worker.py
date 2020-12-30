@@ -150,9 +150,9 @@ def respond_to_trigger_comment(
             submitted_reply = True
         except RedditAPIException as e:
             for sube in e.items:
-                print(f'{sube.error_type}: {sube.message}')
+                print(f'RedditAPIException. {sube.error_type}: {sube.message}')
                 if 'has been deleted' in sube.message:
-                    print('Triggering comment has been deleted')
+                    print('Will not reply.')
                     submit_reply = False
                     return reply_text
             print(f'Waiting to submit reply: {wait} >= {max_wait} sleep(60)')
