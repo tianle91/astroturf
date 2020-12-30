@@ -28,12 +28,15 @@ subscription_path = subscriber.subscription_path(
 
 
 reply_template = """
-In response to [this]({url}), [u/{username}](https://reddit-user-analyser.netlify.app/#{username}) might reply:
+This was triggered by your [comment]({triggering_comment_url}).
+In response to [this]({url}),
+[u/{username}](https://reddit-user-analyser.netlify.app/#{username}) might reply:
 
 {response}
 
 ---
-I'm a DistilGPT2 model finetuned with user comments using [Huggingface's Transformers](https://github.com/huggingface/transformers).
+I'm a DistilGPT2 model finetuned with user comments using 
+[Huggingface's Transformers](https://github.com/huggingface/transformers).
 Source code at [tianle91/astroturf](https://github.com/tianle91/astroturf) (currently private).
 """
 # Play around with the UI at [64.137.143.175](http://64.137.143.175).
@@ -64,12 +67,13 @@ def get_username_from_comment_body(s: str) -> Optional[str]:
         return username.lower().strip()
 
 
-def format_reply(username: str, response: str, url: str) -> str:
+def format_reply(username: str, response: str, url: str, triggering_comment_url: str) -> str:
     quoted_response = '\n'.join(['> ' + s for s in response.split('\n')])
     return reply_template.format(
         username=username,
         url=url,
-        response=quoted_response
+        response=quoted_response,
+        triggering_comment_url=triggering_comment_url
     )
 
 
@@ -150,7 +154,8 @@ def respond_to_trigger_comment(
     reply_text = format_reply(
         username=username,
         response=inferresponse['response'],
-        url=url
+        url=url,
+        triggering_comment_url='https://www.reddit.com'+comment.permalink
     )
     if verbose > 0:
         print(f'Reply text:\n{reply_text}')
