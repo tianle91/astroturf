@@ -38,7 +38,7 @@ services:
 
   updateworker:
     image: astroturf
-    entrypoint: python -u update_worker.py --limit 100 --site astroturf_update_worker
+    entrypoint: python -u update_worker.py --limit 200 --site astroturf_update_worker
     deploy:
       mode: replicated
       replicas: 5
