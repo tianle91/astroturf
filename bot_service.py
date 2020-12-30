@@ -27,7 +27,8 @@ trigger_prefixes = ['what would',
                     'how might']
 trigger_suffixes = ['say',
                     'respond',
-                    'think']
+                    'think',
+                    'reply']
 
 
 def is_relevant(comment: Comment) -> bool:
