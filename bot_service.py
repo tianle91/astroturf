@@ -22,7 +22,9 @@ topic_path = publisher.topic_path(
 trigger_prefixes = ['what would',
                     'what will',
                     'what might',
-                    'how may']
+                    'how would',
+                    'how will',
+                    'how might']
 trigger_suffixes = ['say',
                     'respond',
                     'think']
