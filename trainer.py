@@ -51,7 +51,8 @@ def refresh_finetuned_cloud(
         refresh_local=False
     )
     if not len(downloaded_data_fnames) > 0:
-        raise ValueError('no data for user_name: {}'.format(user_name))
+        print (f'No data for user_name: {user_name}')
+        return None
 
     # run the finetuning. this guy dumps model files in os.path.join(local_model_path_user, 'model')
     dump_finetuned(
