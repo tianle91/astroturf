@@ -3,6 +3,7 @@ import json
 from google.cloud import pubsub_v1, storage
 
 from scraper import refresh_user_comments_cloud
+from status import get_trained_usernames
 
 # some clients and variables
 client = storage.Client()
@@ -78,7 +79,7 @@ if __name__ == '__main__':
                 status='refresh comments success',
                 topic_path=topic_path_status
             ))
-            if len(refreshed_comment_ids) > 0:
+            if len(refreshed_comment_ids) > 0 or not username in get_trained_usernames():
                 pub_futures.append(get_future_from_publish_status_message(
                     username, 
                     status='', 
