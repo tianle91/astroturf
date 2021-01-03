@@ -7,7 +7,7 @@ Are you...
 Look no further!
 
 ## UI
-Hosted at [http://64.137.143.175](http://64.137.143.175) sometimes (when I'm not gaming).
+Hosted at [http://206.253.140.189](http://206.253.140.189) sometimes (when I'm not gaming).
 
 <img src="./ui_screenshot.png" width="400">
 
