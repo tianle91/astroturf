@@ -90,7 +90,7 @@ def respond_to_trigger_comment(
     # TODO: refactor
     if verbose > 0:
         print(
-            f'Triggered comment body: {comment.body} by {comment.author.name})')
+            f'Triggered comment body: {comment.body} by {comment.author.name}')
         print(f'url: {comment.permalink}')
 
     # get username for simulation
