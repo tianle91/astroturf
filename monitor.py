@@ -11,7 +11,14 @@ if __name__ == '__main__':
         sleep(1)
         with sqlite3.connect(requests_db) as conn:
             df = pd.read_sql(f'''
-            SELECT *
+            SELECT
+                id,
+                author,
+                created_utc,
+                target_username,
+                done_scraping,
+                done_training,
+                done_responding
             FROM {table_name}
             WHERE done_scraping <= 0
                 OR done_training <= 0
@@ -19,12 +26,5 @@ if __name__ == '__main__':
             ORDER BY created_utc DESC
             LIMIT 10
             ''', conn)
-            cols = [
-                'permalink',
-                'done_scraping',
-                'done_training',
-                'done_responding'
-            ]
             for i, row in df.iterrows():
-                print('\n'.join([f'{c}:{row[c]}' for c in cols]))
-                print('\n')
+                print(' '.join([f'{c}: {row[c]}' for c in df.columns]))
