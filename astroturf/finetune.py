@@ -71,6 +71,10 @@ def get_dataset(file_path, tokenizer: PreTrainedTokenizer, block_size: int = Non
     )
 
 
+class NoInputError(Exception):
+    pass
+
+
 def dump_finetuned(input_jsons_path: str, output_dump_path: str,
                    block_size: int = 16, max_steps: int = 50,
                    learning_rate: float = 1e-4) -> str:
@@ -90,8 +94,9 @@ def dump_finetuned(input_jsons_path: str, output_dump_path: str,
     print(f'inputpath: {input_jsons_path} --> outputpath: {output_dump_path}')
 
     fnames = glob(os.path.join(input_jsons_path, '*.json'))
-    assert len(fnames) > 0, 'check inputpath: {} is not empty!'.format(
-        input_jsons_path)
+    if len(fnames) > 0:
+        raise NoInputError(
+            f'Check input_jsons_path: {input_jsons_path} has jsons!')
 
     # massage valid_size
     valid_prop = .1
