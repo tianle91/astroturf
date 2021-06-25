@@ -1,101 +1,48 @@
-import json
 import os
+import sqlite3
+from time import sleep
 
-from google.cloud import storage
+import pandas as pd
 
-from astroturf.finetune import dump_finetuned, model_output_fnames
-from gcp_utils import (download_all_cloud_files_with_prefix,
-                       upload_all_local_files_with_prefix)
-
-client = storage.Client()
-config_bucket = client.bucket('astroturf-dev-configs')
-path_config = json.loads(config_bucket.blob(
-    'pathConfig.json').download_as_string())
-data_bucket = client.bucket(path_config['data_bucket'])
-model_bucket = client.bucket(path_config['model_bucket'])
-
-# some local variables
-local_data_path = '/tmp/astroturf/data/'
-local_model_path = '/tmp/astroturf/models/'
-
-
-def refresh_finetuned_cloud(
-        user_name,
-        blocksize=16,
-        maxsteps=10,
-        learning_rate=1e-4,
-        force_update=False
-) -> str:
-    """Download all comments, finetunes on them and then upload finetuned model.
-    """
-    # set up local directories
-    local_model_path_user = os.path.join(local_model_path, user_name)
-    local_data_path_user = os.path.join(local_data_path, user_name)
-    os.makedirs(local_model_path_user, exist_ok=True)
-    os.makedirs(local_data_path_user, exist_ok=True)
-
-    # set up some output flags for completion check
-    output_flags = [os.path.join(user_name, s) for s in model_output_fnames]
-
-    # skip if not force_update and model exists
-    if not force_update and all(model_bucket.blob(s).exists() for s in output_flags):
-        print('Skip refresh_finetuned due to existing output_flags:\n{}'.format(
-            '\n'.join(output_flags)))
-        return user_name
-    # download files for training
-    downloaded_data_fnames = download_all_cloud_files_with_prefix(
-        local_prefix=local_data_path_user,
-        cloud_bucket=data_bucket.name,
-        cloud_prefix=user_name,
-        client=client,
-        refresh_local=False
-    )
-    if not len(downloaded_data_fnames) > 0:
-        print (f'No data for user_name: {user_name}')
-        return None
-
-    # run the finetuning. this guy dumps model files in os.path.join(local_model_path_user, 'model')
-    dump_finetuned(
-        local_data_path_user, local_model_path_user,
-        blocksize=blocksize, max_steps=maxsteps,
-        learning_rate=learning_rate
-    )
-
-    # upload results
-    _ = upload_all_local_files_with_prefix(
-        os.path.join(local_model_path_user, 'model'),
-        model_bucket.name, os.path.join(user_name, 'model'),
-        client
-    )
-    return user_name
-
+from astroturf.finetune import NoInputError, dump_finetuned
 
 if __name__ == '__main__':
 
-    import argparse
+    db_name = 'requests.db'
+    table_name = 'comments'
+    data_prefix = 'data/comment'
+    model_prefix = 'model/user'
 
-    parser = argparse.ArgumentParser(description='finetune on user comments.')
-    parser.add_argument('--users', type=str, nargs='*')
-    parser.add_argument('--blocksize', type=int, default=16)
-    parser.add_argument('--maxsteps', type=int, default=10)
-    parser.add_argument('--learning-rate', type=float, default=1e-4)
-    parser.add_argument('--forceupdate', type=bool, default=False)
-    args = parser.parse_args()
+    sleep(3)
 
-    # list of users
-    if args.users is None:
-        with open('users.txt') as f:
-            users = f.read().split()
-    else:
-        users = list(args.users)
-
-    for user_name in users:
-        print('user_name: {} running...'.format(user_name))
-        ran = refresh_finetuned_cloud(
-            user_name,
-            blocksize=args.blocksize,
-            maxsteps=args.maxsteps,
-            learning_rate=args.learning_rate,
-            force_update=args.forceupdate
-        )
-        print('user_name: {} ran: {}'.format(user_name, ran))
+    while True:
+        with sqlite3.connect(db_name) as conn:
+            todo = pd.read_sql(f'''
+            SELECT DISTINCT target_username 
+            FROM {table_name} 
+            WHERE done_scraping > 0
+                AND done_training <= 0
+            ''', conn)
+        if len(todo) > 0:
+            for user_name in todo['target_username']:
+                local_data_path_user = os.path.join(data_prefix, user_name)
+                local_model_path_user = os.path.join(model_prefix, user_name)
+                try:
+                    dump_finetuned(
+                        local_data_path_user,
+                        local_model_path_user,
+                        block_size=16,
+                        max_steps=10,
+                        learning_rate=1e-4,
+                    )
+                except NoInputError as e:
+                    print(e)
+                with sqlite3.connect(db_name) as conn:
+                    conn.execute(f'''
+                    UPDATE {table_name}
+                    SET done_training = 1
+                    WHERE target_username = '{user_name}'
+                    ''')
+                    conn.commit()
+        else:
+            sleep(1)

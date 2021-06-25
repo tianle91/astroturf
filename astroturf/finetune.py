@@ -71,26 +71,32 @@ def get_dataset(file_path, tokenizer: PreTrainedTokenizer, block_size: int = Non
     )
 
 
-def dump_finetuned(inputpath: str, outputpath: str,
-                   blocksize: int = 16, max_steps: int = 50,
+class NoInputError(Exception):
+    pass
+
+
+def dump_finetuned(input_jsons_path: str, output_dump_path: str,
+                   block_size: int = 16, max_steps: int = 50,
                    learning_rate: float = 1e-4) -> str:
     '''Finetune a LM and dump it locally.
 
     Args:
-        inputpath: *.json here will be used to finetune.
+        input_jsons_path: *.json here will be used to finetune.
             The *.json should be outputs of astroturf.prawtools.make_package_training.
-        outputpath: local path to dump finetuned model.
+        output_dump_path: local path to dump finetuned model.
             Passed to TrainingArguments as output_dir.        
-        blocksize: ...
+        block_size: ...
         max_steps: ...
         learning_rate: ...
     '''
     print(
-        f'blocksize: {blocksize}, max_steps: {max_steps}, learning_rate: {learning_rate}')
-    print(f'inputpath: {inputpath} --> outputpath: {outputpath}')
+        f'blocksize: {block_size}, max_steps: {max_steps}, learning_rate: {learning_rate}')
+    print(f'inputpath: {input_jsons_path} --> outputpath: {output_dump_path}')
 
-    fnames = glob(os.path.join(inputpath, '*.json'))
-    assert len(fnames) > 0, 'check inputpath: {} is not empty!'.format(inputpath)
+    fnames = glob(os.path.join(input_jsons_path, '*.json'))
+    if len(fnames) > 0:
+        raise NoInputError(
+            f'Check input_jsons_path: {input_jsons_path} has jsons!')
 
     # massage valid_size
     valid_prop = .1
@@ -100,7 +106,7 @@ def dump_finetuned(inputpath: str, outputpath: str,
     valid_size = min(20, valid_size)
 
     # write train/test to a path
-    modeldatapath = os.path.join(outputpath, 'data')
+    modeldatapath = os.path.join(output_dump_path, 'data')
     os.makedirs(modeldatapath, exist_ok=True)
     fnames_shuffled = [fnames[i] for i in shuffled_indices]
     fnames_test = fnames_shuffled[:valid_size]
@@ -111,11 +117,11 @@ def dump_finetuned(inputpath: str, outputpath: str,
     write_to_text(fnames_test, file_path_test)
 
     # model training
-    modeloutputpath = os.path.join(outputpath, 'model')
+    modeloutputpath = os.path.join(output_dump_path, 'model')
     train_dataset = get_dataset(
-        file_path_train, tokenizer=tokenizer, block_size=blocksize)
+        file_path_train, tokenizer=tokenizer, block_size=block_size)
     test_dataset = get_dataset(
-        file_path_test, tokenizer=tokenizer, block_size=blocksize)
+        file_path_test, tokenizer=tokenizer, block_size=block_size)
     data_collator = DataCollatorForLanguageModeling(
         tokenizer=tokenizer, mlm=False)
     training_args = TrainingArguments(
