@@ -71,6 +71,7 @@ ipython_config.py
 # data
 data/*
 model/*
+requests.db
 
 # tensorboard
 log/*
