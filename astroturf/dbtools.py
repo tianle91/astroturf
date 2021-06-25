@@ -8,6 +8,7 @@ def initialize_table(db_name, table_name):
             CREATE TABLE {table_name} (
                 id TEXT,
                 author TEXT,
+                created_utc REAL,
                 body TEXT,
                 permalink TEXT,
                 target_username TEXT,
