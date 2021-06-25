@@ -68,24 +68,15 @@ ipython_config.py
 # Environments
 .venv
 
-# config
-praw.ini
-
 # data
 data/*
-models/*
+model/*
 
 # tensorboard
 log/*
 
 # lint
 .DS_Store
-.gcloudignore
 
-# service account json
-astroturf-update.json
-astroturf-ui.json
+# secrets
 *.ini
-
-# pycharm
-.idea/*
