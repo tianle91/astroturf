@@ -4,7 +4,7 @@ from praw import Reddit
 from praw.models import Comment, Submission
 
 
-def get_reddit(path: str = 'praw.ini', site: str = 'HotStickyBalls') -> Reddit:
+def get_reddit(path: str = 'praw.ini', site: str = 'astroturf_bot') -> Reddit:
     with open(path) as f:
         config = configparser.ConfigParser()
         config.read_string(f.read())
