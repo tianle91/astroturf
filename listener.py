@@ -60,12 +60,10 @@ if __name__ == '__main__':
     db_name = 'requests.db'
     table_name = 'comments'
 
-    initialize_table(db_name=db_name,table_name=table_name)
+    initialize_table(db_name=db_name, table_name=table_name)
 
     for comment in reddit.subreddit(subreddit).stream.comments(skip_existing=True):
-        comment: Comment = comment
         if is_relevant(comment):
-
             # get parent_permalink
             parent_comment, submission = get_context(comment, reddit)
             if parent_comment is not None:
@@ -76,6 +74,8 @@ if __name__ == '__main__':
             target_username = get_username_from_comment_body(comment.body)
             print(
                 f'comment.id:{comment.id}\n'
+                f'comment.author.name:{comment.author.name}\n'
+                f'comment.created_utc:{comment.created_utc}\n'
                 f'comment.body:{comment.body}\n'
                 f'comment.permalink:{comment.permalink}\n'
                 f'target_username:{target_username}\n'
@@ -89,6 +89,7 @@ if __name__ == '__main__':
                 new_request_df = pd.DataFrame([{
                     'id': comment.id,
                     'author': comment.author.name,
+                    'created_utc': comment.created_utc,
                     'body': comment.body,
                     'permalink': comment.permalink,
                     'target_username': target_username,
