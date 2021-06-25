@@ -64,46 +64,46 @@ if __name__ == '__main__':
 
     for comment in reddit.subreddit(subreddit).stream.comments(skip_existing=True):
         if is_relevant(comment):
-            # get parent_permalink
-            parent_comment, submission = get_context(comment, reddit)
-            if parent_comment is not None:
-                target_permalink = parent_comment.permalink
-            else:
-                target_permalink = submission.permalink
-
             target_username = get_username_from_comment_body(comment.body)
-            print(
-                f'comment.id:{comment.id}\n'
-                f'comment.author.name:{comment.author.name}\n'
-                f'comment.created_utc:{comment.created_utc}\n'
-                f'comment.body:{comment.body}\n'
-                f'comment.permalink:{comment.permalink}\n'
-                f'target_username:{target_username}\n'
-                f'target_permalink:{target_permalink}'
-            )
-            with sqlite3.connect(db_name) as conn:
-                conn.execute(f'''
-                DELETE FROM {table_name} WHERE id = '{comment.id}'
-                ''')
-                conn.commit()
-                new_request_df = pd.DataFrame([{
-                    'id': comment.id,
-                    'author': comment.author.name,
-                    'created_utc': comment.created_utc,
-                    'body': comment.body,
-                    'permalink': comment.permalink,
-                    'target_username': target_username,
-                    'target_permalink': target_permalink,
-                    # status
-                    'done_scraping': 0,
-                    'done_training': 0,
-                    'done_responding': 0,
-                }])
-                new_request_df.to_sql(
-                    name=table_name,
-                    con=conn,
-                    schema=None,
-                    if_exists='append',
-                    index=False,
-                    index_label='id',
+            if target_username is not None:
+                # get parent_permalink
+                parent_comment, submission = get_context(comment, reddit)
+                if parent_comment is not None:
+                    target_permalink = parent_comment.permalink
+                else:
+                    target_permalink = submission.permalink
+                print(
+                    f'comment.id:{comment.id}\n'
+                    f'comment.author.name:{comment.author.name}\n'
+                    f'comment.created_utc:{comment.created_utc}\n'
+                    f'comment.body:{comment.body}\n'
+                    f'comment.permalink:{comment.permalink}\n'
+                    f'target_username:{target_username}\n'
+                    f'target_permalink:{target_permalink}'
                 )
+                with sqlite3.connect(db_name) as conn:
+                    conn.execute(f'''
+                    DELETE FROM {table_name} WHERE id = '{comment.id}'
+                    ''')
+                    conn.commit()
+                    new_request_df = pd.DataFrame([{
+                        'id': comment.id,
+                        'author': comment.author.name,
+                        'created_utc': comment.created_utc,
+                        'body': comment.body,
+                        'permalink': comment.permalink,
+                        'target_username': target_username,
+                        'target_permalink': target_permalink,
+                        # status
+                        'done_scraping': 0,
+                        'done_training': 0,
+                        'done_responding': 0,
+                    }])
+                    new_request_df.to_sql(
+                        name=table_name,
+                        con=conn,
+                        schema=None,
+                        if_exists='append',
+                        index=False,
+                        index_label='id',
+                    )
