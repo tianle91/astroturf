@@ -1,68 +1,85 @@
 import json
 import os
-from typing import List
+import sqlite3
+from time import sleep
 
+import luigi
+import pandas as pd
 import praw
-from google.cloud import storage
+from luigi import LocalTarget, Parameter, Task
+from praw.reddit import Comment
 
-from astroturf.prawtools import make_package_training
-
-client = storage.Client()
-config_bucket = client.bucket('astroturf-dev-configs')
-path_config = json.loads(config_bucket.blob(
-    'pathConfig.json').download_as_string())
-data_bucket = client.bucket(path_config['data_bucket'])
+from astroturf.prawtools import get_reddit, make_package_training
 
 
-def refresh_user_comments_cloud(user_name: str, reddit: praw.Reddit, limit: int = 1000) -> List[str]:
-    """Update cloud comments and return list of new comment ids.
-    """
-    print(reddit.auth.limits)
-    exist_blob_paths = [
-        blob.name
-        for blob in client.list_blobs(data_bucket, prefix=user_name)
-    ]
-    i = 0
-    comment_ids = []
-    for comment in reddit.redditor(user_name).comments.new(limit=limit):
-        blob_path = os.path.join(user_name, '{}.json'.format(comment.id))
-        if not blob_path in exist_blob_paths:
-            status_str = '[{i}/{limit}] id: {id}, body: {body}'.format(
-                i=i, limit=limit, id=comment.id, body=comment.body.replace(
-                    '\n', ' ').replace('\t', ' ')[:50]
+class DumpCommentContext(Task):
+    comment: Comment = Parameter()
+    user_name = Parameter()
+    prefix = Parameter()
+    reddit = Parameter()
+
+    def output(self):
+        return LocalTarget(os.path.join(
+            self.prefix,
+            self.user_name,
+            f'{self.comment.id}.json',
+        ))
+
+    def run(self):
+        f = self.output().open('w')
+        f.write(json.dumps(make_package_training(self.comment, reddit)))
+        f.close()
+
+
+def dump_user_comments(
+    user_name: str,
+    prefix: str,
+    reddit: praw.Reddit,
+    limit: int = 100,
+):
+    luigi.build(
+        [
+            DumpCommentContext(
+                comment=comment,
+                user_name=user_name,
+                prefix=prefix,
+                reddit=reddit
             )
-            print(status_str)
-            package = make_package_training(comment, reddit)
-            blob = data_bucket.blob(blob_path)
-            blob.upload_from_string(json.dumps(package, indent=4))
-            comment_ids.append(comment.id)
-        i += 1
-    return comment_ids
+            for comment in reddit.redditor(user_name).comments.new(limit=limit)
+        ],
+        workers=1,
+        local_scheduler=True
+    )
 
 
 if __name__ == '__main__':
 
-    import argparse
+    reddit = get_reddit()
+    db_name = 'requests.db'
+    table_name = 'comments'
+    prefix = 'data/comment'
 
-    from praw_utils import get_reddit
+    sleep(3)
 
-    parser = argparse.ArgumentParser(
-        description='search comments by new for user.')
-    parser.add_argument('--users', type=str, nargs='*')
-    parser.add_argument('--limit', type=int, default=100)
-    args = parser.parse_args()
+    os.makedirs(prefix, exist_ok=True)
 
-    limit = args.limit
-    reddit = get_reddit(client, 'astroturf-dev-configs')
-
-    # list of users
-    if args.users is None:
-        with open('users.txt') as f:
-            users = f.read().split()
-    else:
-        users = list(args.users)
-
-    for user_name in users:
-        print('user_name: {} running...'.format(user_name))
-        status = refresh_user_comments_cloud(
-            user_name, reddit, limit=args.limit)
+    while True:
+        with sqlite3.connect(db_name) as conn:
+            todo = pd.read_sql(f'''
+            SELECT DISTINCT target_username
+            FROM {table_name}
+            WHERE done_scraping <= 0
+            ''', conn)
+        if len(todo) > 0:
+            for user_name in todo['target_username']:
+                dump_user_comments(
+                    user_name=user_name, prefix=prefix, reddit=reddit)
+                with sqlite3.connect(db_name) as conn:
+                    conn.execute(f'''
+                    UPDATE {table_name}
+                    SET done_scraping = 1
+                    WHERE target_username = '{user_name}'
+                    ''')
+                    conn.commit()
+        else:
+            sleep(1)
