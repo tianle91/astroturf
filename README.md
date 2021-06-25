@@ -17,6 +17,6 @@ Ok so mostly this is how it works.
 <img src="./Architecture.svg" width="500">
 
 ## Ops
-1. You'll need a `praw.ini`.
+1. You'll need a `praw.ini`. Get one [here] (https://www.reddit.com/prefs/apps).
 2. Build the image. `docker build -t astroturf .`
 3. Deploy. `docker-compose up`
