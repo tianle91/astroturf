@@ -8,7 +8,6 @@ if __name__ == '__main__':
     table_name = 'comments'
 
     while True:
-        sleep(1)
         with sqlite3.connect(requests_db) as conn:
             df = pd.read_sql(f'''
             SELECT
@@ -26,5 +25,9 @@ if __name__ == '__main__':
             ORDER BY created_utc DESC
             LIMIT 10
             ''', conn)
-            for i, row in df.iterrows():
-                print(' '.join([f'{c}: {row[c]}' for c in df.columns]))
+            if len(df) > 0:
+                for i, row in df.iterrows():
+                    print(' '.join([f'{c}: {row[c]}' for c in df.columns]))
+            else:
+                print('No undone')
+        sleep(5)
