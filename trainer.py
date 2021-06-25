@@ -4,7 +4,7 @@ from time import sleep
 
 import pandas as pd
 
-from astroturf.finetune import dump_finetuned
+from astroturf.finetune import NoInputError, dump_finetuned
 
 if __name__ == '__main__':
 
@@ -27,13 +27,16 @@ if __name__ == '__main__':
             for user_name in todo['target_username']:
                 local_data_path_user = os.path.join(data_prefix, user_name)
                 local_model_path_user = os.path.join(model_prefix, user_name)
-                dump_finetuned(
-                    local_data_path_user,
-                    local_model_path_user,
-                    block_size=16,
-                    max_steps=10,
-                    learning_rate=1e-4,
-                )
+                try:
+                    dump_finetuned(
+                        local_data_path_user,
+                        local_model_path_user,
+                        block_size=16,
+                        max_steps=10,
+                        learning_rate=1e-4,
+                    )
+                except NoInputError as e:
+                    print(e)
                 with sqlite3.connect(db_name) as conn:
                     conn.execute(f'''
                     UPDATE {table_name}
