@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM pytorch/pytorch:1.6.0-cuda10.1-cudnn7-runtime
 
 COPY ./requirements.txt ./
 RUN pip install -r requirements.txt
