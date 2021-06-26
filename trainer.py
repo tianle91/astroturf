@@ -31,8 +31,8 @@ if __name__ == '__main__':
                     dump_finetuned(
                         local_data_path_user,
                         local_model_path_user,
-                        block_size=16,
-                        max_steps=10,
+                        block_size=256,
+                        max_steps=500,
                         learning_rate=1e-4,
                     )
                 except NoInputError as e:
