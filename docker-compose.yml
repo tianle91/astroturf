@@ -6,12 +6,18 @@ services:
     volumes:
       - .:/workdir
     entrypoint: python -u listener.py
+    deploy:
+      restart_policy:
+        condition: on-failure
 
   scraper:
     image: astroturf
     volumes:
       - .:/workdir
     entrypoint: python -u scraper.py
+    deploy:
+      restart_policy:
+        condition: on-failure
 
   trainer:
     image: astroturf
@@ -19,6 +25,8 @@ services:
       - .:/workdir
     entrypoint: python -u trainer.py
     deploy:
+      restart_policy:
+        condition: on-failure
       resources:
         reservations:
           devices:
@@ -29,3 +37,6 @@ services:
     volumes:
       - .:/workdir
     entrypoint: python -u responder.py
+    deploy:
+      restart_policy:
+        condition: on-failure
