@@ -94,7 +94,7 @@ def dump_finetuned(input_jsons_path: str, output_dump_path: str,
     print(f'inputpath: {input_jsons_path} --> outputpath: {output_dump_path}')
 
     fnames = glob(os.path.join(input_jsons_path, '*.json'))
-    if len(fnames) > 0:
+    if len(fnames) == 0:
         raise NoInputError(
             f'Check input_jsons_path: {input_jsons_path} has jsons!')
 
