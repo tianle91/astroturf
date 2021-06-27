@@ -7,6 +7,8 @@ if __name__ == '__main__':
     requests_db = 'requests.db'
     table_name = 'comments'
 
+    sleep(3)  # listener initializes db
+
     while True:
         with sqlite3.connect(requests_db) as conn:
             df = pd.read_sql(f'''

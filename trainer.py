@@ -13,7 +13,8 @@ if __name__ == '__main__':
     data_prefix = 'data/comment'
     model_prefix = 'model/user'
 
-    sleep(3)
+    sleep(3)  # listener initializes db
+    print('Waiting to train...')
 
     while True:
         with sqlite3.connect(db_name) as conn:

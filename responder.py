@@ -58,7 +58,9 @@ if __name__ == '__main__':
     table_name = 'comments'
     model_prefix = 'model/user'
 
-    sleep(3)
+    sleep(3)  # listener initializes db
+
+    print('Waiting to respond...')
 
     while True:
         with sqlite3.connect(db_name) as conn:

@@ -59,8 +59,9 @@ if __name__ == '__main__':
     table_name = 'comments'
     prefix = 'data/comment'
 
-    sleep(3)
+    sleep(3)  # listener initializes db
 
+    print('Waiting to scrape...')
     os.makedirs(prefix, exist_ok=True)
 
     while True:
@@ -72,7 +73,7 @@ if __name__ == '__main__':
             ''', conn)
         if len(todo) > 0:
             for user_name in todo['target_username']:
-                print (f'Scraping {user_name}')
+                print(f'Scraping {user_name}')
                 dump_user_comments(
                     user_name=user_name, prefix=prefix, reddit=reddit)
                 with sqlite3.connect(db_name) as conn:

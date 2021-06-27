@@ -60,6 +60,7 @@ if __name__ == '__main__':
     db_name = 'requests.db'
     table_name = 'comments'
 
+    print('Listening...')
     initialize_table(db_name=db_name, table_name=table_name)
 
     for comment in reddit.subreddit(subreddit).stream.comments(skip_existing=True):
