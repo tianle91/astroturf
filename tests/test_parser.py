@@ -1,4 +1,4 @@
-from astroturf.parser import parse_comment_body
+from astroturf.parser import find_username
 import pytest
 
 
@@ -15,19 +15,9 @@ import pytest
         pytest.param('what would u/user_name say?', 'user_name'),
     ]
 )
-def test_parse_comment_body_relevant(s, expected_username):
-    res = parse_comment_body(s)
-    assert res[0]
-    actual_username = res[1]
-    assert expected_username == actual_username, actual_username
-
-
-@pytest.mark.parametrize(
-    ('s'),
-    [
-        pytest.param('bullshit'),
-        pytest.param('u/username?'),
-    ]
-)
-def test_parse_comment_body_not_relevant(s):
-    assert not parse_comment_body(s)[0]
+def test_find_username(s, expected_username):
+    res = find_username(s)
+    if expected_username is not None:
+        assert expected_username == res, res
+    else:
+        assert expected_username is None

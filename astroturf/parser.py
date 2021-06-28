@@ -1,14 +1,26 @@
-import re
-from typing import Optional, Tuple
+from typing import Optional
 
 
-def parse_comment_body(s: str) -> Tuple[bool, Optional[str]]:
-    """Return whether comment is relevant and mentioned username.
+def find_username(s: str) -> Optional[str]:
+    """Return {username} when given string of form * u/{username} *.
     """
     s = s.lower()
-    regex_str_username = r'(.|\s)*u/[a-z0-9_]*\s'
-    regex_str_trigger = regex_str_username + r'(think|say|do)?'
-    if re.match(regex_str_trigger, s):
-        return True, re.search(regex_str_username, s).group(0).split('u/')[1].strip()
+    username = None
+    if 'https://www.reddit.com/u/' in s:
+        # https://www.reddit.com/u/{username}/
+        prefix = 'https://www.reddit.com/u/'
+        username = s[s.find(prefix) + len(prefix):].split('/')[0]
     else:
-        return False, None
+        # <whitespace> u/{username} <whitespace>
+        # <whitespace> /u/{username} <whitespace>
+        found = False
+        for word in s.split():
+            if found:
+                break
+            for prefix in ['u/', '/u/']:
+                if word.startswith(prefix):
+                    username = word.replace(prefix, '')
+                    found = True
+                    break
+    if username is not None:
+        return username.strip()

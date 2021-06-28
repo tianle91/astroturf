@@ -42,8 +42,8 @@ if __name__ == '__main__':
             print('Stream started! Listening...')
             stream_started = True
 
-        is_relevant, target_username = parse_comment_body(comment.body)
-        if not is_relevant or target_username is None:
+        target_username = parse_comment_body(comment.body)
+        if target_username is None:
             continue
         print(
             f'comment.id:{comment.id}\n'
