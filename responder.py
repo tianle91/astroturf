@@ -21,6 +21,8 @@ In response to [this]({url}),
 {response}
 
 ---
+Was I a bad bot? Please reply `ignore` if you'd like to be ignored.
+
 I'm a DistilGPT2 model finetuned with user comments using
 [Huggingface's Transformers](https://github.com/huggingface/transformers).
 Source code at [tianle91/astroturf](https://github.com/tianle91/astroturf).
@@ -90,60 +92,62 @@ if __name__ == '__main__':
                 print(e)
                 print(f'No model found at: {local_model_path_user}')
 
+            if txtgenpipeline is None:
+                continue
+
             for i, row in subdf.iterrows():
                 author = row['author']
                 permalink = row['permalink']
                 triggering_comment_url = f'https://www.reddit.com{permalink}'
-                done = txtgenpipeline is None
-                if not done:
-                    print(
-                        f"Responding to author: {author}'s comment at "
-                        f'{triggering_comment_url}'
-                    )
 
-                    # if cannot generate response, consider done.
-                    try:
-                        response = simulate_pipeline_response(
-                            txtgenpipeline, permalink=permalink, reddit=reddit)['response']
-                    except Exception as e:
-                        print(e)
-                        print('Unable to generate response')
-                        done = True
+                print(
+                    f"Responding to author: {author}'s comment at "
+                    f'{triggering_comment_url}'
+                )
 
-                    # if cannot reply, consider not done (to retry).
-                    try:
-                        trigger_redditor: Redditor = reddit.redditor(author)
-                        reply_text = format_reply(
-                            username=target_username,
-                            response=response,
-                            permalink=permalink,
-                            triggering_comment_url=triggering_comment_url
-                        )
-                        trigger_redditor.message(
-                            subject=f'Simulated response for u/{target_username}',
-                            message=reply_text
-                        )
-                        print(
-                            f'Messaged {trigger_redditor.name} '
-                            f'with simulated response for u/{target_username}:\n'
-                            f'{response}'
-                        )
-                        done = True
-                    except RedditAPIException as e:
-                        for sube in e.items:
-                            print(
-                                f'RedditAPIException. {sube.error_type}: {sube.message}')
-                        print(
-                            f'Did not message {trigger_redditor.name} due to exceptions')
-                        done = False
-
+                # if cannot generate response, consider done.
+                done = False
+                try:
+                    response = simulate_pipeline_response(
+                        txtgenpipeline, permalink=permalink, reddit=reddit)['response']
+                except Exception as e:
+                    print(e)
+                    print('Unable to generate response')
+                    done = True
                 if done:
-                    with sqlite3.connect(db_name) as conn:
-                        conn.execute(f'''
-                        UPDATE {table_name}
-                        SET done_responding = 1
-                        WHERE author = '{author}'
-                            AND permalink = '{permalink}'
-                            AND target_username = '{target_username}'
-                        ''')
-                        conn.commit()
+                    continue
+
+                # if cannot reply, also consider done.
+                try:
+                    trigger_redditor: Redditor = reddit.redditor(author)
+                    reply_text = format_reply(
+                        username=target_username,
+                        response=response,
+                        permalink=permalink,
+                        triggering_comment_url=triggering_comment_url
+                    )
+                    trigger_redditor.message(
+                        subject=f'Simulated response for u/{target_username}',
+                        message=reply_text
+                    )
+                    print(
+                        f'Messaged {trigger_redditor.name} '
+                        f'with simulated response for u/{target_username}:\n'
+                        f'{response}'
+                    )
+                except RedditAPIException as e:
+                    for sube in e.items:
+                        print(
+                            f'RedditAPIException. {sube.error_type}: {sube.message}')
+                    print(
+                        f'Did not message {trigger_redditor.name} due to exceptions')
+
+                with sqlite3.connect(db_name) as conn:
+                    conn.execute(f'''
+                    UPDATE {table_name}
+                    SET done_responding = 1
+                    WHERE author = '{author}'
+                        AND permalink = '{permalink}'
+                        AND target_username = '{target_username}'
+                    ''')
+                    conn.commit()
