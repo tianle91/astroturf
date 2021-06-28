@@ -55,7 +55,7 @@ if __name__ == '__main__':
                 f'target_username:{target_username}'
             )
             try:
-                reddit.redditor(target_username)
+                reddit.redditor(target_username).id
             except RedditAPIException as e:
                 for sube in e.items:
                     print(
