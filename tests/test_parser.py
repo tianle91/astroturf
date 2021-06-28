@@ -1,5 +1,6 @@
-from astroturf.parser import find_username
 import pytest
+
+from astroturf.parser import find_username
 
 
 @pytest.mark.parametrize(
@@ -13,6 +14,8 @@ import pytest
         pytest.param('u/username say?', 'username'),
         pytest.param('what would u/username say?', 'username'),
         pytest.param('what would u/user_name say?', 'user_name'),
+        pytest.param('https://www.reddit.com/u/username/', 'username'),
+        pytest.param('(https://www.reddit.com/u/username/)', 'username'),
     ]
 )
 def test_find_username(s, expected_username):
