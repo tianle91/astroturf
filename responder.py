@@ -78,15 +78,17 @@ if __name__ == '__main__':
             sleep(1)
             continue
         for target_username, subdf in todo.groupby(by='target_username'):
+
+            print(f'Loading model for {target_username}')
             local_model_path_user = os.path.join(
                 model_prefix, target_username, 'model')
-            print(f'Loading model from {local_model_path_user}')
-            if os.path.isdir(local_model_path_user):
+            txtgenpipeline = None
+            try:
                 txtgenpipeline = get_text_generation_pipeline(
                     local_model_path_user)
-            else:
+            except Exception as e:
+                print(e)
                 print(f'No model found at: {local_model_path_user}')
-                txtgenpipeline = None
 
             for i, row in subdf.iterrows():
                 author = row['author']
