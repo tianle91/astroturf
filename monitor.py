@@ -28,8 +28,8 @@ if __name__ == '__main__':
             LIMIT 10
             ''', conn)
             if len(df) > 0:
+                print('\n')
                 for i, row in df.iterrows():
-                    print('\n')
                     print(' '.join([f'{c}: {row[c]}' for c in df.columns]))
             else:
                 print('No undone')
