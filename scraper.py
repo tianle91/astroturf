@@ -44,7 +44,7 @@ def dump_user_comments(
             )
             for comment in reddit.redditor(user_name).comments.new(limit=limit)
         ],
-        workers=5,
+        workers=4,
         local_scheduler=True
     )
 
