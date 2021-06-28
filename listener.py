@@ -45,9 +45,7 @@ if __name__ == '__main__':
 
         # some validation of parsed result
         target_username = find_username(comment.body)
-        if target_username is None:
-            continue
-        else:
+        if target_username is not None:
             print(
                 f'comment.id:{comment.id}\n'
                 f'comment.author.name:{comment.author.name}\n'
@@ -63,8 +61,10 @@ if __name__ == '__main__':
                     print(
                         f'RedditAPIException. {sube.error_type}: {sube.message}')
                 print(
-                    f'Not triggered for {target_username} due to exceptions.')
-                continue
+                    f'Will not trigger for {target_username} due to exceptions.')
+                target_username = None
+        if target_username is None:
+            continue
 
         with sqlite3.connect(db_name) as conn:
             conn.execute(f'''
