@@ -28,9 +28,9 @@ if __name__ == '__main__':
             LIMIT 10
             ''', conn)
             if len(df) > 0:
-                print('\n')
                 for i, row in df.iterrows():
                     print(' '.join([f'{c}: {row[c]}' for c in df.columns]))
+                print(f'\nPending requests:{len(df)}\n')
             else:
                 print('No undone')
         sleep(5)
