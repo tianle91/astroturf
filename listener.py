@@ -56,10 +56,8 @@ if __name__ == '__main__':
             )
             try:
                 reddit.redditor(target_username).id
-            except RedditAPIException as e:
-                for sube in e.items:
-                    print(
-                        f'RedditAPIException. {sube.error_type}: {sube.message}')
+            except Exception as e:
+                print(e)
                 print(
                     f'Will not trigger for {target_username} due to exceptions.')
                 target_username = None
