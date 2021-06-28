@@ -7,11 +7,14 @@ if __name__ == '__main__':
     requests_db = 'requests.db'
     table_name = 'comments'
 
+    ignore_db_name = 'ignore.db'
+    ignore_table_name = 'users'
+
     sleep(3)  # listener initializes db
 
     while True:
         with sqlite3.connect(requests_db) as conn:
-            df = pd.read_sql(f'''
+            undone_df = pd.read_sql(f'''
             SELECT
                 id,
                 author,
@@ -27,10 +30,18 @@ if __name__ == '__main__':
             ORDER BY created_utc DESC
             LIMIT 10
             ''', conn)
-            if len(df) > 0:
-                for i, row in df.iterrows():
-                    print(' '.join([f'{c}: {row[c]}' for c in df.columns]))
-                print(f'Pending requests: {len(df)}\n')
-            else:
-                print('No undone')
+        with sqlite3.connect(ignore_db_name) as conn:
+            ignore_count_df = pd.read_sql(f'''
+            SELECT COUNT(*) AS count
+            FROM {ignore_table_name}
+            ''', conn)
+            ignore_count = ignore_count_df['count'].iloc[0]
+
+        if len(undone_df) > 0:
+            for i, row in undone_df.iterrows():
+                print(' '.join([f'{c}: {row[c]}' for c in undone_df.columns]))
+        print(
+            f'Pending requests: {len(undone_df)}, '
+            f'ignore_count: {ignore_count}\n'
+        )
         sleep(5)
