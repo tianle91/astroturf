@@ -30,7 +30,7 @@ if __name__ == '__main__':
             if len(df) > 0:
                 for i, row in df.iterrows():
                     print(' '.join([f'{c}: {row[c]}' for c in df.columns]))
-                print(f'\nPending requests:{len(df)}\n')
+                print(f'>>> Pending requests:{len(df)} <<<\n')
             else:
                 print('No undone')
         sleep(5)
