@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
             if len(in_ignore) > 0:
                 item.author.message(
-                    subject=f'Re: {item.subject}',
+                    subject=item.subject,
                     message='Already in ignored list.'
                 )
                 print(
@@ -55,8 +55,8 @@ if __name__ == '__main__':
                         index_label='id',
                     )
                 item.author.message(
-                    subject=f'Re: {item.subject}',
+                    subject=item.subject,
                     message='Added to ignored list.'
                 )
-                print(f'Replied to {item.author.name}: Added to list.')
+                print(f'Replied to {item.author.name}: Added to ignored list.')
             item.mark_read()
