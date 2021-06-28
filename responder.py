@@ -21,7 +21,7 @@ In response to [this]({url}),
 {response}
 
 ---
-I'm a DistilGPT2 model finetuned with user comments using 
+I'm a DistilGPT2 model finetuned with user comments using
 [Huggingface's Transformers](https://github.com/huggingface/transformers).
 Source code at [tianle91/astroturf](https://github.com/tianle91/astroturf).
 """
@@ -70,7 +70,7 @@ if __name__ == '__main__':
                 permalink,
                 target_username,
                 target_permalink
-            FROM {table_name} 
+            FROM {table_name}
             WHERE done_scraping > 0
                 AND done_training > 0
                 AND done_responding <= 0
@@ -99,8 +99,7 @@ if __name__ == '__main__':
                                 username=target_username,
                                 response=inferresponse['response'],
                                 permalink=target_permalink,
-                                triggering_comment_url='https://www.reddit.com' +
-                                subdf['permalink']
+                                triggering_comment_url='https://www.reddit.com' + subdf['permalink']
                             )
                             trigger_redditor.message(
                                 subject=f'Simulated response for u/{target_username}',

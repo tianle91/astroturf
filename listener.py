@@ -5,8 +5,29 @@ from typing import Optional
 import pandas as pd
 from praw.reddit import Comment
 
-from astroturf.dbtools import initialize_table
 from astroturf.prawtools import get_context, get_reddit
+
+
+def initialize_table(db_name, table_name):
+    with sqlite3.connect(db_name) as conn:
+        try:
+            conn.execute(f'''
+            CREATE TABLE {table_name} (
+                id TEXT,
+                author TEXT,
+                created_utc REAL,
+                body TEXT,
+                permalink TEXT,
+                target_username TEXT,
+                target_permalink TEXT,
+                done_scraping INTEGER,
+                done_training INTEGER,
+                done_responding INTEGER
+            );
+            ''')
+        except Exception:
+            pass
+
 
 trigger_prefixes = ['what would',
                     'what will',
@@ -36,7 +57,7 @@ def get_username_from_comment_body(s: str) -> Optional[str]:
     if 'https://www.reddit.com/u/' in s:
         # https://www.reddit.com/u/{username}/
         prefix = 'https://www.reddit.com/u/'
-        username = s[s.find(prefix)+len(prefix):].split('/')[0]
+        username = s[s.find(prefix) + len(prefix):].split('/')[0]
     else:
         # <whitespace> u/{username} <whitespace>
         # <whitespace> /u/{username} <whitespace>
