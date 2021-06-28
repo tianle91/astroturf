@@ -34,13 +34,13 @@ if __name__ == '__main__':
                 ''', conn)
 
             if len(in_ignore) > 0:
-                print(f'Already in ignored list.')
                 item.author.message(
                     subject=f'Re: {item.subject}',
                     message='Already in ignored list.'
                 )
+                print(
+                    f'Replied to {item.author.name}: Already in ignored list.')
             else:
-                print(f'Added to list.')
                 with sqlite3.connect(ignore_db_name) as conn:
                     new_ignore_df = pd.DataFrame([{
                         'id': item.author.id,
@@ -58,4 +58,5 @@ if __name__ == '__main__':
                     subject=f'Re: {item.subject}',
                     message='Added to ignored list.'
                 )
+                print(f'Replied to {item.author.name}: Added to list.')
             item.mark_read()
