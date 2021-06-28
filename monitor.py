@@ -29,6 +29,7 @@ if __name__ == '__main__':
             ''', conn)
             if len(df) > 0:
                 for i, row in df.iterrows():
+                    print('\n')
                     print(' '.join([f'{c}: {row[c]}' for c in df.columns]))
             else:
                 print('No undone')
