@@ -94,13 +94,12 @@ if __name__ == '__main__':
                 author = row['author']
                 permalink = row['permalink']
                 triggering_comment_url = f'https://www.reddit.com{permalink}'
-                print(
-                    f"Responding to author: {author}'s comment at "
-                    f'{triggering_comment_url}'
-                )
-
                 done = txtgenpipeline is None
                 if not done:
+                    print(
+                        f"Responding to author: {author}'s comment at "
+                        f'{triggering_comment_url}'
+                    )
                     trigger_redditor: Redditor = reddit.redditor(author)
                     try:
                         response = simulate_pipeline_response(
