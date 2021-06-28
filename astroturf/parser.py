@@ -3,7 +3,7 @@ from typing import Optional, Tuple
 
 
 def parse_comment_body(s: str) -> Tuple[bool, Optional[str]]:
-    """Return whether comment is relevent and mentioned username.
+    """Return whether comment is relevant and mentioned username.
     """
     s = s.lower()
     regex_str_username = r'(.|\s)*u/[a-z0-9_]*\s'
