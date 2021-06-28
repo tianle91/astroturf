@@ -34,10 +34,14 @@ if __name__ == '__main__':
     db_name = 'requests.db'
     table_name = 'comments'
 
-    print('Listening...')
     initialize_table(db_name=db_name, table_name=table_name)
+    stream_started = False
 
     for comment in reddit.subreddit(subreddit).stream.comments(skip_existing=True):
+        if not stream_started:
+            print('Stream started! Listening...')
+            stream_started = True
+
         is_relevant, target_username = parse_comment_body(comment.body)
         if not is_relevant or target_username is None:
             continue
