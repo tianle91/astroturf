@@ -33,7 +33,8 @@ def initialize_ignore_db(db_name, table_name):
             conn.execute(f'''
             CREATE TABLE {table_name} (
                 id TEXT,
-                name TEXT
+                name TEXT,
+                created_utc REAL
             );
             ''')
         except Exception:

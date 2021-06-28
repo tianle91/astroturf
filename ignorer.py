@@ -45,6 +45,7 @@ if __name__ == '__main__':
                     new_ignore_df = pd.DataFrame([{
                         'id': item.author.id,
                         'name': item.author.name,
+                        'created_utc': item.created_utc,
                     }])
                     new_ignore_df.to_sql(
                         name=ignore_table_name,
