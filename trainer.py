@@ -19,8 +19,8 @@ if __name__ == '__main__':
     while True:
         with sqlite3.connect(db_name) as conn:
             todo = pd.read_sql(f'''
-            SELECT DISTINCT target_username 
-            FROM {table_name} 
+            SELECT DISTINCT target_username
+            FROM {table_name}
             WHERE done_scraping > 0
                 AND done_training <= 0
             ''', conn)
