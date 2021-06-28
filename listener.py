@@ -2,7 +2,6 @@ import os
 import sqlite3
 
 import pandas as pd
-from praw.objector import RedditAPIException
 
 from astroturf.parser import find_username
 from astroturf.prawtools import get_reddit
