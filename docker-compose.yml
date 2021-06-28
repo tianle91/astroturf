@@ -40,3 +40,12 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
+
+  ignorer:
+    image: astroturf
+    volumes:
+      - .:/workdir
+    entrypoint: python -u ignorer.py
+    deploy:
+      restart_policy:
+        condition: on-failure
