@@ -45,17 +45,17 @@ if __name__ == '__main__':
 
         # some validation of parsed result
         target_username = find_username(comment.body)
-        print(
-            f'comment.id:{comment.id}\n'
-            f'comment.author.name:{comment.author.name}\n'
-            f'comment.created_utc:{comment.created_utc}\n'
-            f'comment.body:{comment.body}\n'
-            f'comment.permalink:{comment.permalink}\n'
-            f'target_username:{target_username}'
-        )
         if target_username is None:
             continue
         else:
+            print(
+                f'comment.id:{comment.id}\n'
+                f'comment.author.name:{comment.author.name}\n'
+                f'comment.created_utc:{comment.created_utc}\n'
+                f'comment.body:{comment.body}\n'
+                f'comment.permalink:{comment.permalink}\n'
+                f'target_username:{target_username}'
+            )
             try:
                 reddit.redditor(target_username)
             except RedditAPIException as e:
