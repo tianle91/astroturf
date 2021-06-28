@@ -16,6 +16,7 @@ from astroturf.parser import find_username
         pytest.param('what would u/user_name say?', 'user_name'),
         pytest.param('https://www.reddit.com/u/username/', 'username'),
         pytest.param('(https://www.reddit.com/u/username/)', 'username'),
+        pytest.param('www.site.edu/page', None)
     ]
 )
 def test_find_username(s, expected_username):

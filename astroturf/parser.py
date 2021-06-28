@@ -2,7 +2,7 @@ import re
 from typing import Optional
 
 
-U_NAME_DETECTOR = re.compile(r'u/[a-z0-9_-]*')
+U_NAME_DETECTOR = re.compile(r'(/u/|^u/|\su/)[a-z0-9_-]*')
 
 
 def find_username(s: str) -> Optional[str]:
