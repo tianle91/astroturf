@@ -92,33 +92,17 @@ if __name__ == '__main__':
                 print(e)
                 print(f'No model found at: {local_model_path_user}')
 
-            if txtgenpipeline is None:
-                continue
-
             for i, row in subdf.iterrows():
                 author = row['author']
                 permalink = row['permalink']
                 triggering_comment_url = f'https://www.reddit.com{permalink}'
-
-                print(
-                    f"Responding to author: {author}'s comment at "
-                    f'{triggering_comment_url}'
-                )
-
-                # if cannot generate response, consider done.
-                done = False
                 try:
+                    print(
+                        f"Responding to author: {author}'s comment at "
+                        f'{triggering_comment_url}'
+                    )
                     response = simulate_pipeline_response(
                         txtgenpipeline, permalink=permalink, reddit=reddit)['response']
-                except Exception as e:
-                    print(e)
-                    print('Unable to generate response')
-                    done = True
-                if done:
-                    continue
-
-                # if cannot reply, also consider done.
-                try:
                     trigger_redditor: Redditor = reddit.redditor(author)
                     reply_text = format_reply(
                         username=target_username,
@@ -135,12 +119,9 @@ if __name__ == '__main__':
                         f'with simulated response for u/{target_username}:\n'
                         f'{response}'
                     )
-                except RedditAPIException as e:
-                    for sube in e.items:
-                        print(
-                            f'RedditAPIException. {sube.error_type}: {sube.message}')
-                    print(
-                        f'Did not message {trigger_redditor.name} due to exceptions')
+                except Exception as e:
+                    print(e)
+                    print('Failed! Still marking as done.')
 
                 with sqlite3.connect(db_name) as conn:
                     conn.execute(f'''
