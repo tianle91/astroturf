@@ -68,62 +68,71 @@ if __name__ == '__main__':
             SELECT DISTINCT
                 author,
                 permalink,
-                target_username,
-                target_permalink
+                target_username
             FROM {table_name}
             WHERE done_scraping > 0
                 AND done_training > 0
                 AND done_responding <= 0
             ''', conn)
-        if len(todo) > 0:
-            for target_username, subdf in todo.groupby(by='target_username'):
-                local_model_path_user = os.path.join(
-                    model_prefix, target_username, 'model')
-                if os.path.isdir(local_model_path_user):
-                    txtgenpipeline = get_text_generation_pipeline(
-                        local_model_path_user)
-                else:
-                    print(f'No model found at: {local_model_path_user}')
-                    txtgenpipeline = None
-
-                for i, row in subdf.iterrows():
-                    target_permalink = row['target_permalink']
-                    trigger_redditor: Redditor = reddit.redditor(row['author'])
-                    done = txtgenpipeline is None
-
-                    if not done:
-                        try:
-                            inferresponse = simulate_pipeline_response(
-                                txtgenpipeline, permalink=target_permalink, reddit=reddit)
-                            reply_text = format_reply(
-                                username=target_username,
-                                response=inferresponse['response'],
-                                permalink=target_permalink,
-                                triggering_comment_url='https://www.reddit.com' + subdf['permalink']
-                            )
-                            trigger_redditor.message(
-                                subject=f'Simulated response for u/{target_username}',
-                                message=reply_text
-                            )
-                            print(f'Messaged {trigger_redditor.name}')
-                            done = True
-                        except RedditAPIException as e:
-                            for sube in e.items:
-                                print(
-                                    f'RedditAPIException. {sube.error_type}: {sube.message}')
-                            print(
-                                f'Did not message {trigger_redditor.name} due to exceptions')
-
-                    if done:
-                        with sqlite3.connect(db_name) as conn:
-                            conn.execute(f'''
-                            UPDATE {table_name}
-                            SET done_responding = 1
-                            WHERE author = '{row["author"]}'
-                                AND permalink = '{row["permalink"]}'
-                                AND target_username = '{target_username}'
-                                AND target_permalink = '{target_permalink}'
-                            ''')
-                            conn.commit()
-        else:
+        if len(todo) == 0:
             sleep(1)
+            continue
+        for target_username, subdf in todo.groupby(by='target_username'):
+            local_model_path_user = os.path.join(
+                model_prefix, target_username, 'model')
+            print('Loading model from {local_model_path_user}')
+            if os.path.isdir(local_model_path_user):
+                txtgenpipeline = get_text_generation_pipeline(
+                    local_model_path_user)
+            else:
+                print(f'No model found at: {local_model_path_user}')
+                txtgenpipeline = None
+
+            for i, row in subdf.iterrows():
+                author = row['author']
+                permalink = row['permalink']
+                triggering_comment_url = f'https://www.reddit.com{permalink}'
+                print(
+                    f"Responding to author: {author}'s comment at "
+                    f'{triggering_comment_url}'
+                )
+
+                done = txtgenpipeline is None
+                if not done:
+                    trigger_redditor: Redditor = reddit.redditor(author)
+                    try:
+                        response = simulate_pipeline_response(
+                            txtgenpipeline, permalink=permalink, reddit=reddit)['response']
+                        reply_text = format_reply(
+                            username=target_username,
+                            response=response,
+                            permalink=permalink,
+                            triggering_comment_url=triggering_comment_url
+                        )
+                        trigger_redditor.message(
+                            subject=f'Simulated response for u/{target_username}',
+                            message=reply_text
+                        )
+                        print(
+                            f'Messaged {trigger_redditor.name} '
+                            f'with simulated response for u/{target_username}:\n'
+                            f'{response}'
+                        )
+                        done = True
+                    except RedditAPIException as e:
+                        for sube in e.items:
+                            print(
+                                f'RedditAPIException. {sube.error_type}: {sube.message}')
+                        print(
+                            f'Did not message {trigger_redditor.name} due to exceptions')
+
+                if done:
+                    with sqlite3.connect(db_name) as conn:
+                        conn.execute(f'''
+                        UPDATE {table_name}
+                        SET done_responding = 1
+                        WHERE author = '{author}'
+                            AND permalink = '{permalink}'
+                            AND target_username = '{target_username}'
+                        ''')
+                        conn.commit()
