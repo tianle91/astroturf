@@ -21,6 +21,8 @@ In response to [this]({url}),
 {response}
 
 ---
+Was I a bad bot? Please reply `ignore` if you'd like to be ignored.
+
 I'm a DistilGPT2 model finetuned with user comments using
 [Huggingface's Transformers](https://github.com/huggingface/transformers).
 Source code at [tianle91/astroturf](https://github.com/tianle91/astroturf).
