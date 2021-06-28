@@ -3,7 +3,7 @@ import sqlite3
 
 import pandas as pd
 
-from astroturf.parser import parse_comment_body
+from astroturf.parser import find_username
 from astroturf.prawtools import get_reddit
 
 
@@ -42,7 +42,7 @@ if __name__ == '__main__':
             print('Stream started! Listening...')
             stream_started = True
 
-        target_username = parse_comment_body(comment.body)
+        target_username = find_username(comment.body)
         if target_username is None:
             continue
         print(
