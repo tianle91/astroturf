@@ -6,17 +6,20 @@ Are you...
 
 Look no further!
 
-Bot responds to “what would u/xxx say” or something similar. Currently only monitors [r/AskReddit](https://www.reddit.com/r/AskReddit).
+Bot responds to mentions of reddit users in comments.
+Currently only monitors [r/AskReddit](https://www.reddit.com/r/AskReddit).
 
-<img src="./bot_screenshot.png" width="300">
+<img src="./bot_screenshot.png" width="1000">
 
 
 # Architecture
-Ok so mostly this is how it works.
+Works locally like so:
 
-<img src="./Architecture.svg" width="500">
+<img src="./Architecture.svg" width="400">
 
 ## Ops
-1. You'll need a `praw.ini`. Get one [here](https://www.reddit.com/prefs/apps).
+1. You'll need a `praw.ini`. 
+   - Get one [here](https://www.reddit.com/prefs/apps). 
+   - By default it looks for `praw.ini` and finds credentials under `[astroturf_bot]`.
 2. Build the image. `docker build -t astroturf .`
 3. Deploy. `docker-compose up`
