@@ -100,10 +100,19 @@ if __name__ == '__main__':
                         f"Responding to author: {author}'s comment at "
                         f'{triggering_comment_url}'
                     )
-                    trigger_redditor: Redditor = reddit.redditor(author)
+
+                    # if cannot generate response, consider done.
                     try:
                         response = simulate_pipeline_response(
                             txtgenpipeline, permalink=permalink, reddit=reddit)['response']
+                    except Exception as e:
+                        print(e)
+                        print('Unable to generate response')
+                        done = True
+
+                    # if cannot reply, consider not done (to retry).
+                    try:
+                        trigger_redditor: Redditor = reddit.redditor(author)
                         reply_text = format_reply(
                             username=target_username,
                             response=response,
@@ -126,6 +135,7 @@ if __name__ == '__main__':
                                 f'RedditAPIException. {sube.error_type}: {sube.message}')
                         print(
                             f'Did not message {trigger_redditor.name} due to exceptions')
+                        done = False
 
                 if done:
                     with sqlite3.connect(db_name) as conn:
