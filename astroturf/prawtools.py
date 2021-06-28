@@ -56,7 +56,7 @@ def make_package_training(comment: Comment, reddit: Reddit):
     parent_comment, submission = get_context(comment, reddit)
     return {
         'comment': format_comment_as_json(comment),
-        'parent_comment': format_comment_as_json(parent_comment) if parent_comment is not None else None,
+        'parent_comment': None if parent_comment is None else format_comment_as_json(parent_comment),
         'submission': format_submission_as_json(submission)
     }
 
