@@ -6,12 +6,13 @@ import pytest
     ('s', 'expected_username'),
     [
         pytest.param('u/username ?', 'username'),
+        pytest.param('u/username1 ?', 'username1'),
+        pytest.param('u/userName ?', 'username'),
+        pytest.param('u/user_name ?', 'user_name'),
         pytest.param(' u/username ?', 'username'),
         pytest.param('u/username say?', 'username'),
         pytest.param('what would u/username say?', 'username'),
         pytest.param('what would u/user_name say?', 'user_name'),
-        pytest.param('u/username1 ?', 'username1'),
-        pytest.param('u/user_name ?', 'user_name'),
     ]
 )
 def test_parse_comment_body_relevant(s, expected_username):
