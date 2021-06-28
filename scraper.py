@@ -5,7 +5,6 @@ from time import sleep
 
 import luigi
 import pandas as pd
-import praw
 from luigi import LocalTarget, Parameter, Task
 from praw.reddit import Comment
 
@@ -16,7 +15,6 @@ class DumpCommentContext(Task):
     comment: Comment = Parameter()
     user_name = Parameter()
     prefix = Parameter()
-    reddit = Parameter()
 
     def output(self):
         return LocalTarget(os.path.join(
@@ -26,6 +24,7 @@ class DumpCommentContext(Task):
         ))
 
     def run(self):
+        reddit = get_reddit()
         f = self.output().open('w')
         f.write(json.dumps(make_package_training(self.comment, reddit)))
         f.close()
@@ -34,7 +33,6 @@ class DumpCommentContext(Task):
 def dump_user_comments(
     user_name: str,
     prefix: str,
-    reddit: praw.Reddit,
     limit: int = 100,
 ):
     luigi.build(
@@ -43,11 +41,10 @@ def dump_user_comments(
                 comment=comment,
                 user_name=user_name,
                 prefix=prefix,
-                reddit=reddit
             )
             for comment in reddit.redditor(user_name).comments.new(limit=limit)
         ],
-        workers=1,
+        workers=4,
         local_scheduler=True
     )
 
@@ -75,7 +72,7 @@ if __name__ == '__main__':
             for user_name in todo['target_username']:
                 print(f'Scraping {user_name}')
                 dump_user_comments(
-                    user_name=user_name, prefix=prefix, reddit=reddit)
+                    user_name=user_name, prefix=prefix)
                 with sqlite3.connect(db_name) as conn:
                     conn.execute(f'''
                     UPDATE {table_name}
