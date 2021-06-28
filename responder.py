@@ -80,7 +80,7 @@ if __name__ == '__main__':
         for target_username, subdf in todo.groupby(by='target_username'):
             local_model_path_user = os.path.join(
                 model_prefix, target_username, 'model')
-            print('Loading model from {local_model_path_user}')
+            print(f'Loading model from {local_model_path_user}')
             if os.path.isdir(local_model_path_user):
                 txtgenpipeline = get_text_generation_pipeline(
                     local_model_path_user)

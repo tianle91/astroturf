@@ -2,6 +2,7 @@ import os
 import sqlite3
 
 import pandas as pd
+from praw.objector import RedditAPIException
 
 from astroturf.parser import find_username
 from astroturf.prawtools import get_reddit
@@ -42,17 +43,28 @@ if __name__ == '__main__':
             print('Stream started! Listening...')
             stream_started = True
 
+        # some validation of parsed result
         target_username = find_username(comment.body)
         if target_username is None:
             continue
-        print(
-            f'comment.id:{comment.id}\n'
-            f'comment.author.name:{comment.author.name}\n'
-            f'comment.created_utc:{comment.created_utc}\n'
-            f'comment.body:{comment.body}\n'
-            f'comment.permalink:{comment.permalink}\n'
-            f'target_username:{target_username}'
-        )
+        else:
+            print(
+                f'comment.id:{comment.id}\n'
+                f'comment.author.name:{comment.author.name}\n'
+                f'comment.created_utc:{comment.created_utc}\n'
+                f'comment.body:{comment.body}\n'
+                f'comment.permalink:{comment.permalink}\n'
+                f'target_username:{target_username}'
+            )
+            try:
+                reddit.redditor(target_username)
+            except RedditAPIException as e:
+                for sube in e.items:
+                    print(
+                        f'RedditAPIException. {sube.error_type}: {sube.message}')
+                print(
+                    f'Not triggered for {target_username} due to exceptions.')
+
         with sqlite3.connect(db_name) as conn:
             conn.execute(f'''
             DELETE FROM {table_name} WHERE id = '{comment.id}'
