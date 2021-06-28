@@ -17,9 +17,19 @@ Works locally like so:
 
 <img src="./Architecture.svg" width="400">
 
-## Ops
-1. You'll need a `praw.ini`. 
-   - Get one [here](https://www.reddit.com/prefs/apps). 
-   - By default it looks for `praw.ini` and finds credentials under `[astroturf_bot]`.
-2. Build the image. `docker build -t astroturf .`
-3. Deploy. `docker-compose up`
+# Deploy
+You'll need a `praw.ini`. 
+By default it looks for `praw.ini` and finds credentials under `[astroturf_bot]`.
+It looks something like the following (get your own keys [here](https://www.reddit.com/prefs/apps)):
+```ini
+[astroturf_bot]
+client_id=???
+client_secret=???
+password=???
+user_agent=???
+username=???
+```
+
+Steps:
+1. Build the image. `docker build -t astroturf .`
+2. Deploy. `docker-compose up`
