@@ -1,7 +1,6 @@
 import re
 from typing import Optional
 
-
 U_NAME_DETECTOR = re.compile(r'(/u/|^u/|\su/)[a-z0-9_-]*')
 
 
