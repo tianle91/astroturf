@@ -72,7 +72,7 @@ if __name__ == '__main__':
             for user_name in todo['target_username']:
                 print(f'Scraping {user_name}')
                 dump_user_comments(
-                    user_name=user_name, prefix=prefix, reddit=reddit)
+                    user_name=user_name, prefix=prefix)
                 with sqlite3.connect(db_name) as conn:
                     conn.execute(f'''
                     UPDATE {table_name}
