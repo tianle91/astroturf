@@ -4,7 +4,6 @@ from time import sleep
 from typing import Dict
 
 import pandas as pd
-from praw.objector import RedditAPIException
 from praw.reddit import Reddit, Redditor
 from transformers import pipeline
 
