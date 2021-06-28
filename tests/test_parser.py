@@ -9,6 +9,7 @@ import pytest
         pytest.param(' u/username ?', 'username'),
         pytest.param('u/username say?', 'username'),
         pytest.param('what would u/username say?', 'username'),
+        pytest.param('what would u/user_name say?', 'user_name'),
         pytest.param('u/username1 ?', 'username1'),
         pytest.param('u/user_name ?', 'user_name'),
     ]
